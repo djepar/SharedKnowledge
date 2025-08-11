@@ -1,24 +1,26 @@
-/* static/css/components/forms.css */
+/* static/css/components/forms.css - Reusable form styles */
+
 .form-group {
-  margin-bottom: var(--spacing-lg);
+  margin-bottom: var(--space-xl);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--space-sm);
   color: var(--gray-600);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: var(--space-lg) var(--space-md);
   border: 2px solid var(--gray-200);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   transition: border-color var(--transition-normal);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .form-group input:focus,
@@ -26,6 +28,7 @@
 .form-group select:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .form-group textarea {
@@ -36,7 +39,7 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
+  gap: var(--space-md);
 }
 
 @media (max-width: 768px) {

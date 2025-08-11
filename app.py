@@ -356,28 +356,40 @@ def dashboard():
     avg_rating = 0
     
     if 'user_id' in session:
+        # Get completed lessons count
         c.execute("SELECT COUNT(*) FROM student_progress WHERE user_id=? AND completed=1", 
                   (session['user_id'],))
         completed_lessons = c.fetchone()[0]
         
+        # Get books read count
         c.execute("SELECT COUNT(*) FROM reading_log WHERE user_id=?", (session['user_id'],))
         books_read = c.fetchone()[0]
         
+        # Get average rating
         c.execute("SELECT AVG(rating) FROM reading_log WHERE user_id=? AND rating IS NOT NULL", 
                   (session['user_id'],))
-        avg_rating = c.fetchone()[0] or 0
+        avg_rating_result = c.fetchone()[0]
+        avg_rating = round(avg_rating_result, 1) if avg_rating_result else 0
     
+    # Get total lessons count
     c.execute("SELECT COUNT(*) FROM lessons")
     total_lessons = c.fetchone()[0]
     
+    # Calculate progress percentage
+    if total_lessons > 0:
+        progress_percentage = round((completed_lessons / total_lessons * 100), 1)
+    else:
+        progress_percentage = 0
+    
     conn.close()
     
+    # Prepare data for template
     data = {
         'completed_lessons': completed_lessons,
         'total_lessons': total_lessons,
         'books_read': books_read,
-        'avg_rating': round(avg_rating, 1) if avg_rating else 0,
-        'progress_percentage': round((completed_lessons / total_lessons * 100), 1) if total_lessons > 0 else 0
+        'avg_rating': avg_rating,
+        'progress_percentage': progress_percentage
     }
     
     return render_template('dashboard.html', **data)

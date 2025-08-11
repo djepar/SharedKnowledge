@@ -1,0 +1,60 @@
+:root {
+  /* Match your template's variable names */
+  --primary-color: #667eea;
+  --primary-dark: #5a67d8;
+  --secondary-color: #764ba2;
+  --success-color: #28a745;
+  --success-dark: #218838;
+  --danger-color: #dc3545;
+  --gray-100: #f8f9fa;
+  --gray-200: #e9ecef;
+  --gray-500: #6c757d;
+  --gray-600: #495057;
+  --white: #ffffff;
+  
+  /* Your existing gradients */
+  --gradient-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-card: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  
+  /* Spacing */
+  --space-sm: 10px;
+  --space-md: 15px;
+  --space-lg: 20px;
+  --space-xl: 30px;
+  --space-2xl: 40px;
+  --space-3xl: 50px;
+  
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 15px;
+  --radius-xl: 20px;
+  --radius-2xl: 25px;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 5px rgba(0,0,0,0.1);
+  --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.3);
+  --shadow-xl: 0 15px 35px rgba(0,0,0,0.1);
+  --shadow-2xl: 0 20px 60px rgba(0,0,0,0.3);
+  
+  /* Typography */
+  --font-size-sm: 0.85em;
+  --font-size-md: 1em;
+  --font-size-lg: 1.1em;
+  --font-size-xl: 1.2em;
+  --font-size-2xl: 1.5em;
+  --font-size-3xl: 1.8em;
+  --font-size-4xl: 2.5em;
+  
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+}
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.8s ease;

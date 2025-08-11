@@ -1,6 +1,7 @@
-/* FILE 3: static/css/components/navigation.css */
+/* static/css/components/navigation.css */
 .nav-bar {
     background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
     padding: var(--space-md) var(--space-xl);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-lg);
@@ -16,16 +17,34 @@
 }
 
 .nav-links a {
-    color: var(--primary);
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: 500;
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
-    transition: all 0.3s;
+    transition: all var(--transition-normal);
 }
 
 .nav-links a:hover,
 .nav-links a.active {
-    background: var(--primary);
+    background: var(--primary-color);
     color: var(--white);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    body {
+        padding: var(--space-md);
+    }
+    
+    .nav-bar {
+        flex-direction: column;
+        gap: var(--space-lg);
+        text-align: center;
+    }
+    
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }

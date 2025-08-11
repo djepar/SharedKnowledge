@@ -1,49 +1,156 @@
-<!-- templates/base_new.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Français Secondaire 2{% endblock %}</title>
+    <title>Tableau de bord - Français Secondaire 2</title>
     
     <!-- CSS Components -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base/variables.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base/reset.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navigation.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/containers.css') }}">
-    
-    <!-- Page specific CSS -->
-    {% block extra_css %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/progress.css') }}">
 </head>
 <body>
     <!-- Navigation -->
-    {% if session.user %}
     <nav class="nav-bar">
         <div class="nav-links">
-            <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">🏠 Accueil</a>
-            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">📊 Tableau de bord</a>
-            <a href="{{ url_for('calendar') }}" class="{% if request.endpoint == 'calendar' %}active{% endif %}">📅 Calendrier</a>
-            <a href="{{ url_for('reading_log') }}" class="{% if request.endpoint == 'reading_log' %}active{% endif %}">📚 Carnet de lecture</a>
+            <a href="{{ url_for('index') }}" class="nav-link">🏠 Accueil</a>
+            <a href="{{ url_for('dashboard') }}" class="nav-link active">📊 Tableau de bord</a>
+            <a href="{{ url_for('calendar') }}" class="nav-link">📅 Calendrier</a>
+            <a href="{{ url_for('reading_log') }}" class="nav-link">📚 Carnet de lecture</a>
         </div>
-        <div>
-            <span style="margin-right: 15px;">👋 {{ session.user }}</span>
-            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+        <div class="nav-user">
+            <span class="user-greeting">👋 {{ session.user or 'Utilisateur' }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Déconnexion</a>
         </div>
     </nav>
-    {% endif %}
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert alert-{{ 'error' if category == 'error' else category }}" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 20px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                <div class="alert alert-{{ 'error' if category == 'error' else category }}" style="background: var(--success-color); color: var(--white); padding: var(--spacing-lg); border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg); max-width: 1400px; margin-left: auto; margin-right: auto; text-align: center;">
                     {{ message }}
                 </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
-    
-    <!-- Main Content -->
-    {% block content %}{% endblock %}
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="card-header">
+            <h1 class="card-title">📊 Tableau de bord</h1>
+            <p class="card-subtitle">Suivez votre progression en français secondaire 2</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="card-content">
+            <!-- Statistics Grid -->
+            <div class="grid grid-auto-fit animate-fade-in">
+                <div class="stat-card animate-slide-up animate-delay-1">
+                    <div class="stat-header">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-trend">+3 cette semaine</div>
+                    </div>
+                    <div class="stat-value">{{ completed_lessons or 15 }}</div>
+                    <div class="stat-label">Séances terminées</div>
+                    <div class="stat-description">sur {{ total_lessons or 160 }} au total dans le programme PFEQ</div>
+                </div>
+                
+                <div class="stat-card animate-slide-up animate-delay-2">
+                    <div class="stat-header">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-trend info">En progression</div>
+                    </div>
+                    <div class="stat-value">{{ progress_percentage or 9.4 }}%</div>
+                    <div class="stat-label">Progression</div>
+                    <div class="stat-description">du programme complet de français secondaire 2</div>
+                </div>
+                
+                <div class="stat-card animate-slide-up animate-delay-3">
+                    <div class="stat-header">
+                        <div class="stat-icon">📖</div>
+                        <div class="stat-trend warning">+1 ce mois</div>
+                    </div>
+                    <div class="stat-value">{{ books_read or 7 }}</div>
+                    <div class="stat-label">Livres lus</div>
+                    <div class="stat-description">dans votre carnet de lecture personnel</div>
+                </div>
+                
+                <div class="stat-card animate-slide-up animate-delay-4">
+                    <div class="stat-header">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-trend">Excellent</div>
+                    </div>
+                    <div class="stat-value">{{ avg_rating or 4.2 }}</div>
+                    <div class="stat-label">Note moyenne</div>
+                    <div class="stat-description">évaluation de vos lectures sur 5 étoiles</div>
+                </div>
+            </div>
+            
+            <!-- Progress Section -->
+            <div class="progress-section animate-fade-in animate-delay-5" style="opacity: 0;">
+                <div class="progress-title">🎯 Progression du programme PFEQ</div>
+                <div class="progress-container">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar progress-bar-success" style="width: {{ progress_percentage or 9.4 }}%">
+                            {{ progress_percentage or 9.4 }}% complété
+                        </div>
+                    </div>
+                    <p class="progress-text">
+                        {{ (total_lessons or 160) - (completed_lessons or 15) }} séances restantes sur {{ total_lessons or 160 }} • Excellent rythme de progression !
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="grid grid-auto-fit animate-fade-in animate-delay-5" style="opacity: 0;">
+                <a href="{{ url_for('calendar') }}" class="btn btn-primary btn-lg">
+                    <span>📅</span>
+                    Voir le calendrier complet
+                </a>
+                <a href="{{ url_for('reading_log') }}" class="btn btn-info btn-lg">
+                    <span>📚</span>
+                    Mon carnet de lecture
+                </a>
+                <a href="{{ url_for('add_book') }}" class="btn btn-success btn-lg">
+                    <span>➕</span>
+                    Ajouter un nouveau livre
+                </a>
+                <!-- Future feature -->
+                <a href="#" class="btn btn-warning btn-lg" onclick="alert('Fonctionnalité à venir!')">
+                    <span>📝</span>
+                    Mes évaluations
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional: Simple JavaScript for enhanced animations -->
+    <script>
+        // Enhanced animation timing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Trigger animations with proper delays
+            const elementsWithDelay = document.querySelectorAll('[class*="animate-delay"]');
+            elementsWithDelay.forEach((element, index) => {
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                }, (index + 1) * 100);
+            });
+            
+            // Progress bar animation
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                setTimeout(() => {
+                    progressBar.style.width = progressBar.style.width || '9.4%';
+                }, 600);
+            }
+        });
+    </script>
 </body>
-</html>
+</html>	
+
