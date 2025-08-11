@@ -1,13 +1,208 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Français Secondaire 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            background: rgba(255,255,255,0.95);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .welcome-header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-header p {
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .action-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .action-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .action-card p {
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .action-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .recent-activity {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .recent-activity h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        
+        .activity-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="active">🏠 Accueil</a>
+            <a href="{{ url_for('dashboard') }}">📊 Tableau de bord</a>
+            <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
+            <a href="{{ url_for('reading_log') }}">📚 Carnet de lecture</a>
+        </div>
+        <div>
+            <span style="margin-right: 15px;">👋 {{ name }}</span>
+            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+        </div>
+    </div>
 
-{% block content %}
-
-<section style="margin-top: 2rem;">
-  <h3>Shared Knowledge:</h3>
-  <p>
-    Shared Knowledge  is your centralized resource for learning
-	
-  </p>
-  <href 
-</section>
-{% endblock %}
+    <div class="container">
+        <div class="welcome-header">
+            <h1>Bienvenue, {{ name }}! 📚</h1>
+            <p>Plateforme d'apprentissage - Français Secondaire 2</p>
+        </div>
+        
+        <div class="quick-actions">
+            <div class="action-card">
+                <h3>📅 Calendrier des séances</h3>
+                <p>Consultez les 160 séances du programme PFEQ, organisées par mois avec tous les détails pédagogiques.</p>
+                <a href="{{ url_for('calendar') }}" class="action-btn">Voir le calendrier</a>
+            </div>
+            
+            <div class="action-card">
+                <h3>📊 Tableau de bord</h3>
+                <p>Suivez votre progression, vos statistiques de lecture et vos évaluations en temps réel.</p>
+                <a href="{{ url_for('dashboard') }}" class="action-btn">Voir les statistiques</a>
+            </div>
+            
+            <div class="action-card">
+                <h3>📚 Carnet de lecture</h3>
+                <p>Gérez votre portfolio de lecture personnelle et ajoutez vos œuvres avec notes et évaluations.</p>
+                <a href="{{ url_for('reading_log') }}" class="action-btn">Mon carnet</a>
+            </div>
+            
+            <div class="action-card">
+                <h3>➕ Ajouter un livre</h3>
+                <p>Enregistrez rapidement une nouvelle lecture dans votre carnet personnel.</p>
+                <a href="{{ url_for('add_book') }}" class="action-btn">Ajouter un livre</a>
+            </div>
+        </div>
+        
+        <div class="recent-activity">
+            <h3>🔔 Activité récente</h3>
+            <div class="activity-item">
+                <strong>Nouveau !</strong> Le calendrier complet des 160 séances est maintenant disponible.
+            </div>
+            <div class="activity-item">
+                <strong>Rappel :</strong> N'oubliez pas de mettre à jour votre carnet de lecture régulièrement.
+            </div>
+            <div class="activity-item">
+                <strong>Prochaine étape :</strong> Consultez les prochaines séances dans le calendrier.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

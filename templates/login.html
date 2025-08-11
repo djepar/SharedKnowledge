@@ -1,99 +1,159 @@
-{% extends 'base_login.html' %}
-
-{% block content %}
-<style>
-  .login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin-top: 4rem;
-  }
-
-  .ib-logo {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 1rem;
-  }
-
-  .login-container {
-    max-width: 400px;
-    padding: 2rem;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    text-align: center;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease-out forwards;
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .login-container input,
-  .login-container button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    font-size: 16px;
-    border: 1px solid #bbb;
-    border-radius: 4px;
-  }
-
-  .login-container button {
-    background-color: #003865;
-    color: white;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-  }
-
-  .login-container button:hover {
-    background-color: #0055a5;
-  }
-
-  .login-container .register-link {
-    margin-top: 1rem;
-    font-size: 14px;
-  }
-
-  .login-container .register-link a {
-    color: #003865;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .footer {
-    text-align: center;
-    margin-top: 3rem;
-    font-size: 13px;
-    color: gray;
-  }
-</style>
-
-<div class="login-wrapper">
-  
-
-  <!-- Login Box -->
-  <div class="login-container">
-    <h2>Shared Knowledge</h2>
-    <form method="post">
-      <input type="text" name="name" placeholder="NAME" required>
-      <input type="password" name="password" placeholder="PASSWORD" required>
-      <button type="submit">LOG IN</button>
-    </form>
-    <div class="register-link">
-      Are you new here? <a href="{{ url_for('register') }}">Create account</a>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Français Secondaire 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #667eea;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #6c757d;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>📚 Connexion</h1>
+            <p>Français Secondaire 2</p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">Nom d'utilisateur</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Se connecter</button>
+        </form>
+        
+        <div class="register-link">
+            <p>Pas encore de compte? <a href="{{ url_for('register') }}">Créer un compte</a></p>
+        </div>
     </div>
-  </div>
-</div>
-
-<div class="footer">
-  2025 @ Shared Knowledge
-</div>
-{% endblock %}
+</body>
+</html>

@@ -1,26 +1,255 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Français Secondaire 2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            background: rgba(255,255,255,0.95);
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-description {
+            color: #495057;
+            font-size: 0.9em;
+        }
+        
+        .progress-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .progress-title {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .progress-bar-container {
+            background: #e9ecef;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.secondary {
+            background: #6c757d;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .action-btn.success {
+            background: #28a745;
+        }
+        
+        .action-btn.success:hover {
+            background: #218838;
+        }
+    </style>
 </head>
 <body>
-    <div class="dashboard">
-        <h1>Dashboard</h1>
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Accueil</a>
+            <a href="{{ url_for('dashboard') }}" class="active">📊 Tableau de bord</a>
+            <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
+            <a href="{{ url_for('reading_log') }}">📚 Carnet de lecture</a>
+        </div>
+        <div>
+            <span style="margin-right: 15px;">👋 {{ session.user }}</span>
+            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 Tableau de bord</h1>
+            <p>Suivez votre progression en français secondaire 2</p>
+        </div>
         
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>Total Users</h3>
-                <p>{{ user_count }}</p>
+                <div class="stat-value">{{ completed_lessons }}</div>
+                <div class="stat-label">Séances terminées</div>
+                <div class="stat-description">sur {{ total_lessons }} au total</div>
             </div>
+            
             <div class="stat-card">
-                <h3>Sales Today</h3>
-                <p>${{ "%.2f"|format(sales_today) }}</p>
+                <div class="stat-value">{{ progress_percentage }}%</div>
+                <div class="stat-label">Progression</div>
+                <div class="stat-description">du programme PFEQ</div>
             </div>
+            
             <div class="stat-card">
-                <h3>Active Sessions</h3>
-                <p>{{ active_sessions }}</p>
+                <div class="stat-value">{{ books_read }}</div>
+                <div class="stat-label">Livres lus</div>
+                <div class="stat-description">dans votre carnet</div>
             </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">{{ avg_rating }}⭐</div>
+                <div class="stat-label">Note moyenne</div>
+                <div class="stat-description">de vos lectures</div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-title">🎯 Progression du programme</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ progress_percentage }}%">
+                    {{ progress_percentage }}% complété
+                </div>
+            </div>
+            <p style="text-align: center; color: #6c757d; margin-top: 10px;">
+                {{ total_lessons - completed_lessons }} séances restantes sur {{ total_lessons }}
+            </p>
+        </div>
+        
+        <div class="quick-actions">
+            <a href="{{ url_for('calendar') }}" class="action-btn">
+                📅 Voir le calendrier
+            </a>
+            <a href="{{ url_for('reading_log') }}" class="action-btn secondary">
+                📚 Mon carnet de lecture
+            </a>
+            <a href="{{ url_for('add_book') }}" class="action-btn success">
+                ➕ Ajouter un livre
+            </a>
         </div>
     </div>
 </body>
