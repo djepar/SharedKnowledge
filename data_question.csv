@@ -1,0 +1,7 @@
+﻿Sub-Question ID,Nom,genre du nom,niveau de difficulté,Exemple usage courant,Exemple usage littéraire,Exemple usage universitaire,Terminaisons
+QAG1-1,soleil,masculin,3,Un soleil radieux brille dans le ciel,"Le soleil, ce dieu d'or, s'endort dans son royaume pourpre",L'imagerie solaire dans la poésie romantique française,-eil (exception car mots en -eil peuvent être féminins comme abeille)
+QAG1-2,amour,masculin,3,Un grand amour de jeunesse,Les amours défuntes hantent ses vers (usage poétique au féminin),L'amour courtois dans la littérature médiévale,exception
+QAG1-3,mer,féminin,3,La mer est agitée aujourd'hui,"La mer, la grande mer consolatrice (Baudelaire)",La symbolique de la mer dans l'œuvre de Victor Hugo,exception
+QAG1-4,automne,masculin,3,Un automne pluvieux,L'automne languissant berçait leur rêverie,L'imaginaire de l'automne dans la poésie symboliste,ambigu
+QAG1-5,orchidée,féminin,1,Une belle orchidée blanche,L'orchidée sauvage parsemait la forêt,Taxonomie des orchidées tropicales,typiquement féminin
+QAG1-6,pétale,masculin,3,Un pétale de rose,Les pétales embaumés tombaient en pluie,Morphologie du pétale dans les angiospermes,ambigu

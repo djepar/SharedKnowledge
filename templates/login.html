@@ -1,0 +1,99 @@
+{% extends 'base_login.html' %}
+
+{% block content %}
+<style>
+  .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 4rem;
+  }
+
+  .ib-logo {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+
+  .login-container {
+    max-width: 400px;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .login-container input,
+  .login-container button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    font-size: 16px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+  }
+
+  .login-container button {
+    background-color: #003865;
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+
+  .login-container button:hover {
+    background-color: #0055a5;
+  }
+
+  .login-container .register-link {
+    margin-top: 1rem;
+    font-size: 14px;
+  }
+
+  .login-container .register-link a {
+    color: #003865;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 3rem;
+    font-size: 13px;
+    color: gray;
+  }
+</style>
+
+<div class="login-wrapper">
+  
+
+  <!-- Login Box -->
+  <div class="login-container">
+    <h2>Shared Knowledge</h2>
+    <form method="post">
+      <input type="text" name="name" placeholder="NAME" required>
+      <input type="password" name="password" placeholder="PASSWORD" required>
+      <button type="submit">LOG IN</button>
+    </form>
+    <div class="register-link">
+      Are you new here? <a href="{{ url_for('register') }}">Create account</a>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  2025 @ Shared Knowledge
+</div>
+{% endblock %}

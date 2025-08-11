@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shared Knowledge</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <table width="100%">
+        <tr> 
+            <td width="95%">
+                <h1>Shared Knowledge</h1>
+            </td>
+            <td width="5%">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Free Learning" class="ib-logo">
+            </td>
+        </tr>
+    </table>
+    
+    
+    <hr>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

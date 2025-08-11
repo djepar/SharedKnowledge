@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Dashboard</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <p>{{ user_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Sales Today</h3>
+                <p>${{ "%.2f"|format(sales_today) }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Sessions</h3>
+                <p>{{ active_sessions }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

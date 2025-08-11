@@ -1,0 +1,149 @@
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Length
+from werkzeug.security import generate_password_hash, check_password_hash
+from config import config
+from datetime import datetime
+
+from wtforms.validators import ValidationError
+import os
+
+# Initialize Flask app
+app = Flask(__name__)
+app.config.from_object(config[os.environ.get('FLASK_ENV', 'default')])
+
+# Initialize extensions
+db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+
+# User Model
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(120), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='student')  # teacher or student
+
+    first_name = db.Column(db.String(50), nullable=True)
+    last_name = db.Column(db.String(50), nullable=True)
+    email = db.Column(db.String(120), nullable=True)
+    student_id = db.Column(db.String(20), nullable=True, unique=True)
+    class_year = db.Column(db.String(10), nullable=True)  # 2024, 2025, etc.
+    is_active = db.Column(db.Boolean, default=True)
+    created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+# Add this after LoginForm
+class RegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
+    first_name = StringField('First Name', validators=[DataRequired(), Length(min=2, max=50)])
+    last_name = StringField('Last Name', validators=[DataRequired(), Length(min=2, max=50)])
+    email = StringField('Email', validators=[DataRequired(), Length(min=6, max=120)])
+    student_id = StringField('Student ID', validators=[Length(max=20)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired()])
+    role = StringField('Role', default='student')  # Hidden field, default to student
+    submit = SubmitField('Register')
+    
+    def validate_confirm_password(self, confirm_password):
+        if confirm_password.data != self.password.data:
+            raise ValidationError('Passwords must match.')
+    
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Username already exists. Choose a different one.')
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+# Forms
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Login')
+
+# Routes
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard'))
+        flash('Invalid username or password', 'error')
+    
+    return render_template('login.html', form=form)
+# Add this route after the login route
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        # Generate class year (current year)
+        class_year = str(datetime.now().year)
+        
+        # Create new user
+        user = User(
+            username=form.username.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            email=form.email.data,
+            student_id=form.student_id.data or None,
+            class_year=class_year,
+            role='student',  # Default to student
+            is_active=True
+        )
+        user.set_password(form.password.data)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        flash('Registration successful! You can now log in.', 'success')
+        return redirect(url_for('login'))
+    
+    return render_template('register.html', form=form)
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('login'))
+
+# Create database tables
+with app.app_context():
+    db.create_all()
+    
+    # Create a default teacher account if it doesn't exist
+    if not User.query.filter_by(username='teacher').first():
+        teacher = User(username='teacher', role='teacher')
+        teacher.set_password('password123')  # Change this!
+        db.session.add(teacher)
+        db.session.commit()
+        print("Default teacher account created: username='teacher', password='password123'")
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

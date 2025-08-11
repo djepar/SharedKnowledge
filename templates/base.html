@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shared Knowledge</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <table width="100%">
+        <tr> 
+            <td width="35%">
+                <h1>Shared Knowledge</h1>
+            </td>
+            <td width="60%">
+      <nav>
+
+      {% if session.get('user') %}
+        
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% endif %}
+    </nav>
+            </td>
+            <td width="5%">
+                <img src="{{ url_for('static', filename='sharedknowledge.png') }}" alt="IB Logo" class="ib-logo">
+            </td>
+        </tr>
+    </table>
+    
+    
+    <hr>
+  </header>
+  
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
+
