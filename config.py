@@ -10,12 +10,13 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'instance', 'classroom.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
+    CSS_MINIFY = False    
 class DevelopmentConfig(Config):
     DEBUG = True
-
+    CSS_MINIFY = False
 class ProductionConfig(Config):
     DEBUG = False
+    CSS_MINIFY = True
 
 config = {
     'development': DevelopmentConfig,

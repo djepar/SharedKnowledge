@@ -1,0 +1,23 @@
+<!-- templates/components/navigation.html -->
+{% if session.user %}
+<nav class="nav-bar">
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
+            �� Accueil
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+            📊 Tableau de bord
+        </a>
+        <a href="{{ url_for('calendar') }}" class="nav-link {% if request.endpoint == 'calendar' %}active{% endif %}">
+            📅 Calendrier
+        </a>
+        <a href="{{ url_for('reading_log') }}" class="nav-link {% if request.endpoint == 'reading_log' %}active{% endif %}">
+            📚 Carnet de lecture
+        </a>
+    </div>
+    <div class="nav-user">
+        <span class="user-greeting">👋 {{ session.user }}</span>
+        <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Déconnexion</a>
+    </div>
+</nav>
+{% endif %}

@@ -1,39 +1,49 @@
+<!-- templates/base_new.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Shared Knowledge</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Français Secondaire 2{% endblock %}</title>
+    
+    <!-- CSS Components -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/containers.css') }}">
+    
+    <!-- Page specific CSS -->
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <header>
-    <table width="100%">
-        <tr> 
-            <td width="35%">
-                <h1>Shared Knowledge</h1>
-            </td>
-            <td width="60%">
-      <nav>
-
-      {% if session.get('user') %}
-        
-        <a href="{{ url_for('logout') }}">Logout</a>
-      {% endif %}
+    <!-- Navigation -->
+    {% if session.user %}
+    <nav class="nav-bar">
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">🏠 Accueil</a>
+            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">📊 Tableau de bord</a>
+            <a href="{{ url_for('calendar') }}" class="{% if request.endpoint == 'calendar' %}active{% endif %}">📅 Calendrier</a>
+            <a href="{{ url_for('reading_log') }}" class="{% if request.endpoint == 'reading_log' %}active{% endif %}">📚 Carnet de lecture</a>
+        </div>
+        <div>
+            <span style="margin-right: 15px;">👋 {{ session.user }}</span>
+            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+        </div>
     </nav>
-            </td>
-            <td width="5%">
-                <img src="{{ url_for('static', filename='sharedknowledge.png') }}" alt="IB Logo" class="ib-logo">
-            </td>
-        </tr>
-    </table>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else category }}" style="background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 20px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     
-    
-    <hr>
-  </header>
-  
-  <main>
+    <!-- Main Content -->
     {% block content %}{% endblock %}
-  </main>
 </body>
 </html>
-
