@@ -1,0 +1,54 @@
+/* static/css/components/add-book.css - Add Book Form Styles */
+
+.add-book-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    padding: var(--space-2xl);
+}
+
+.add-book-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.add-book-header h1 {
+    color: var(--primary-color);
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-sm);
+}
+
+.back-btn {
+    background: var(--gray-500);
+    color: var(--white);
+    padding: var(--space-sm) var(--space-lg);
+    border: none;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: var(--space-lg);
+    transition: all var(--transition-normal);
+}
+
+.back-btn:hover {
+    background: var(--gray-600);
+}
+
+.submit-btn {
+    background: var(--success-color);
+    color: var(--white);
+    padding: var(--space-md) var(--space-xl);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    width: 100%;
+}
+
+.submit-btn:hover {
+    background: var(--success-dark);
+    transform: translateY(-1px);
+}

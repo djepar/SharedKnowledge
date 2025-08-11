@@ -1,0 +1,182 @@
+/*
+ * Classroom Management Platform CSS
+ * Generated on: 2025-08-11 20:48:55
+ * Auto-generated file - DO NOT EDIT DIRECTLY
+ */
+
+
+/* === static/css/base/variables.css === */
+
+
+/* === static/css/base/reset.css === */
+/* FILE 2: static/css/base/reset.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--gradient-main);
+    min-height: 100vh;
+    padding: var(--space-lg);
+}
+
+
+/* === static/css/components/navigation.css === */
+/* FILE 3: static/css/components/navigation.css */
+.nav-bar {
+    background: rgba(255,255,255,0.95);
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+}
+
+.nav-links {
+    display: flex;
+    gap: var(--space-lg);
+}
+
+.nav-links a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary);
+    color: var(--white);
+}
+
+
+/* === static/css/components/dashboard.css === */
+
+
+/* === static/css/components/home.css === */
+/* static/css/components/home.css */
+
+/* Main container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-2xl);
+  padding: var(--space-3xl);
+}
+
+/* Welcome header */
+.welcome-header {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+}
+
+.welcome-header h1 {
+  color: var(--primary-color);
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--space-md);
+}
+
+.welcome-header p {
+  color: var(--gray-500);
+  font-size: var(--font-size-xl);
+}
+
+/* Quick actions grid */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-3xl);
+}
+
+/* Action cards */
+.action-card {
+  background: var(--gradient-card);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  transition: all var(--transition-normal);
+  border: 2px solid transparent;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-color);
+}
+
+.action-card h3 {
+  color: var(--primary-color);
+  margin-bottom: var(--space-xl);
+  font-size: var(--font-size-xl);
+}
+
+.action-card p {
+  color: var(--gray-500);
+  margin-bottom: var(--space-xl);
+  line-height: 1.5;
+}
+
+.action-btn {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: var(--space-lg) var(--space-2xl);
+  border: none;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  display: inline-block;
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-normal);
+}
+
+.action-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Recent activity */
+.recent-activity {
+  background: var(--gray-100);
+  padding: var(--space-2xl);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-3xl);
+}
+
+.recent-activity h3 {
+  color: var(--primary-color);
+  margin-bottom: var(--space-xl);
+}
+
+.activity-item {
+  background: var(--white);
+  padding: var(--space-xl);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.activity-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .welcome-header h1 {
+    font-size: var(--font-size-3xl);
+  }
+  
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -6,23 +6,20 @@
     <title>Tableau de bord - Français Secondaire 2</title>
     
     <!-- External CSS Components -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/variables.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/reset.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navigation.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
 </head>
 <body>
     <!-- Navigation -->
     <div class="nav-bar">
         <div class="nav-links">
             <a href="{{ url_for('index') }}">🏠 Accueil</a>
-            <a href="{{ url_for('dashboard') }}" class="active">📊 Tableau de bord</a>
+            <a href="{{ url_for('dashboard') }}" class="active">�� Tableau de bord</a>
             <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
             <a href="{{ url_for('reading_log') }}">📚 Carnet de lecture</a>
         </div>
         <div>
-            <span style="margin-right: 15px;">👋 {{ session.user }}</span>
-            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+            <span style="margin-right: 15px; font-weight: 500;">👋 {{ session.user or 'Utilisateur' }}</span>
+            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500;">Déconnexion</a>
         </div>
     </div>
 
@@ -30,7 +27,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
-                <div class="alert">
+                <div class="alert animate-fade-in">
                     {{ message }}
                 </div>
             {% endfor %}
@@ -38,105 +35,103 @@
     {% endwith %}
 
     <!-- Main Container -->
-    <div class="container">
+    <div class="container animate-fade-in">
         <!-- Header -->
         <div class="header">
             <h1>📊 Tableau de bord</h1>
             <p>Suivez votre progression en français secondaire 2</p>
         </div>
         
-        <!-- Content -->
-        <div class="content">
-            <!-- Statistics Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">📚</div>
-                        <div class="stat-trend">
-                            {% if completed_lessons >= 5 %}+{{ completed_lessons - 5 }} cette semaine{% else %}Début du programme{% endif %}
-                        </div>
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card animate-slide-up animate-delay-1">
+                <div class="stat-header">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-trend">
+                        {% if completed_lessons >= 5 %}+{{ completed_lessons - 5 }} cette semaine{% else %}Début du programme{% endif %}
                     </div>
-                    <div class="stat-value">{{ completed_lessons or 0 }}</div>
-                    <div class="stat-label">Séances terminées</div>
-                    <div class="stat-description">sur {{ total_lessons or 160 }} au total dans le programme PFEQ</div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-trend info">
-                            {% if progress_percentage >= 10 %}Bon rythme{% else %}En démarrage{% endif %}
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ progress_percentage or 0.0 }}%</div>
-                    <div class="stat-label">Progression</div>
-                    <div class="stat-description">du programme complet de français secondaire 2</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">📖</div>
-                        <div class="stat-trend warning">
-                            {% if books_read >= 1 %}+{{ books_read }} livres{% else %}Commencez votre carnet{% endif %}
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ books_read or 0 }}</div>
-                    <div class="stat-label">Livres lus</div>
-                    <div class="stat-description">dans votre carnet de lecture personnel</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">⭐</div>
-                        <div class="stat-trend">
-                            {% if avg_rating >= 4 %}Excellent{% elif avg_rating >= 3 %}Bien{% else %}Débutant{% endif %}
-                        </div>
-                    </div>
-                    <div class="stat-value">{{ avg_rating if avg_rating > 0 else '--' }}</div>
-                    <div class="stat-label">Note moyenne</div>
-                    <div class="stat-description">évaluation de vos lectures sur 5 étoiles</div>
-                </div>
+                <div class="stat-value">{{ completed_lessons or 0 }}</div>
+                <div class="stat-label">Séances terminées</div>
+                <div class="stat-description">sur {{ total_lessons or 160 }} au total dans le programme PFEQ</div>
             </div>
             
-            <!-- Progress Section -->
-            <div class="progress-section">
-                <div class="progress-title">🎯 Progression du programme PFEQ</div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: {{ progress_percentage or 0 }}%" data-target="{{ progress_percentage or 0 }}">
-                        {{ progress_percentage or 0 }}% complété
+            <div class="stat-card animate-slide-up animate-delay-2">
+                <div class="stat-header">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-trend info">
+                        {% if progress_percentage >= 10 %}Bon rythme{% else %}En progression{% endif %}
                     </div>
                 </div>
-                <p class="progress-text">
-                    {{ (total_lessons or 160) - (completed_lessons or 0) }} séances restantes sur {{ total_lessons or 160 }}
-                    {% if progress_percentage >= 10 %}
-                        • Excellent rythme de progression !
-                    {% elif progress_percentage >= 5 %}
-                        • Bon démarrage, continuez !
-                    {% else %}
-                        • C'est parti pour l'aventure !
-                    {% endif %}
-                </p>
+                <div class="stat-value">{{ progress_percentage or 0.0 }}%</div>
+                <div class="stat-label">Progression</div>
+                <div class="stat-description">du programme complet de français secondaire 2</div>
             </div>
             
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <a href="{{ url_for('calendar') }}" class="action-btn">
-                    <span>📅</span>
-                    Voir le calendrier complet
-                </a>
-                <a href="{{ url_for('reading_log') }}" class="action-btn secondary">
-                    <span>📚</span>
-                    Mon carnet de lecture
-                </a>
-                <a href="{{ url_for('add_book') }}" class="action-btn success">
-                    <span>➕</span>
-                    Ajouter un nouveau livre
-                </a>
-                <a href="#" class="action-btn warning" onclick="alert('Fonctionnalité à venir! Les évaluations seront bientôt disponibles.')">
-                    <span>📝</span>
-                    Mes évaluations
-                </a>
+            <div class="stat-card animate-slide-up animate-delay-3">
+                <div class="stat-header">
+                    <div class="stat-icon">📖</div>
+                    <div class="stat-trend warning">
+                        {% if books_read >= 1 %}+{{ books_read }} livres{% else %}Commencez votre carnet{% endif %}
+                    </div>
+                </div>
+                <div class="stat-value">{{ books_read or 0 }}</div>
+                <div class="stat-label">Livres lus</div>
+                <div class="stat-description">dans votre carnet de lecture personnel</div>
             </div>
+            
+            <div class="stat-card animate-slide-up animate-delay-4">
+                <div class="stat-header">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-trend">
+                        {% if avg_rating >= 4 %}Excellent{% elif avg_rating >= 3 %}Bien{% else %}Débutant{% endif %}
+                    </div>
+                </div>
+                <div class="stat-value">{{ avg_rating if avg_rating > 0 else '--' }}</div>
+                <div class="stat-label">Note moyenne</div>
+                <div class="stat-description">évaluation de vos lectures sur 5 étoiles</div>
+            </div>
+        </div>
+        
+        <!-- Progress Section -->
+        <div class="progress-section animate-fade-in animate-delay-5">
+            <div class="progress-title">🎯 Progression du programme PFEQ</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 0%" data-target="{{ progress_percentage or 0 }}"></div>
+                <div class="progress-text-overlay">
+                    {{ progress_percentage or 0 }}% complété
+                </div>
+            </div>
+            <p class="progress-text">
+                {{ (total_lessons or 160) - (completed_lessons or 0) }} séances restantes sur {{ total_lessons or 160 }}
+                {% if progress_percentage >= 10 %}
+                    • Excellent rythme de progression !
+                {% elif progress_percentage >= 5 %}
+                    • Bon démarrage, continuez !
+                {% else %}
+                    • C'est parti pour l'aventure !
+                {% endif %}
+            </p>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions animate-fade-in animate-delay-5">
+            <a href="{{ url_for('calendar') }}" class="action-btn btn-primary">
+                <span>📅</span>
+                Voir le calendrier complet
+            </a>
+            <a href="{{ url_for('reading_log') }}" class="action-btn btn-info">
+                <span>📚</span>
+                Mon carnet de lecture
+            </a>
+            <a href="{{ url_for('add_book') }}" class="action-btn btn-success">
+                <span>➕</span>
+                Ajouter un nouveau livre
+            </a>
+            <a href="#" class="action-btn btn-warning" onclick="alert('Fonctionnalité à venir! Les évaluations seront bientôt disponibles.')">
+                <span>📝</span>
+                Mes évaluations
+            </a>
         </div>
     </div>
 
@@ -147,12 +142,21 @@
             const progressBar = document.querySelector('.progress-bar');
             if (progressBar) {
                 const targetWidth = progressBar.dataset.target || 0;
-                progressBar.style.width = '0%';
                 
                 setTimeout(() => {
                     progressBar.style.width = targetWidth + '%';
-                }, 800);
+                }, 1200);
             }
+            
+            // Trigger animations with stagger
+            const animatedElements = document.querySelectorAll('.animate-slide-up');
+            animatedElements.forEach((element, index) => {
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                    element.style.transition = 'all 0.6s ease-out';
+                }, (index + 1) * 150);
+            });
         });
     </script>
 </body>

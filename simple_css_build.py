@@ -15,13 +15,18 @@ def build_css():
     
     # Clean, logical order
     css_files = [
-        'static/css/base/variables.css',     # Variables first (colors, spacing)
-        'static/css/base/reset.css',         # Reset browser defaults
+        'static/css/base/variables.css',         # Variables first (colors, spacing)
+        'static/css/base/reset.css',             # Reset browser defaults
         'static/css/components/navigation.css',  # Navigation (used everywhere)
         'static/css/components/buttons.css',     # Buttons (used everywhere)
         'static/css/components/forms.css',       # Forms (used in multiple pages)
         'static/css/components/home.css',        # Home page specific
         'static/css/components/dashboard.css',   # Dashboard page specific
+        'static/css/components/auth.css',        # Authentication pages
+        'static/css/components/calendar.css',    # Calendar page
+        'static/css/components/reading-log.css', # Reading log page
+        'static/css/components/add-book.css',    # Add book page
+        'static/css/components/lesson-detail.css', # Lesson detail page
     ]
     
     combined_css = f"""/*
@@ -32,9 +37,8 @@ def build_css():
  * 1. Variables (colors, spacing, fonts)
  * 2. Reset (browser normalization)
  * 3. Navigation (reusable across all pages)
- * 4. Buttons (reusable components)
- * 5. Forms (reusable components)
- * 6. Page-specific styles (home, dashboard)
+ * 4. Buttons & Forms (reusable components)
+ * 5. Page-specific styles (home, dashboard, auth, etc.)
  */
 
 """

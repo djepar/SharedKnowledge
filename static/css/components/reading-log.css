@@ -1,0 +1,103 @@
+/* static/css/components/reading-log.css - Reading Log Styles */
+
+.reading-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    padding: var(--space-xl);
+}
+
+.reading-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+}
+
+.reading-header h1 {
+    color: var(--primary-color);
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-sm);
+}
+
+.add-book-btn {
+    background: var(--success-color);
+    color: var(--white);
+    padding: var(--space-md) var(--space-xl);
+    border: none;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: var(--space-xl);
+    transition: all var(--transition-normal);
+}
+
+.add-book-btn:hover {
+    background: var(--success-dark);
+    transform: translateY(-1px);
+}
+
+.books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+}
+
+.book-card {
+    background: var(--gradient-card);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+    transition: all var(--transition-normal);
+}
+
+.book-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.book-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.book-author {
+    color: var(--gray-500);
+    margin-bottom: var(--space-sm);
+}
+
+.book-progress {
+    background: var(--gray-200);
+    height: 8px;
+    border-radius: 4px;
+    margin: var(--space-sm) 0;
+    overflow: hidden;
+}
+
+.book-progress-bar {
+    background: var(--success-color);
+    height: 100%;
+    transition: width var(--transition-normal);
+}
+
+.book-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-sm);
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+}
+
+.rating {
+    color: #ffc107;
+}
+
+.no-books {
+    text-align: center;
+    color: var(--gray-500);
+    font-style: italic;
+    margin: var(--space-2xl) 0;
+}
