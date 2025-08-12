@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Exemple - Français Secondaire 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Accueil</a>
+            <a href="{{ url_for('dashboard') }}">📊 Tableau de bord</a>
+            <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
+            <a href="{{ url_for('reading_log') }}">📚 Carnet</a>
+        </div>
+        <div>
+            <span style="margin-right: 15px;">👋 {{ session.user or 'Utilisateur' }}</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Déconnexion</a>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <div class="header">
+            <h1>Page d'exemple</h1>
+            <p>Utilise l'architecture CSS modulaire</p>
+        </div>
+        
+        <!-- Contenu de la page -->
+        <div class="content">
+            <p>Cette page utilise les composants CSS modulaires.</p>
+            
+            <div class="form-group">
+                <label>Exemple de formulaire:</label>
+                <input type="text" placeholder="Utilise les styles de forms.css">
+            </div>
+            
+            <button class="btn btn-primary">Bouton principal</button>
+            <button class="btn btn-secondary">Bouton secondaire</button>
+        </div>
+    </div>
+</body>
+</html>

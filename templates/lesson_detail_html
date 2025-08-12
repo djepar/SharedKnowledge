@@ -4,304 +4,217 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Séance {{ lesson[1] }} - Français Secondaire 2</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .nav-bar {
-            background: rgba(255,255,255,0.95);
-            padding: 15px 30px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .nav-links a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .nav-links a:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .lesson-number {
-            background: rgba(255,255,255,0.2);
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-        
-        .lesson-title {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        
-        .lesson-meta {
-            opacity: 0.9;
-            font-size: 1.1em;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .info-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .info-card h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-        
-        .lesson-content {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-        
-        .lesson-content h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-        
-        .lesson-content pre {
-            white-space: pre-wrap;
-            font-family: inherit;
-        }
-        
-        .tags {
-            margin-bottom: 25px;
-        }
-        
-        .tag {
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-right: 8px;
-            display: inline-block;
-            margin-bottom: 5px;
-        }
-        
-        .tag-lecture {
-            background: #ffe3e3;
-            color: #c92a2a;
-        }
-        
-        .tag-ecriture {
-            background: #e7f5ff;
-            color: #1971c2;
-        }
-        
-        .tag-oral {
-            background: #e6fcf5;
-            color: #099268;
-        }
-        
-        .tag-grammaire {
-            background: #fff3bf;
-            color: #e67700;
-        }
-        
-        .tag-evaluation {
-            background: #f3f0ff;
-            color: #5f3dc4;
-            font-weight: bold;
-        }
-        
-        .progress-section {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            border: 2px solid #2196f3;
-        }
-        
-        .progress-title {
-            color: #1565c0;
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        
-        .complete-btn {
-            background: #28a745;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .complete-btn:hover {
-            background: #218838;
-            transform: translateY(-1px);
-        }
-        
-        .completed {
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .back-btn {
-            background: #6c757d;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .back-btn:hover {
-            background: #5a6268;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
 </head>
 <body>
+    <!-- Navigation -->
     <div class="nav-bar">
         <div class="nav-links">
             <a href="{{ url_for('index') }}">🏠 Accueil</a>
             <a href="{{ url_for('dashboard') }}">📊 Tableau de bord</a>
-            <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
+            <a href="{{ url_for('calendar') }}" class="active">📅 Calendrier</a>
             <a href="{{ url_for('reading_log') }}">📚 Carnet de lecture</a>
         </div>
         <div>
-            <span style="margin-right: 15px;">👋 {{ session.user }}</span>
-            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+            <span style="margin-right: 15px; font-weight: 500;">👋 {{ session.user }}</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Déconnexion</a>
         </div>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <div class="lesson-number">Séance {{ lesson[1] }}</div>
-            <div class="lesson-title">{{ lesson[5] }}</div>
-            <div class="lesson-meta">{{ lesson[2].title() }} • Semaine {{ lesson[3] }} • Jour {{ lesson[4] }} • {{ lesson[7] }} minutes</div>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}" style="max-width: 1000px; margin: 0 auto var(--space-lg) auto;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Container principal -->
+    <div class="lesson-detail-container">
+        <!-- En-tête de la leçon -->
+        <div class="lesson-detail-header">
+            <div class="lesson-number-badge">Séance {{ lesson[1] }}</div>
+            <div class="lesson-detail-title">{{ lesson[5] }}</div>
+            <div class="lesson-meta">
+                {{ lesson[2].title() }} • Semaine {{ lesson[3] }} • Jour {{ lesson[4] }} • {{ lesson[7] }} minutes
+            </div>
         </div>
         
-        <div class="content">
+        <!-- Contenu de la leçon -->
+        <div class="lesson-detail-content">
+            <!-- Bouton retour -->
             <a href="{{ url_for('calendar') }}" class="back-btn">← Retour au calendrier</a>
             
+            <!-- Grille d'informations -->
             <div class="info-grid">
                 <div class="info-card">
                     <h3>🎯 Compétences visées</h3>
-                    <p>{{ lesson[8] or 'Non spécifiée' }}</p>
+                    <p>{{ lesson[8] or 'Compétences selon le programme PFEQ' }}</p>
                 </div>
                 
                 <div class="info-card">
                     <h3>📋 Matériel nécessaire</h3>
-                    <p>{{ lesson[9] or 'Matériel standard' }}</p>
+                    <p>{{ lesson[9] or 'Matériel standard de classe' }}</p>
                 </div>
                 
                 <div class="info-card">
-                    <h3>🎯 Objectifs</h3>
-                    <p>{{ lesson[10] or 'Voir contenu détaillé' }}</p>
+                    <h3>🎯 Objectifs pédagogiques</h3>
+                    <p>{{ lesson[10] or 'Voir le contenu détaillé ci-dessous' }}</p>
                 </div>
                 
                 <div class="info-card">
-                    <h3>⏱️ Durée</h3>
-                    <p>{{ lesson[7] }} minutes</p>
+                    <h3>⏱️ Durée de la séance</h3>
+                    <p>{{ lesson[7] }} minutes ({{ "%.1f"|format(lesson[7]/60) }} heures)</p>
                 </div>
             </div>
             
+            <!-- Tags des compétences -->
             {% if lesson[11] %}
-            <div class="tags">
+            <div class="tags-section">
+                <h3 style="color: var(--primary-color); margin-bottom: var(--space-sm);">🏷️ Tags :</h3>
                 {% for tag in lesson[11].split(',') %}
                     <span class="tag tag-{{ tag.strip() }}">{{ tag.strip().title() }}</span>
                 {% endfor %}
             </div>
             {% endif %}
             
-            <div class="lesson-content">
-                <h3>📝 Contenu détaillé de la séance</h3>
-                <pre>{{ lesson[6] }}</pre>
+            <!-- Contenu détaillé -->
+            <div class="lesson-content-section">
+                <h3>📝 Déroulement détaillé de la séance</h3>
+                <div style="background: var(--white); padding: var(--space-lg); border-radius: var(--radius-md); border-left: 4px solid var(--primary-color);">
+                    <pre style="white-space: pre-wrap; font-family: inherit; line-height: 1.6; margin: 0;">{{ lesson[6] }}</pre>
+                </div>
             </div>
             
+            <!-- Section progression -->
             <div class="progress-section">
-                <div class="progress-title">📊 Votre progression</div>
+                <div class="progress-section-title">📊 Votre progression pour cette séance</div>
+                
                 {% if progress and progress[3] %}
-                    <div class="completed">
-                        ✅ Séance terminée le {{ progress[5] or 'Date non disponible' }}
+                    <!-- Séance terminée -->
+                    <div class="completed-status">
+                        <div style="display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-sm);">
+                            <span style="font-size: 1.5em;">✅</span>
+                            <strong>Séance terminée !</strong>
+                        </div>
+                        <p>Complétée le {{ progress[5] or 'Date non disponible' }}</p>
                         {% if progress[4] %}
-                            <br><strong>Notes:</strong> {{ progress[4] }}
+                            <div style="margin-top: var(--space-sm); padding-top: var(--space-sm); border-top: 1px solid #c3e6cb;">
+                                <strong>Vos notes :</strong><br>
+                                {{ progress[4] }}
+                            </div>
                         {% endif %}
                     </div>
                 {% else %}
-                    <p style="margin-bottom: 15px;">Marquez cette séance comme terminée une fois que vous avez complété toutes les activités.</p>
+                    <!-- Séance à compléter -->
+                    <div style="margin-bottom: var(--space-lg);">
+                        <p style="color: #1565c0; margin-bottom: var(--space-md);">
+                            Marquez cette séance comme terminée une fois que vous avez complété toutes les activités proposées.
+                        </p>
+                        <div style="background: rgba(21, 101, 192, 0.1); padding: var(--space-md); border-radius: var(--radius-sm); font-size: var(--font-size-sm);">
+                            <strong>�� Conseil :</strong> Prenez le temps de bien suivre chaque étape du déroulement pour maximiser votre apprentissage.
+                        </div>
+                    </div>
+                    
                     <form method="POST" action="{{ url_for('mark_complete', lesson_id=lesson[0]) }}" style="display: inline;">
                         <button type="submit" class="complete-btn">
-                            ✅ Marquer comme terminée
+                            ✅ Marquer cette séance comme terminée
                         </button>
                     </form>
                 {% endif %}
             </div>
+            
+            <!-- Navigation entre les séances -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 2px solid var(--gray-200);">
+                <div>
+                    {% if lesson[1] > 1 %}
+                    <a href="#" class="btn btn-secondary" onclick="alert('Navigation entre séances à venir!')">
+                        ← Séance précédente
+                    </a>
+                    {% endif %}
+                </div>
+                
+                <div style="text-align: center;">
+                    <span style="color: var(--gray-500); font-size: var(--font-size-sm);">
+                        Séance {{ lesson[1] }} sur 160
+                    </span>
+                </div>
+                
+                <div>
+                    {% if lesson[1] < 160 %}
+                    <a href="#" class="btn btn-secondary" onclick="alert('Navigation entre séances à venir!')">
+                        Séance suivante →
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- JavaScript pour les animations et interactions -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation d'entrée
+            const container = document.querySelector('.lesson-detail-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.5s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+
+            // Animation des cartes d'information
+            const infoCards = document.querySelectorAll('.info-card');
+            infoCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 + (index * 100));
+            });
+
+            // Confirmation avant marquage comme terminé
+            const completeForm = document.querySelector('form[action*="mark_complete"]');
+            if (completeForm) {
+                completeForm.addEventListener('submit', function(e) {
+                    const confirmed = confirm(
+                        '✅ Confirmer que vous avez terminé cette séance ?\n\n' +
+                        'Cette action marquera la séance comme complétée dans votre progression.'
+                    );
+                    
+                    if (!confirmed) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Mise en évidence du contenu lors du scroll
+            const contentSection = document.querySelector('.lesson-content-section');
+            if (contentSection) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.transform = 'scale(1.02)';
+                            entry.target.style.transition = 'transform 0.3s ease';
+                            
+                            setTimeout(() => {
+                                entry.target.style.transform = 'scale(1)';
+                            }, 300);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                
+                observer.observe(contentSection);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,17 +1,19 @@
 /*
- * Classroom Management Platform CSS - Clean Component Architecture
- * Generated on: 2025-08-11 21:23:10
+ * Classroom Management Platform CSS - Architecture Complète
+ * Generated on: 2025-08-12 00:41:17
  * 
- * Structure:
- * 1. Variables (colors, spacing, fonts)
- * 2. Reset (browser normalization)
- * 3. Navigation (reusable across all pages)
- * 4. Buttons & Forms (reusable components)
- * 5. Page-specific styles (home, dashboard, auth, etc.)
+ * Architecture modulaire:
+ * 1. Variables CSS (couleurs, espacements, polices)
+ * 2. Reset navigateur (normalisation)
+ * 3. Navigation (barre de navigation commune)
+ * 4. Composants réutilisables (boutons, formulaires)
+ * 5. Pages spécifiques (home, dashboard, auth, etc.)
+ * 
+ * Tous les templates sont maintenant compatibles avec cette architecture.
  */
 
 
-/* === static/css/base/variables.css === */
+/* === Variables Component === */
 :root {
   /* Match your template's variable names */
   --primary-color: #667eea;
@@ -94,7 +96,7 @@
 --radius-full: 50%;
 
 
-/* === static/css/base/reset.css === */
+/* === Reset Component === */
 /* FILE 2: static/css/base/reset.css */
 * {
     margin: 0;
@@ -110,8 +112,8 @@ body {
 }
 
 
-/* === static/css/components/navigation.css === */
-/* static/css/components/navigation.css */
+/* === Navigation Component === */
+/* static/css/components/navigation.css - Navigation fixée */
 .nav-bar {
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
@@ -127,6 +129,7 @@ body {
 .nav-links {
     display: flex;
     gap: var(--space-lg);
+    align-items: center;
 }
 
 .nav-links a {
@@ -136,12 +139,50 @@ body {
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
     transition: all var(--transition-normal);
+    white-space: nowrap;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
     background: var(--primary-color);
     color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* User section */
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.user-greeting {
+    margin-right: var(--space-md);
+    font-weight: 500;
+    color: var(--gray-600);
+    white-space: nowrap;
+}
+
+/* Logout button styles */
+.logout-btn,
+.nav-bar a[href*="logout"] {
+    background: var(--danger-color) !important;
+    color: var(--white) !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    border-radius: var(--radius-sm) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    font-size: var(--font-size-sm) !important;
+    transition: all var(--transition-normal) !important;
+    white-space: nowrap !important;
+}
+
+.logout-btn:hover,
+.nav-bar a[href*="logout"]:hover {
+    background: #c82333 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 /* Mobile responsive */
@@ -154,16 +195,56 @@ body {
         flex-direction: column;
         gap: var(--space-lg);
         text-align: center;
+        padding: var(--space-lg);
     }
     
     .nav-links {
         flex-wrap: wrap;
         justify-content: center;
+        gap: var(--space-sm);
+    }
+    
+    .nav-links a {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .nav-user {
+        flex-direction: column;
+        gap: var(--space-sm);
+        width: 100%;
+    }
+    
+    .user-greeting {
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .logout-btn,
+    .nav-bar a[href*="logout"] {
+        width: 100%;
+        text-align: center;
+        padding: var(--space-sm) var(--space-lg) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-links {
+        grid-template-columns: 1fr 1fr;
+        display: grid;
+        gap: var(--space-xs);
+        width: 100%;
+    }
+    
+    .nav-links a {
+        text-align: center;
+        padding: var(--space-xs);
+        font-size: 0.85em;
     }
 }
 
 
-/* === static/css/components/buttons.css === */
+/* === Buttons Component === */
 /* static/css/components/buttons.css */
 
 /* Base button styles */
@@ -498,7 +579,7 @@ body {
 }
 
 
-/* === static/css/components/forms.css === */
+/* === Forms Component === */
 /* static/css/components/forms.css - Reusable form styles */
 
 .form-group {
@@ -550,7 +631,7 @@ body {
 }
 
 
-/* === static/css/components/home.css === */
+/* === Home Component === */
 /* static/css/components/home.css */
 
 /* Main container */
@@ -670,7 +751,7 @@ body {
 }
 
 
-/* === static/css/components/dashboard.css === */
+/* === Dashboard Component === */
 /* static/css/components/dashboard.css - Professional Dashboard Styles */
 
 .container {
@@ -971,7 +1052,7 @@ body {
 }
 
 
-/* === static/css/components/auth.css === */
+/* === Auth Component === */
 /* static/css/components/auth.css - Authentication Pages */
 
 .auth-container {
@@ -1050,7 +1131,7 @@ body {
 }
 
 
-/* === static/css/components/calendar.css === */
+/* === Calendar Component === */
 /* static/css/components/calendar.css - Calendar Specific Styles */
 
 .calendar-container {
@@ -1235,7 +1316,7 @@ body {
 }
 
 
-/* === static/css/components/reading-log.css === */
+/* === Reading Log Component === */
 /* static/css/components/reading-log.css - Reading Log Styles */
 
 .reading-container {
@@ -1341,7 +1422,7 @@ body {
 }
 
 
-/* === static/css/components/add-book.css === */
+/* === Add Book Component === */
 /* static/css/components/add-book.css - Add Book Form Styles */
 
 .add-book-container {
@@ -1395,5 +1476,155 @@ body {
 .submit-btn:hover {
     background: var(--success-dark);
     transform: translateY(-1px);
+}
+
+
+/* === Lesson Detail Component === */
+/* static/css/components/lesson-detail.css - Lesson Detail Page Styles */
+
+.lesson-detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+}
+
+.lesson-detail-header {
+    background: var(--gradient-main);
+    color: var(--white);
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+.lesson-number-badge {
+    background: rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.lesson-detail-title {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-sm);
+}
+
+.lesson-meta {
+    opacity: 0.9;
+    font-size: var(--font-size-lg);
+}
+
+.lesson-detail-content {
+    padding: var(--space-xl);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.info-card {
+    background: var(--gradient-card);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+}
+
+.info-card h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-size-lg);
+}
+
+.lesson-content-section {
+    background: var(--gray-100);
+    padding: var(--space-2xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-2xl);
+    line-height: 1.6;
+}
+
+.lesson-content-section h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-xl);
+}
+
+.lesson-content-section pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+}
+
+.tags-section {
+    margin-bottom: var(--space-2xl);
+}
+
+.progress-section {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-2xl);
+    border: 2px solid #2196f3;
+}
+
+.progress-section-title {
+    color: #1565c0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--space-lg);
+}
+
+.complete-btn {
+    background: var(--success-color);
+    color: var(--white);
+    padding: var(--space-md) var(--space-xl);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-md);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.complete-btn:hover {
+    background: var(--success-dark);
+    transform: translateY(-1px);
+}
+
+.completed-status {
+    background: #d4edda;
+    color: #155724;
+    padding: var(--space-lg);
+    border-radius: var(--radius-sm);
+    border: 1px solid #c3e6cb;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .lesson-detail-container {
+        margin: 0 var(--space-sm);
+    }
+    
+    .lesson-detail-header {
+        padding: var(--space-lg);
+    }
+    
+    .lesson-detail-title {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .lesson-detail-content {
+        padding: var(--space-lg);
+    }
 }
 

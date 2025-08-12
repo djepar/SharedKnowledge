@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de bord - Français Secondaire 2</title>
-    
-    <!-- External CSS Components -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
 </head>
 <body>
@@ -13,7 +11,7 @@
     <div class="nav-bar">
         <div class="nav-links">
             <a href="{{ url_for('index') }}">🏠 Accueil</a>
-            <a href="{{ url_for('dashboard') }}" class="active">�� Tableau de bord</a>
+            <a href="{{ url_for('dashboard') }}" class="active">📈 Tableau de bord</a>
             <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
             <a href="{{ url_for('reading_log') }}">📚 Carnet de lecture</a>
         </div>
@@ -38,7 +36,7 @@
     <div class="container animate-fade-in">
         <!-- Header -->
         <div class="header">
-            <h1>📊 Tableau de bord</h1>
+            <h1>📈 Tableau de bord</h1>
             <p>Suivez votre progression en français secondaire 2</p>
         </div>
         
@@ -121,7 +119,7 @@
                 Voir le calendrier complet
             </a>
             <a href="{{ url_for('reading_log') }}" class="action-btn btn-info">
-                <span>📚</span>
+                <span>��</span>
                 Mon carnet de lecture
             </a>
             <a href="{{ url_for('add_book') }}" class="action-btn btn-success">
@@ -135,7 +133,7 @@
         </div>
     </div>
 
-    <!-- JavaScript for enhanced animations -->
+    <!-- JavaScript pour les animations -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Animated progress bar

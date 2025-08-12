@@ -4,175 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carnet de lecture - Français Secondaire 2</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .nav-bar {
-            background: rgba(255,255,255,0.95);
-            padding: 15px 30px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .nav-links a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .nav-links a:hover, .nav-links a.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 30px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .add-book-btn {
-            background: #28a745;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 30px;
-            transition: all 0.3s;
-        }
-        
-        .add-book-btn:hover {
-            background: #218838;
-            transform: translateY(-1px);
-        }
-        
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .book-card {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s;
-        }
-        
-        .book-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .book-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-        
-        .book-author {
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-        
-        .book-progress {
-            background: #e9ecef;
-            height: 8px;
-            border-radius: 4px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        
-        .book-progress-bar {
-            background: #28a745;
-            height: 100%;
-            transition: width 0.3s;
-        }
-        
-        .book-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        
-        .rating {
-            color: #ffc107;
-        }
-        
-        .no-books {
-            text-align: center;
-            color: #6c757d;
-            font-style: italic;
-            margin: 40px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
 </head>
 <body>
+    <!-- Navigation -->
     <div class="nav-bar">
         <div class="nav-links">
             <a href="{{ url_for('index') }}">🏠 Accueil</a>
-            <a href="{{ url_for('dashboard') }}">📊 Tableau de bord</a>
+            <a href="{{ url_for('dashboard') }}">📈 Tableau de bord</a>
             <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
             <a href="{{ url_for('reading_log') }}" class="active">📚 Carnet de lecture</a>
         </div>
         <div>
-            <span style="margin-right: 15px;">👋 {{ session.user }}</span>
-            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none;">Déconnexion</a>
+            <span style="margin-right: 15px; font-weight: 500;">👋 {{ session.user }}</span>
+            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500;">Déconnexion</a>
         </div>
     </div>
 
-    <div class="container">
-        <div class="header">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}" style="max-width: 1200px; margin: 0 auto var(--space-lg) auto;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Container principal -->
+    <div class="reading-container">
+        <!-- En-tête -->
+        <div class="reading-header">
             <h1>📚 Mon carnet de lecture</h1>
             <p>Suivez vos lectures et créez votre portfolio personnel</p>
         </div>
         
-        <a href="{{ url_for('add_book') }}" class="add-book-btn">+ Ajouter un livre</a>
+        <!-- Bouton d'ajout -->
+        <div style="text-align: center; margin-bottom: var(--space-xl);">
+            <a href="{{ url_for('add_book') }}" class="add-book-btn">
+                ➕ Ajouter un livre
+            </a>
+        </div>
         
+        <!-- Statistiques rapides -->
+        {% if books %}
+        <div class="stats-grid" style="margin-bottom: var(--space-xl);">
+            <div class="stat-card">
+                <div class="stat-value">{{ books|length }}</div>
+                <div class="stat-label">Livres lus</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">
+                    {% set total_pages = books|selectattr(4)|map(attribute=4)|sum %}
+                    {{ total_pages or 0 }}
+                </div>
+                <div class="stat-label">Pages lues</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">
+                    {% set rated_books = books|selectattr(8)|list %}
+                    {% if rated_books %}
+                        {{ "%.1f"|format(rated_books|map(attribute=8)|sum / rated_books|length) }}
+                    {% else %}
+                        --
+                    {% endif %}
+                </div>
+                <div class="stat-label">Note moyenne</div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Grille des livres -->
         {% if books %}
             <div class="books-grid">
                 {% for book in books %}
@@ -180,48 +85,95 @@
                     <div class="book-title">{{ book[2] }}</div>
                     <div class="book-author">par {{ book[3] or 'Auteur inconnu' }}</div>
                     
-                    {% if book[5] %}
+                    <!-- Barre de progression -->
+                    {% if book[5] and book[5] > 0 %}
                     <div class="book-progress">
-                        <div class="book-progress-bar" style="width: {{ (book[4] / book[5] * 100) if book[5] > 0 else 0 }}%"></div>
+                        <div class="book-progress-bar" 
+                             style="width: {{ (book[4] / book[5] * 100) if book[4] else 0 }}%">
+                        </div>
+                    </div>
+                    <div style="font-size: var(--font-size-sm); color: var(--gray-500); text-align: center; margin-top: 5px;">
+                        {{ book[4] or 0 }}/{{ book[5] }} pages
+                        ({{ "%.0f"|format((book[4] / book[5] * 100) if book[4] and book[5] > 0 else 0) }}%)
+                    </div>
+                    {% elif book[4] %}
+                    <div style="font-size: var(--font-size-sm); color: var(--gray-500); text-align: center; margin: var(--space-sm) 0;">
+                        {{ book[4] }} pages lues
                     </div>
                     {% endif %}
                     
+                    <!-- Notes personnelles (extrait) -->
                     {% if book[7] %}
-                    <div style="margin: 10px 0; font-style: italic; color: #495057;">
+                    <div style="margin: var(--space-md) 0; font-style: italic; color: var(--gray-600); font-size: var(--font-size-sm); line-height: 1.4;">
                         "{{ book[7][:100] }}{% if book[7]|length > 100 %}...{% endif %}"
                     </div>
                     {% endif %}
                     
+                    <!-- Métadonnées du livre -->
                     <div class="book-meta">
-                        <span>
-                            {% if book[4] and book[5] %}
-                                {{ book[4] }}/{{ book[5] }} pages
-                            {% elif book[4] %}
-                                {{ book[4] }} pages lues
+                        <span style="font-size: var(--font-size-sm);">
+                            {% if book[6] %}
+                                Lu le {{ book[6] }}
                             {% endif %}
                         </span>
                         <span class="rating">
                             {% if book[8] %}
                                 {% for i in range(book[8]) %}★{% endfor %}
                                 {% for i in range(5 - book[8]) %}☆{% endfor %}
+                            {% else %}
+                                <span style="color: var(--gray-400);">Pas de note</span>
                             {% endif %}
                         </span>
                     </div>
-                    
-                    {% if book[6] %}
-                    <div style="font-size: 0.85em; color: #6c757d; margin-top: 8px;">
-                        Lu le {{ book[6] }}
-                    </div>
-                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
         {% else %}
+            <!-- État vide -->
             <div class="no-books">
-                <p>Aucun livre dans votre carnet pour le moment.</p>
-                <p>Commencez par ajouter votre première lecture !</p>
+                <div style="font-size: 4em; margin-bottom: var(--space-lg);">📚</div>
+                <h3 style="color: var(--gray-600); margin-bottom: var(--space-md);">
+                    Aucun livre dans votre carnet
+                </h3>
+                <p style="margin-bottom: var(--space-xl);">
+                    Commencez par ajouter votre première lecture pour créer votre portfolio personnel !
+                </p>
+                <a href="{{ url_for('add_book') }}" class="btn btn-primary btn-lg">
+                    📖 Ajouter mon premier livre
+                </a>
             </div>
         {% endif %}
     </div>
+
+    <!-- JavaScript pour les animations -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animation d'entrée pour les cartes de livres
+            const bookCards = document.querySelectorAll('.book-card');
+            bookCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Animation pour les statistiques
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.3s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'scale(1)';
+                }, index * 150);
+            });
+        });
+    </script>
 </body>
 </html>

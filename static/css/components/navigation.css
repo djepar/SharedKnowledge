@@ -1,4 +1,4 @@
-/* static/css/components/navigation.css */
+/* static/css/components/navigation.css - Navigation fixée */
 .nav-bar {
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
@@ -14,6 +14,7 @@
 .nav-links {
     display: flex;
     gap: var(--space-lg);
+    align-items: center;
 }
 
 .nav-links a {
@@ -23,12 +24,50 @@
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
     transition: all var(--transition-normal);
+    white-space: nowrap;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
     background: var(--primary-color);
     color: var(--white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* User section */
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.user-greeting {
+    margin-right: var(--space-md);
+    font-weight: 500;
+    color: var(--gray-600);
+    white-space: nowrap;
+}
+
+/* Logout button styles */
+.logout-btn,
+.nav-bar a[href*="logout"] {
+    background: var(--danger-color) !important;
+    color: var(--white) !important;
+    padding: var(--space-sm) var(--space-md) !important;
+    border-radius: var(--radius-sm) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    font-size: var(--font-size-sm) !important;
+    transition: all var(--transition-normal) !important;
+    white-space: nowrap !important;
+}
+
+.logout-btn:hover,
+.nav-bar a[href*="logout"]:hover {
+    background: #c82333 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 /* Mobile responsive */
@@ -41,10 +80,50 @@
         flex-direction: column;
         gap: var(--space-lg);
         text-align: center;
+        padding: var(--space-lg);
     }
     
     .nav-links {
         flex-wrap: wrap;
         justify-content: center;
+        gap: var(--space-sm);
+    }
+    
+    .nav-links a {
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--font-size-sm);
+    }
+    
+    .nav-user {
+        flex-direction: column;
+        gap: var(--space-sm);
+        width: 100%;
+    }
+    
+    .user-greeting {
+        margin-right: 0;
+        text-align: center;
+    }
+    
+    .logout-btn,
+    .nav-bar a[href*="logout"] {
+        width: 100%;
+        text-align: center;
+        padding: var(--space-sm) var(--space-lg) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-links {
+        grid-template-columns: 1fr 1fr;
+        display: grid;
+        gap: var(--space-xs);
+        width: 100%;
+    }
+    
+    .nav-links a {
+        text-align: center;
+        padding: var(--space-xs);
+        font-size: 0.85em;
     }
 }
