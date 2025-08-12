@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Séance {{ lesson[1] }} - Français Secondaire 2</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+    
+    <!-- CSS Components -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/cards.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/lesson-detail.css') }}">
 </head>
 <body>
     <!-- Navigation -->
-    <div class="nav-bar">
-        <div class="nav-links">
-            <a href="{{ url_for('index') }}">🏠 Accueil</a>
-            <a href="{{ url_for('dashboard') }}">📊 Tableau de bord</a>
-            <a href="{{ url_for('calendar') }}" class="active">📅 Calendrier</a>
-            <a href="{{ url_for('reading_log') }}">📚 Carnet de lecture</a>
-        </div>
-        <div>
-            <span style="margin-right: 15px; font-weight: 500;">👋 {{ session.user }}</span>
-            <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Déconnexion</a>
-        </div>
-    </div>
+    {% include 'components/navigation.html' %}
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -46,7 +42,7 @@
         <!-- Contenu de la leçon -->
         <div class="lesson-detail-content">
             <!-- Bouton retour -->
-            <a href="{{ url_for('calendar') }}" class="back-btn">← Retour au calendrier</a>
+            <a href="{{ url_for('calendar') }}" class="btn btn-secondary">← Retour au calendrier</a>
             
             <!-- Grille d'informations -->
             <div class="info-grid">
@@ -120,7 +116,7 @@
                     </div>
                     
                     <form method="POST" action="{{ url_for('mark_complete', lesson_id=lesson[0]) }}" style="display: inline;">
-                        <button type="submit" class="complete-btn">
+                        <button type="submit" class="btn btn-success btn-lg">
                             ✅ Marquer cette séance comme terminée
                         </button>
                     </form>
@@ -131,7 +127,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 2px solid var(--gray-200);">
                 <div>
                     {% if lesson[1] > 1 %}
-                    <a href="#" class="btn btn-secondary" onclick="alert('Navigation entre séances à venir!')">
+                    <a href="#" class="btn btn-outline-secondary" onclick="alert('Navigation entre séances à venir!')">
                         ← Séance précédente
                     </a>
                     {% endif %}
@@ -145,7 +141,7 @@
                 
                 <div>
                     {% if lesson[1] < 160 %}
-                    <a href="#" class="btn btn-secondary" onclick="alert('Navigation entre séances à venir!')">
+                    <a href="#" class="btn btn-outline-secondary" onclick="alert('Navigation entre séances à venir!')">
                         Séance suivante →
                     </a>
                     {% endif %}
