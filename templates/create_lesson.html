@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer une leçon - Français Secondaire 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    {% include 'components/navigation.html' %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}" style="max-width: 800px; margin: 0 auto var(--space-lg) auto;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Container principal -->
+    <div class="create-lesson-container">
+        <!-- Bouton retour -->
+        <a href="{{ url_for('lessons_list') }}" class="back-btn">← Retour à la liste des leçons</a>
+        
+        <!-- En-tête -->
+        <div class="create-lesson-header">
+            <h1>📝 Créer une nouvelle leçon</h1>
+            <p>Concevoir une séance du programme PFEQ français secondaire 2</p>
+        </div>
+        
+        <!-- Formulaire de création -->
+        <form method="POST" class="lesson-form">
+            <!-- Informations générales -->
+            <div class="form-section">
+                <h2>📋 Informations générales</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="session_number">Numéro de séance *</label>
+                        <input type="number" id="session_number" name="session_number" min="1" max="160" required 
+                               placeholder="Ex: 15">
+                        <small>Séance dans le programme complet (1-160)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="title">Titre de la leçon *</label>
+                        <input type="text" id="title" name="title" required 
+                               placeholder="Ex: L'analyse littéraire - Les procédés stylistiques">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="month">Mois *</label>
+                        <select id="month" name="month" required>
+                            <option value="">Choisir le mois...</option>
+                            <option value="septembre">Septembre</option>
+                            <option value="octobre">Octobre</option>
+                            <option value="novembre">Novembre</option>
+                            <option value="décembre">Décembre</option>
+                            <option value="janvier">Janvier</option>
+                            <option value="février">Février</option>
+                            <option value="mars">Mars</option>
+                            <option value="avril">Avril</option>
+                            <option value="mai">Mai</option>
+                            <option value="juin">Juin</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="week">Semaine du mois *</label>
+                        <select id="week" name="week" required>
+                            <option value="">Choisir la semaine...</option>
+                            <option value="1">Semaine 1</option>
+                            <option value="2">Semaine 2</option>
+                            <option value="3">Semaine 3</option>
+                            <option value="4">Semaine 4</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="day">Jour de la semaine *</label>
+                        <select id="day" name="day" required>
+                            <option value="">Choisir le jour...</option>
+                            <option value="1">Jour 1</option>
+                            <option value="2">Jour 2</option>
+                            <option value="3">Jour 3</option>
+                            <option value="4">Jour 4</option>
+                            <option value="5">Jour 5</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="duration">Durée (minutes) *</label>
+                        <input type="number" id="duration" name="duration" min="15" max="180" required 
+                               placeholder="75" value="75">
+                        <small>Durée habituelle : 75 minutes</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="competence">Compétence principale *</label>
+                        <select id="competence" name="competence" required>
+                            <option value="">Choisir la compétence...</option>
+                            <option value="Lire et apprécier des textes variés">Lire et apprécier des textes variés</option>
+                            <option value="Écrire des textes variés">Écrire des textes variés</option>
+                            <option value="Communiquer oralement selon des modalités variées">Communiquer oralement selon des modalités variées</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu pédagogique -->
+            <div class="form-section">
+                <h2>🎯 Contenu pédagogique</h2>
+                
+                <div class="form-group">
+                    <label for="objectives">Objectifs d'apprentissage *</label>
+                    <textarea id="objectives" name="objectives" required 
+                              placeholder="Décrivez les objectifs spécifiques de cette leçon...
+
+Exemples:
+• Identifier les procédés stylistiques dans un texte littéraire
+• Analyser l'effet des figures de style sur le sens
+• Rédiger une analyse structurée de 200 mots"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">Déroulement de la leçon *</label>
+                    <textarea id="content" name="content" class="content-textarea" required 
+                              placeholder="Décrivez le déroulement détaillé de la séance...
+
+Structure suggérée:
+1. AMORCE (10 min) - Activation des connaissances
+2. EXPLORATION (25 min) - Découverte du concept
+3. PRATIQUE GUIDÉE (25 min) - Exercices avec accompagnement
+4. PRATIQUE AUTONOME (10 min) - Application individuelle
+5. OBJECTIVATION (5 min) - Retour sur les apprentissages
+
+Détaillez chaque étape avec:
+• Les activités proposées
+• Le matériel nécessaire
+• Les consignes précises
+• Les critères d'évaluation"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="materials">Matériel et ressources</label>
+                    <textarea id="materials" name="materials" 
+                              placeholder="Listez le matériel nécessaire pour cette leçon...
+
+Exemples:
+• Manuel de français (pages XX à XX)
+• Extraits littéraires distribués
+• Grille d'analyse
+• Tableau interactif
+• Vidéo d'introduction (lien)
+• Cahier d'exercices"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="evaluation">Évaluation</label>
+                        <select id="evaluation" name="evaluation">
+                            <option value="">Type d'évaluation...</option>
+                            <option value="formative">Évaluation formative</option>
+                            <option value="sommative">Évaluation sommative</option>
+                            <option value="autoévaluation">Autoévaluation</option>
+                            <option value="coévaluation">Coévaluation</option>
+                            <option value="observation">Observation</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="homework">Travaux à la maison</label>
+                        <input type="text" id="homework" name="homework" 
+                               placeholder="Ex: Lire le chapitre 3, exercices 1-5">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Différenciation pédagogique -->
+            <div class="form-section">
+                <h2>🔄 Différenciation pédagogique</h2>
+                
+                <div class="form-group">
+                    <label for="adaptations">Adaptations et soutien</label>
+                    <textarea id="adaptations" name="adaptations" 
+                              placeholder="Décrivez les adaptations pour différents profils d'élèves...
+
+Exemples:
+• Pour les élèves en difficulté : support visuel supplémentaire, temps prolongé
+• Pour les élèves avancés : exercices d'enrichissement, rôle de tuteur
+• Pour les élèves ayant des besoins particuliers : consignes simplifiées
+• Stratégies d'enseignement universal (SEU)"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Notes pédagogiques</label>
+                    <textarea id="notes" name="notes" 
+                              placeholder="Ajoutez vos notes, réflexions et améliorations à apporter...
+
+• Points d'attention particuliers
+• Liens avec les leçons précédentes/suivantes
+• Suggestions d'activités alternatives
+• Observations sur l'efficacité de la leçon
+• Modifications à prévoir pour l'année suivante"></textarea>
+                </div>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="form-actions">
+                <button type="submit" name="action" value="save" class="btn btn-success btn-lg">
+                    💾 Enregistrer la leçon
+                </button>
+                <button type="submit" name="action" value="save_and_continue" class="btn btn-primary btn-lg">
+                    ➡️ Enregistrer et créer la suivante
+                </button>
+                <a href="{{ url_for('lessons_list') }}" class="btn btn-secondary btn-lg">
+                    ❌ Annuler
+                </a>
+            </div>
+        </form>
+        
+        <!-- Conseils pédagogiques -->
+        <div class="tips-section">
+            <h3>💡 Conseils pour créer une leçon efficace</h3>
+            <div class="tips-grid">
+                <ul>
+                    <li><strong>Objectifs clairs</strong> : Formulez des objectifs mesurables et observables</li>
+                    <li><strong>Structure équilibrée</strong> : Variez les modalités d'apprentissage</li>
+                    <li><strong>Progression logique</strong> : Du simple au complexe, du concret à l'abstrait</li>
+                </ul>
+                <ul>
+                    <li><strong>Engagement actif</strong> : Impliquez les élèves dans leur apprentissage</li>
+                    <li><strong>Évaluation intégrée</strong> : Prévoyez des moments d'évaluation formative</li>
+                    <li><strong>Différenciation</strong> : Adaptez selon les besoins de vos élèves</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript pour améliorer l'expérience utilisateur -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-sauvegarde en brouillon (localStorage)
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            
+            // Charger les données sauvegardées
+            inputs.forEach(input => {
+                const savedValue = localStorage.getItem(`lesson_draft_${input.name}`);
+                if (savedValue && !input.value) {
+                    input.value = savedValue;
+                }
+            });
+            
+            // Sauvegarder automatiquement les modifications
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    localStorage.setItem(`lesson_draft_${this.name}`, this.value);
+                });
+            });
+            
+            // Nettoyer le brouillon lors de la soumission
+            form.addEventListener('submit', function() {
+                inputs.forEach(input => {
+                    localStorage.removeItem(`lesson_draft_${input.name}`);
+                });
+            });
+            
+            // Validation avant soumission
+            form.addEventListener('submit', function(e) {
+                const sessionNumber = document.getElementById('session_number').value;
+                const title = document.getElementById('title').value.trim();
+                const content = document.getElementById('content').value.trim();
+                const objectives = document.getElementById('objectives').value.trim();
+                
+                if (!sessionNumber || sessionNumber < 1 || sessionNumber > 160) {
+                    alert('⚠️ Le numéro de séance doit être entre 1 et 160');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (!title) {
+                    alert('⚠️ Le titre de la leçon est obligatoire');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (!objectives) {
+                    alert('⚠️ Les objectifs d\'apprentissage sont obligatoires');
+                    e.preventDefault();
+                    return;
+                }
+                
+                if (!content) {
+                    alert('⚠️ Le déroulement de la leçon est obligatoire');
+                    e.preventDefault();
+                    return;
+                }
+            });
+            
+            // Compteur de caractères pour les zones de texte importantes
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                const counter = document.createElement('div');
+                counter.className = 'char-counter';
+                textarea.parentNode.appendChild(counter);
+                
+                function updateCounter() {
+                    const length = textarea.value.length;
+                    counter.textContent = `${length} caractères`;
+                }
+                
+                textarea.addEventListener('input', updateCounter);
+                updateCounter();
+            });
+        });
+    </script>
+</body>
+</html>

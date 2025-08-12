@@ -8,18 +8,7 @@
 </head>
 <body>
     <!-- Navigation -->
-    <div class="nav-bar">
-        <div class="nav-links">
-            <a href="{{ url_for('index') }}">🏠 Accueil</a>
-            <a href="{{ url_for('dashboard') }}">📈 Tableau de bord</a>
-            <a href="{{ url_for('calendar') }}">📅 Calendrier</a>
-            <a href="{{ url_for('reading_log') }}" class="active">📚 Carnet de lecture</a>
-        </div>
-        <div>
-            <span style="margin-right: 15px; font-weight: 500;">👋 {{ session.user }}</span>
-            <a href="{{ url_for('logout') }}" style="background: #dc3545; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500;">Déconnexion</a>
-        </div>
-    </div>
+    {% include 'components/navigation.html' %}
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}

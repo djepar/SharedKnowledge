@@ -14,10 +14,13 @@
         <a href="{{ url_for('reading_log') }}" class="nav-link {% if request.endpoint == 'reading_log' %}active{% endif %}">
             📚 Carnet de lecture
         </a>
+        <a href="{{ url_for('lessons_list') }}" class="nav-link {% if request.endpoint == 'lessons_list' %}active{% endif %}">
+            📋 Gestion des leçons
+        </a>
     </div>
     <div class="nav-user">
-        <span class="user-greeting">👋 {{ session.user }}</span>
-        <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Déconnexion</a>
+        <span class="user-greeting">👋 {{ session.user or name or 'Utilisateur' }}</span>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Déconnexion</a>
     </div>
 </nav>
 {% endif %}

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des leçons - Français Secondaire 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+    <style>
+        .lessons-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-2xl);
+            padding: var(--space-xl);
+        }
+        
+        .filters-section {
+            background: var(--gray-100);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+        
+        .lesson-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-lg);
+        }
+        
+        .lesson-table th,
+        .lesson-table td {
+            padding: var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .lesson-table th {
+            background: var(--gradient-card);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+        }
+        
+        .lesson-table tr:hover {
+            background: var(--gray-100);
+        }
+        
+        .lesson-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .lesson-actions a,
+        .lesson-actions button {
+            padding: var(--space-xs) var(--space-sm);
+            border: none;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+        
+        .bulk-actions {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            display: none;
+        }
+        
+        .bulk-actions.visible {
+            display: block;
+        }
+        
+        .lesson-content-preview {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .competence-tag {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: var(--font-size-sm);
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    {% include 'components/navigation.html' %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}" style="max-width: 1400px; margin: 0 auto var(--space-lg) auto;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Container principal -->
+    <div class="lessons-container">
+        <!-- En-tête -->
+        <div class="header" style="text-align: center; margin-bottom: var(--space-xl);">
+            <h1 style="color: var(--primary-color); font-size: var(--font-size-4xl); margin-bottom: var(--space-sm);">
+                📋 Gestion des leçons
+            </h1>
+            <p style="color: var(--gray-500); font-size: var(--font-size-xl);">
+                Créer, modifier et organiser les 160 séances du programme PFEQ
+            </p>
+        </div>
+        
+        <!-- Actions principales -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+            <div style="display: flex; gap: var(--space-md);">
+                <a href="{{ url_for('create_lesson') }}" class="btn btn-success">
+                    ➕ Nouvelle leçon
+                </a>
+                <a href="{{ url_for('import_lessons') }}" class="btn btn-info">
+                    📥 Importer
+                </a>
+                <a href="{{ url_for('export_lessons') }}" class="btn btn-secondary">
+                    📤 Exporter
+                </a>
+            </div>
+            
+            <div style="color: var(--gray-600);">
+                {{ lessons|length }} leçon{{ 's' if lessons|length != 1 else '' }} trouvée{{ 's' if lessons|length != 1 else '' }}
+            </div>
+        </div>
+        
+        <!-- Filtres et recherche -->
+        <div class="filters-section">
+            <h3 style="color: var(--primary-color); margin-bottom: var(--space-md);">🔍 Filtres et recherche</h3>
+            
+            <form method="GET" action="{{ url_for('lessons_list') }}">
+                <div class="filters-grid">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="search">Recherche</label>
+                        <input type="text" id="search" name="search" 
+                               value="{{ current_filters.search }}"
+                               placeholder="Titre, contenu...">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="month">Mois</label>
+                        <select id="month" name="month">
+                            <option value="">Tous les mois</option>
+                            {% for month in months %}
+                                <option value="{{ month }}" 
+                                        {% if month == current_filters.month %}selected{% endif %}>
+                                    {{ month.title() }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="competence">Compétence</label>
+                        <select id="competence" name="competence">
+                            <option value="">Toutes les compétences</option>
+                            {% for comp in competences %}
+                                <option value="{{ comp }}"
+                                        {% if comp == current_filters.competence %}selected{% endif %}>
+                                    {{ comp }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: var(--space-sm);">
+                    <button type="submit" class="btn btn-primary">Filtrer</button>
+                    <a href="{{ url_for('lessons_list') }}" class="btn btn-secondary">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Actions groupées -->
+        <div id="bulk-actions" class="bulk-actions">
+            <form method="POST" action="{{ url_for('bulk_actions') }}" onsubmit="return confirmBulkAction()">
+                <div style="display: flex; align-items: center; gap: var(--space-md); flex-wrap: wrap;">
+                    <span style="font-weight: var(--font-weight-bold);">
+                        <span id="selected-count">0</span> leçon(s) sélectionnée(s)
+                    </span>
+                    
+                    <select name="action" required>
+                        <option value="">Choisir une action...</option>
+                        <option value="delete">🗑️ Supprimer</option>
+                        <option value="update_month">📅 Changer le mois</option>
+                        <option value="update_competence">🎯 Changer la compétence</option>
+                    </select>
+                    
+                    <input type="text" name="new_month" placeholder="Nouveau mois" style="display: none;">
+                    <input type="text" name="new_competence" placeholder="Nouvelle compétence" style="display: none;">
+                    
+                    <button type="submit" class="btn btn-warning">Appliquer</button>
+                    <button type="button" onclick="clearSelection()" class="btn btn-secondary">Annuler</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Tableau des leçons -->
+        {% if lessons %}
+            <form id="lessons-form">
+                <table class="lesson-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <input type="checkbox" id="select-all" onchange="toggleAll()">
+                            </th>
+                            <th>Séance</th>
+                            <th>Titre</th>
+                            <th>Mois</th>
+                            <th>Semaine</th>
+                            <th>Durée</th>
+                            <th>Compétences</th>
+                            <th>Contenu</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lesson in lessons %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="lesson_ids" value="{{ lesson[0] }}" 
+                                       class="lesson-checkbox" onchange="updateSelection()">
+                            </td>
+                            <td>
+                                <span style="background: var(--gradient-primary); color: var(--white); padding: 4px 8px; border-radius: 12px; font-weight: var(--font-weight-bold);">
+                                    {{ lesson[1] }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong>{{ lesson[5] }}</strong>
+                            </td>
+                            <td>{{ lesson[2].title() }}</td>
+                            <td>S{{ lesson[3] }} - J{{ lesson[4] }}</td>
+                            <td>{{ lesson[7] }}min</td>
+                            <td>
+                                {% if lesson[8] %}
+                                    <span class="competence-tag">{{ lesson[8] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="lesson-content-preview">
+                                    {{ lesson[6][:100] }}{% if lesson[6]|length > 100 %}...{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="lesson-actions">
+                                    <a href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}" 
+                                       class="btn btn-info btn-sm">👁️</a>
+                                    <a href="{{ url_for('edit_lesson', lesson_id=lesson[0]) }}" 
+                                       class="btn btn-warning btn-sm">✏️</a>
+                                    <form method="POST" action="{{ url_for('duplicate_lesson', lesson_id=lesson[0]) }}" style="display: inline;">
+                                        <button type="submit" class="btn btn-secondary btn-sm">📋</button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('delete_lesson', lesson_id=lesson[0]) }}" 
+                                          style="display: inline;" onsubmit="return confirm('Supprimer cette leçon ?')">
+                                        <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        {% else %}
+            <!-- État vide -->
+            <div style="text-align: center; padding: var(--space-3xl); color: var(--gray-500);">
+                <div style="font-size: 4em; margin-bottom: var(--space-lg);">📚</div>
+                <h3>Aucune leçon trouvée</h3>
+                <p style="margin: var(--space-md) 0;">
+                    {% if current_filters.search or current_filters.month or current_filters.competence %}
+                        Modifiez vos filtres ou créez une nouvelle leçon.
+                    {% else %}
+                        Commencez par créer votre première leçon du programme PFEQ.
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('create_lesson') }}" class="btn btn-primary btn-lg">
+                    ➕ Créer ma première leçon
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Gestion de la sélection multiple
+        function toggleAll() {
+            const selectAll = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.lesson-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateSelection();
+        }
+        
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.lesson-checkbox:checked');
+            const count = checkboxes.length;
+            const bulkActions = document.getElementById('bulk-actions');
+            const selectedCount = document.getElementById('selected-count');
+            
+            selectedCount.textContent = count;
+            
+            if (count > 0) {
+                bulkActions.classList.add('visible');
+            } else {
+                bulkActions.classList.remove('visible');
+            }
+            
+            // Update select-all checkbox state
+            const allCheckboxes = document.querySelectorAll('.lesson-checkbox');
+            const selectAll = document.getElementById('select-all');
+            
+            if (count === allCheckboxes.length) {
+                selectAll.checked = true;
+                selectAll.indeterminate = false;
+            } else if (count > 0) {
+                selectAll.checked = false;
+                selectAll.indeterminate = true;
+            } else {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            }
+        }
+        
+        function clearSelection() {
+            const checkboxes = document.querySelectorAll('.lesson-checkbox');
+            const selectAll = document.getElementById('select-all');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+            
+            updateSelection();
+        }
+        
+        function confirmBulkAction() {
+            const action = document.querySelector('select[name="action"]').value;
+            const count = document.querySelectorAll('.lesson-checkbox:checked').length;
+            
+            let message = '';
+            switch(action) {
+                case 'delete':
+                    message = `Êtes-vous sûr de vouloir supprimer ${count} leçon(s) ? Cette action est irréversible.`;
+                    break;
+                case 'update_month':
+                case 'update_competence':
+                    message = `Confirmer la mise à jour de ${count} leçon(s) ?`;
+                    break;
+                default:
+                    alert('Veuillez sélectionner une action');
+                    return false;
+            }
+            
+            return confirm(message);
+        }
+        
+        // Gestion des champs conditionnels pour les actions groupées
+        document.querySelector('select[name="action"]').addEventListener('change', function() {
+            const monthField = document.querySelector('input[name="new_month"]');
+            const competenceField = document.querySelector('input[name="new_competence"]');
+            
+            // Masquer tous les champs
+            monthField.style.display = 'none';
+            competenceField.style.display = 'none';
+            
+            // Afficher le champ approprié
+            if (this.value === 'update_month') {
+                monthField.style.display = 'block';
+                monthField.required = true;
+                competenceField.required = false;
+            } else if (this.value === 'update_competence') {
+                competenceField.style.display = 'block';
+                competenceField.required = true;
+                monthField.required = false;
+            } else {
+                monthField.required = false;
+                competenceField.required = false;
+            }
+        });
+        
+        // Animation d'entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            const rows = document.querySelectorAll('.lesson-table tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(10px)';
+                
+                setTimeout(() => {
+                    row.style.transition = 'all 0.3s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+    </script>
+</body>
+</html>
