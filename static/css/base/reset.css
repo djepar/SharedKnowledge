@@ -1,4 +1,4 @@
-/* FILE 2: static/css/base/reset.css */
+/* Component-based CSS Reset */
 * {
     margin: 0;
     padding: 0;
@@ -9,5 +9,46 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: var(--gradient-main);
     min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* Layout containers - component-based approach */
+.layout-main {
     padding: var(--space-lg);
+    min-height: 100vh;
+}
+
+.layout-auth {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    min-height: 100vh;
+}
+
+.layout-discipline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    min-height: 100vh;
+}
+
+/* Responsive layout adjustments */
+@media (max-width: 768px) {
+    .layout-main {
+        padding: var(--space-md);
+    }
+    
+    .layout-auth,
+    .layout-discipline {
+        padding: var(--space-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .layout-auth,
+    .layout-discipline {
+        padding: var(--space-sm);
+    }
 }

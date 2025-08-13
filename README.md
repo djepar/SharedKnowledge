@@ -17,12 +17,13 @@ Une plateforme web moderne pour la gestion de classe et le suivi pédagogique, s
 - **📚 Carnet de lecture personnel** - Portfolio de lecture avec notes et évaluations
 - **🎯 Conformité PFEQ** - Respect complet du programme officiel du Québec
 
-### 🎨 Interface moderne (NOUVEAU!)
-- ✅ **Architecture CSS professionnelle** - Composants modulaires et maintenables
-- ✅ **Design cohérent** - Variables CSS centralisées et système de couleurs unifié
+### 🎨 Interface moderne (RÉCEMMENT AMÉLIORÉ!)
+- ✅ **Architecture CSS composants** - BEM-like naming et isolation parfaite
+- ✅ **Variables CSS complètes** - Design system unifié sans conflits
+- ✅ **Zéro !important** - Spécificité CSS propre et maintenable
+- ✅ **Layouts flexibles** - `.layout-auth`, `.layout-main`, `.layout-discipline`
 - ✅ **Responsive design** - Optimisé pour desktop, tablette et mobile
-- ✅ **Animations fluides** - Transitions et effets visuels modernes
-- ✅ **Accessibilité** - Contraste et navigation optimisés
+- ✅ **Build optimisé** - Compilation CSS sans duplication ni erreurs
 
 ## 🚀 Installation et démarrage
 
@@ -44,29 +45,53 @@ python app.py
 
 L'application sera disponible sur `http://localhost:5002`
 
-## 🎨 Architecture CSS (NOUVEAU!)
+## 🎨 Architecture CSS Component-Based (RÉCEMMENT REFACTORISÉ!)
 
-### Structure modulaire
+### Structure modulaire propre
 ```
 static/css/
 ├── base/
-│   ├── variables.css    # Variables CSS centralisées
-│   └── reset.css        # Reset navigateur
-├── components/
-│   ├── navigation.css   # Barre de navigation
-│   ├── buttons.css      # Système de boutons
-│   ├── forms.css        # Formulaires
-│   ├── dashboard.css    # Tableau de bord
-│   ├── auth.css         # Pages d'authentification
-│   └── home.css         # Page d'accueil
+│   ├── variables.css    # Toutes variables dans :root (FIXÉ!)
+│   └── reset.css        # Layouts flexibles (.layout-*)
+├── components/          # Composants isolés avec BEM-like naming
+│   ├── navigation.css   # .nav-logout, .nav-dropdown
+│   ├── auth.css         # .auth-header__title, .auth-btn
+│   ├── buttons.css      # .btn-primary, .btn-outline-*
+│   ├── forms.css        # .form-group, .form-row
+│   ├── progress.css     # .progress-bar, .progress-circle
+│   ├── dashboard.css    # .stat-card, .quick-actions
+│   └── [autres...]      # Components page-spécifiques
 └── dist/
-   └── main.css         # CSS final compilé
+    └── main.css        # Build final optimisé
 ```
 
-### Build CSS
+### Build CSS amélioré
 ```bash
-# Compiler tous les composants CSS
+# Compiler avec validation et optimisation
 python simple_css_build.py
+
+# ✅ Résout toutes les variables CSS
+# ✅ Élimine les duplications
+# ✅ Validation des composants
+# ✅ Architecture sans !important
+```
+
+### Nouveaux layouts composants
+```html
+<!-- Auth pages -->
+<div class="layout-auth">
+  <div class="auth-container">
+    <h1 class="auth-header__title">Connexion</h1>
+    <button class="auth-btn">Se connecter</button>
+  </div>
+</div>
+
+<!-- Main app -->
+<div class="layout-main">
+  <nav class="nav-bar">
+    <a href="/logout" class="nav-logout">Déconnexion</a>
+  </nav>
+</div>
 ```
 
 ## 📋 Liste des tâches
@@ -77,14 +102,17 @@ python simple_css_build.py
 - [x] Suivi de progression individuelle
 - [x] Carnet de lecture personnel
 - [x] Dashboard avec statistiques
-- [x] **Architecture CSS modulaire** - Composants CSS organisés
-- [x] **Design system cohérent** - Variables CSS centralisées
-- [x] **Build automatisé** - Script de compilation CSS
+- [x] **Architecture CSS component-based** - BEM-like naming et isolation
+- [x] **Variables CSS complètes** - Toutes dans :root, zéro conflit
+- [x] **Build CSS optimisé** - Sans duplication ni !important
+- [x] **Layouts flexibles** - .layout-auth, .layout-main, .layout-discipline
+- [x] **Templates mis à jour** - login.html avec nouveaux composants
 
-### 📅 Court terme
-- [ ] **Finaliser templates CSS** - Compléter calendar.html, reading_log.html, add_book.html
-- [ ] **Tests d'interface** - Validation responsive
-- [ ] **Optimisation CSS** - Minification pour production
+### 📅 Court terme  
+- [ ] **Mise à jour templates restants** - Appliquer l'architecture aux autres pages
+- [ ] **Tests responsiveness** - Validation mobile/tablette/desktop
+- [ ] **Documentation composants** - Guide d'utilisation CSS
+- [ ] **Optimisation production** - Minification et tree-shaking
 
 ### 🔮 Fonctionnalités futures
 - [ ] Gestion des notes et évaluations
@@ -93,11 +121,40 @@ python simple_css_build.py
 
 ## 🔧 Développement
 
-### Variables CSS disponibles
-- `--primary-color`, `--secondary-color` - Couleurs principales
-- `--space-sm`, `--space-md`, `--space-lg` - Espacement
-- `--radius-sm`, `--radius-md`, `--radius-lg` - Bordures arrondies
-- `--shadow-sm`, `--shadow-md`, `--shadow-lg` - Ombres
+### Variables CSS disponibles (DESIGN SYSTEM COMPLET)
+```css
+/* Couleurs */
+--primary-color, --primary-dark, --secondary-color
+--success-color, --danger-color, --warning-color, --info-color
+--gray-100 à --gray-800, --white, --black
+
+/* Gradients */
+--gradient-main, --gradient-primary, --gradient-success, etc.
+
+/* Espacement */
+--space-xs à --space-5xl (5px à 80px)
+
+/* Bordures et ombres */
+--radius-sm à --radius-2xl, --radius-full
+--shadow-sm à --shadow-2xl
+
+/* Typography */
+--font-size-xs à --font-size-4xl
+--font-weight-normal à --font-weight-bold
+
+/* Transitions */
+--transition-fast, --transition-normal, --transition-slow
+
+/* Z-index */
+--z-index-dropdown, --z-index-overlay, --z-index-modal
+```
+
+### Conventions de nommage
+- **Composants**: `.component-name` (ex: `.auth-container`)
+- **Modificateurs**: `.component__element` (ex: `.auth-header__title`)
+- **Variants**: `.component--variant` (ex: `.alert--error`)
+- **Layouts**: `.layout-context` (ex: `.layout-auth`)
+- **Utilitaires**: `.u-utility` (rare, préférer les composants)
 
 ---
 

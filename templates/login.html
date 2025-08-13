@@ -6,39 +6,41 @@
     <title>Connexion - Français Secondaire 2</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
 </head>
-<body class="auth-body">
-    <div class="auth-container">
-        <div class="auth-header">
-            <h1>📚 Connexion</h1>
-            <p>Français Secondaire 2</p>
-        </div>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <form method="POST">
-            <div class="form-group">
-                <label for="name">Nom d'utilisateur</label>
-                <input type="text" id="name" name="name" required>
+<body>
+    <div class="layout-auth">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1 class="auth-header__title">📚 Connexion</h1>
+                <p class="auth-header__subtitle">Français Secondaire 2</p>
             </div>
             
-            <div class="form-group">
-                <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="password" required>
-            </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert--{{ 'error' if category == 'error' else 'success' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
             
-            <button type="submit" class="auth-btn">Se connecter</button>
-        </form>
-        
-        <div class="auth-link">
-            <p>Pas encore de compte? <a href="{{ url_for('register') }}">Créer un compte</a></p>
+            <form method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Nom d'utilisateur</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="auth-btn">Se connecter</button>
+            </form>
+            
+            <div class="auth-link">
+                <p class="auth-link__text">Pas encore de compte? <a href="{{ url_for('register') }}" class="auth-link__anchor">Créer un compte</a></p>
+            </div>
         </div>
     </div>
 </body>
