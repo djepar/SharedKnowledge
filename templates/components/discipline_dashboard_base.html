@@ -1,0 +1,115 @@
+<!-- Base template for discipline-specific dashboards -->
+<!-- This template provides the common structure and can be extended by specific disciplines -->
+
+{% macro discipline_stat_card(icon, value, label, description, trend_text="", trend_type="") %}
+<div class="discipline-stat-card discipline-slide-up">
+    <div class="stat-header">
+        <div class="stat-icon">{{ icon }}</div>
+        {% if trend_text %}
+        <div class="stat-trend {{ trend_type }}">{{ trend_text }}</div>
+        {% endif %}
+    </div>
+    <div class="stat-value">{{ value }}</div>
+    <div class="stat-label">{{ label }}</div>
+    <div class="stat-description">{{ description }}</div>
+</div>
+{% endmacro %}
+
+{% macro discipline_progress_section(title, current, total, description="") %}
+{% set percentage = (current * 100 // total) if total > 0 else 0 %}
+<div class="discipline-progress-section discipline-fade-in">
+    <div class="discipline-progress-title">{{ title }}</div>
+    <div class="progress-bar-container">
+        <div class="discipline-progress-bar" style="width: 0%" data-target="{{ percentage }}"></div>
+        <div class="progress-text-overlay">{{ percentage }}% complété</div>
+    </div>
+    <p class="progress-text">
+        {{ current }} / {{ total }} terminé{% if description %} • {{ description }}{% endif %}
+    </p>
+</div>
+{% endmacro %}
+
+{% macro discipline_competency_card(icon, title, description, progress_percentage, competency_code="") %}
+<div class="discipline-competency-card discipline-scale-in">
+    <div class="discipline-competency-icon">{{ icon }}</div>
+    <h3 class="discipline-competency-title">{{ title }}</h3>
+    {% if competency_code %}
+    <div class="discipline-badge" style="background: var(--discipline-gradient);">{{ competency_code }}</div>
+    {% endif %}
+    <p class="discipline-competency-description">{{ description }}</p>
+    <div class="discipline-competency-progress">
+        <div class="discipline-competency-progress-bar" style="width: 0%" data-target="{{ progress_percentage }}"></div>
+    </div>
+    <div class="discipline-competency-percentage">{{ progress_percentage }}% maîtrisé</div>
+</div>
+{% endmacro %}
+
+{% macro discipline_action_button(url, icon, title, description="") %}
+<a href="{{ url }}" class="discipline-action-btn">
+    <span>{{ icon }}</span>
+    <div>
+        <div>{{ title }}</div>
+        {% if description %}
+        <small style="opacity: 0.8;">{{ description }}</small>
+        {% endif %}
+    </div>
+</a>
+{% endmacro %}
+
+
+<!-- JavaScript for discipline dashboard interactions -->
+<script>
+// Animate progress bars on load
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate main progress bars
+    const progressBars = document.querySelectorAll('.discipline-progress-bar');
+    progressBars.forEach((bar, index) => {
+        const targetWidth = bar.dataset.target;
+        setTimeout(() => {
+            bar.style.transition = 'width 1.5s ease-out';
+            bar.style.width = targetWidth + '%';
+        }, index * 200);
+    });
+    
+    // Animate competency progress bars
+    const competencyBars = document.querySelectorAll('.discipline-competency-progress-bar');
+    competencyBars.forEach((bar, index) => {
+        const targetWidth = bar.dataset.target;
+        setTimeout(() => {
+            bar.style.transition = 'width 1s ease-out';
+            bar.style.width = targetWidth + '%';
+        }, (index * 100) + 800); // Start after main progress bars
+    });
+    
+    // Stagger animation classes
+    const slideElements = document.querySelectorAll('.discipline-slide-up');
+    slideElements.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.opacity = '1';
+            element.style.transform = 'translateY(0)';
+            element.style.transition = 'all 0.6s ease-out';
+        }, index * 150);
+    });
+    
+    const scaleElements = document.querySelectorAll('.discipline-scale-in');
+    scaleElements.forEach((element, index) => {
+        setTimeout(() => {
+            element.style.opacity = '1';
+            element.style.transform = 'scale(1)';
+            element.style.transition = 'all 0.5s ease-out';
+        }, (index * 100) + 400);
+    });
+});
+
+// Utility function to get discipline theme
+function getDisciplineTheme(discipline) {
+    const themes = {
+        'mathematiques': 'math',
+        'francais': 'francais', 
+        'histoire': 'histoire',
+        'culture_citoyennete': 'culture',
+        'geographie': 'geographie'
+    };
+    return `discipline-theme-${themes[discipline] || 'math'}`;
+}
+</script>

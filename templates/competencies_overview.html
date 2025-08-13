@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Compétences PFEQ - Mathématiques{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/math-schedule.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main Container -->
+    <div class="math-overview-container math-fade-in">
+        <!-- Header -->
+        <div class="math-header">
+            <h1>🎯 Compétences PFEQ</h1>
+            <p>Distribution des compétences mathématiques selon le Programme de formation</p>
+        </div>
+        
+        <!-- Competencies Grid -->
+        <div class="math-competencies-grid">
+            {% for code, info in competencies_info.items() %}
+                <div class="math-competency-card math-scale-in" style="border-left-color: {{ info.color }};">
+                    <div class="math-competency-code">{{ code }}</div>
+                    <h3 class="math-competency-title">{{ info.title }}</h3>
+                    <p class="math-competency-description">{{ info.description }}</p>
+                    <div class="math-competency-count">{{ info.count }} séances</div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Statistics -->
+        <div class="math-stats-grid" style="margin-top: var(--space-2xl);">
+            <div class="math-stat-card">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📊</div>
+                </div>
+                <div class="math-stat-value">{{ total_lessons or 0 }}</div>
+                <div class="math-stat-label">Séances totales</div>
+                <div class="math-stat-description">avec compétences définies</div>
+            </div>
+            
+            <div class="math-stat-card">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">⚖️</div>
+                </div>
+                <div class="math-stat-value">Équilibrée</div>
+                <div class="math-stat-label">Distribution</div>
+                <div class="math-stat-description">répartition équilibrée entre les 3 compétences</div>
+            </div>
+            
+            <div class="math-stat-card">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">✅</div>
+                </div>
+                <div class="math-stat-value">100%</div>
+                <div class="math-stat-label">Conformité PFEQ</div>
+                <div class="math-stat-description">respect complet du programme officiel</div>
+            </div>
+        </div>
+
+        <!-- Back Navigation -->
+        <div style="text-align: center; margin-top: var(--space-2xl);">
+            <a href="{{ url_for('math_schedule_overview') }}" class="btn btn-primary btn-lg">
+                ← Retour à l'aperçu
+            </a>
+        </div>
+    </div>
+{% endblock %}

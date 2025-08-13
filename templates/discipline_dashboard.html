@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ discipline_config.title }} - Tableau de bord</title>
+    
+    <!-- CSS Components -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base/reset.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/progress.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/discipline-dashboard.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    {% include 'components/navigation.html' %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category == 'error' else category }}" style="background: var(--{{ 'danger' if category == 'error' else 'success' }}-color); color: var(--white); padding: var(--space-lg); border-radius: var(--radius-lg); margin-bottom: var(--space-lg); max-width: 1400px; margin-left: auto; margin-right: auto; text-align: center;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Import dashboard component macros -->
+    {% from 'components/discipline_dashboard_base.html' import discipline_stat_card, discipline_progress_section, discipline_competency_card, discipline_action_button %}
+
+    <!-- Main Container with Discipline Theme -->
+    <div class="discipline-dashboard discipline-theme-{{ discipline_config.theme }} discipline-fade-in">
+        
+        <!-- Header -->
+        <div class="discipline-header">
+            <h1>{{ discipline_config.icon }} {{ discipline_config.title }}</h1>
+            <p>{{ discipline_config.description }}</p>
+            <div class="discipline-badge" style="background: var(--discipline-gradient);">
+                Secondaire 2 • PFEQ
+            </div>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            {{ discipline_stat_card(
+                icon="📚",
+                value=completed_lessons,
+                label="Séances terminées",
+                description="sur " + total_lessons|string + " au total dans le programme",
+                trend_text=("+5 cette semaine" if completed_lessons >= 5 else "En progression"),
+                trend_type="info"
+            ) }}
+            
+            {{ discipline_stat_card(
+                icon="🎯",
+                value=progress_percentage|string + "%",
+                label="Progression",
+                description="du programme complet de " + discipline_config.title.lower(),
+                trend_text=("Excellent rythme" if progress_percentage >= 15 else "Bon démarrage"),
+                trend_type=""
+            ) }}
+            
+            {% if discipline == 'francais' or books_read > 0 %}
+            {{ discipline_stat_card(
+                icon="📖",
+                value=books_read,
+                label="Livres lus",
+                description="dans votre carnet de lecture personnel",
+                trend_text=(books_read|string + " livres" if books_read > 0 else "Commencez votre carnet"),
+                trend_type="warning"
+            ) }}
+            {% endif %}
+            
+            {% if avg_rating > 0 %}
+            {{ discipline_stat_card(
+                icon="⭐",
+                value=(avg_rating if avg_rating > 0 else "--"),
+                label="Note moyenne",
+                description="évaluation de vos lectures sur 5 étoiles",
+                trend_text=("Excellent" if avg_rating >= 4 else "Bien" if avg_rating >= 3 else "Débutant"),
+                trend_type=""
+            ) }}
+            {% endif %}
+        </div>
+
+        <!-- Overall Progress -->
+        {{ discipline_progress_section(
+            title="🎯 Progression du programme " + discipline_config.title,
+            current=completed_lessons,
+            total=total_lessons,
+            description=("Excellent rythme de progression !" if progress_percentage >= 15 else 
+                        "Bon démarrage, continuez !" if progress_percentage >= 5 else 
+                        "C'est parti pour l'aventure !")
+        ) }}
+
+        <!-- Competencies Section -->
+        {% if competencies %}
+        <div style="margin-top: var(--space-2xl);">
+            <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--discipline-primary, var(--primary-color)); margin-bottom: var(--space-lg); text-align: center;">
+                🎯 Compétences PFEQ
+            </h2>
+            
+            <div class="discipline-competency-grid">
+                {% for competency in competencies %}
+                {{ discipline_competency_card(
+                    icon=("🔢" if discipline == 'mathematiques' else "📖" if discipline == 'francais' else "🎯"),
+                    title=competency.title,
+                    description="Développement progressif selon le Programme de formation de l'école québécoise",
+                    progress_percentage=competency.progress,
+                    competency_code=competency.code
+                ) }}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Activity -->
+        {% if recent_activity %}
+        <div style="margin-top: var(--space-2xl);">
+            <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--discipline-primary, var(--primary-color)); margin-bottom: var(--space-lg); text-align: center;">
+                📅 Activité récente
+            </h2>
+            
+            <div class="stats-grid">
+                {% for activity in recent_activity[:3] %}
+                <div class="discipline-stat-card discipline-scale-in" style="border-color: var(--discipline-accent);">
+                    <div class="stat-header">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-trend">Terminé</div>
+                    </div>
+                    <div class="stat-value" style="font-size: var(--font-size-lg); color: var(--discipline-primary);">
+                        Séance {{ activity[1] }}
+                    </div>
+                    <div class="stat-label">{{ activity[0][:50] }}{% if activity[0]|length > 50 %}...{% endif %}</div>
+                    <div class="stat-description">
+                        Complété le {{ activity[2].split()[0] if activity[2] else 'récemment' }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Actions -->
+        <div style="margin-top: var(--space-2xl);">
+            <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--discipline-primary, var(--primary-color)); margin-bottom: var(--space-lg); text-align: center;">
+                🚀 Actions rapides
+            </h2>
+            
+            <div class="stats-grid">
+                {% if discipline == 'mathematiques' %}
+                {{ discipline_action_button(
+                    url=url_for('math_schedule_overview'),
+                    icon="📊",
+                    title="Aperçu du programme",
+                    description="Vue d'ensemble du curriculum mathématique"
+                ) }}
+                
+                {{ discipline_action_button(
+                    url=url_for('math_units'),
+                    icon="📚",
+                    title="Unités thématiques",
+                    description="Explorer les 5 domaines mathématiques"
+                ) }}
+                
+                {{ discipline_action_button(
+                    url=url_for('progress_dashboard'),
+                    icon="📈",
+                    title="Progrès détaillé",
+                    description="Suivi avancé de votre progression"
+                ) }}
+                {% else %}
+                {{ discipline_action_button(
+                    url=url_for('calendar'),
+                    icon="📅",
+                    title="Calendrier des séances",
+                    description="Voir toutes les leçons programmées"
+                ) }}
+                
+                {{ discipline_action_button(
+                    url=url_for('lessons_list'),
+                    icon="📋",
+                    title="Liste des leçons",
+                    description="Parcourir et rechercher dans les leçons"
+                ) }}
+                
+                {% if discipline == 'francais' %}
+                {{ discipline_action_button(
+                    url=url_for('reading_log'),
+                    icon="📖",
+                    title="Carnet de lecture",
+                    description="Gérer vos lectures personnelles"
+                ) }}
+                {% endif %}
+                {% endif %}
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Include component JavaScript -->
+    {% include 'components/discipline_dashboard_base.html' %}
+</body>
+</html>

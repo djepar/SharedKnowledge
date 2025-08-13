@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Programme de Mathématiques - Aperçu{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/math-schedule.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main Container -->
+    <div class="math-overview-container math-fade-in">
+        <!-- Header -->
+        <div class="math-header">
+            <h1>📊 Programme de Mathématiques</h1>
+            <p>Aperçu complet du curriculum - {{ total_lessons }} séances réparties en {{ total_cycles }} cycles</p>
+        </div>
+        
+        <!-- Statistics Grid -->
+        <div class="math-stats-grid">
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">🔢</div>
+                </div>
+                <div class="math-stat-value">{{ total_lessons or 160 }}</div>
+                <div class="math-stat-label">Séances totales</div>
+                <div class="math-stat-description">Programme complet de mathématiques réparti sur l'année scolaire</div>
+            </div>
+            
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">🎯</div>
+                </div>
+                <div class="math-stat-value">{{ total_cycles or 20 }}</div>
+                <div class="math-stat-label">Cycles d'apprentissage</div>
+                <div class="math-stat-description">Cycles hebdomadaires structurant la progression pédagogique</div>
+            </div>
+            
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📋</div>
+                </div>
+                <div class="math-stat-value">5</div>
+                <div class="math-stat-label">Unités thématiques</div>
+                <div class="math-stat-description">Grands domaines mathématiques couverts dans le programme</div>
+            </div>
+            
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">🎓</div>
+                </div>
+                <div class="math-stat-value">3</div>
+                <div class="math-stat-label">Compétences PFEQ</div>
+                <div class="math-stat-description">Compétences mathématiques selon le Programme de formation</div>
+            </div>
+        </div>
+
+        <!-- Cycles Overview -->
+        <div style="margin-bottom: var(--space-2xl);">
+            <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--primary-color); margin-bottom: var(--space-lg); text-align: center;">
+                📅 Aperçu des cycles
+            </h2>
+            
+            {% if cycles %}
+                <div class="math-lessons-grid">
+                    {% for cycle in cycles %}
+                        <div class="math-lesson-card math-scale-in">
+                            <div class="math-lesson-header">
+                                <div class="math-lesson-number">Cycle {{ cycle[0] }}</div>
+                                <div class="math-lesson-status pending">{{ cycle[1] }} séances</div>
+                            </div>
+                            
+                            <h3 class="math-lesson-title">Semaine {{ cycle[0] }}</h3>
+                            
+                            {% if cycle[2] %}
+                                <div class="math-lesson-content">
+                                    <strong>Thèmes:</strong> {{ cycle[2][:100] }}{% if cycle[2]|length > 100 %}...{% endif %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="math-lesson-actions">
+                                <a href="{{ url_for('cycle_detail', cycle_number=cycle[0]) }}" class="btn btn-primary">
+                                    📖 Voir les détails
+                                </a>
+                                <span style="color: var(--gray-500); font-size: var(--font-size-sm);">
+                                    {{ cycle[1] }} séance{{ 's' if cycle[1] > 1 else '' }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: var(--space-3xl); color: var(--gray-500);">
+                    <p style="font-size: var(--font-size-lg); margin-bottom: var(--space-md);">📋 Aucun cycle disponible</p>
+                    <p>Importez d'abord le programme de mathématiques pour voir les cycles.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="math-stats-grid">
+            <a href="{{ url_for('math_units') }}" class="math-stat-card math-scale-in" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📚</div>
+                </div>
+                <div class="math-stat-label">Unités thématiques</div>
+                <div class="math-stat-description">Explorer les 5 grandes unités du programme</div>
+            </a>
+            
+            <a href="{{ url_for('competencies_overview') }}" class="math-stat-card math-scale-in" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">🎯</div>
+                </div>
+                <div class="math-stat-label">Compétences PFEQ</div>
+                <div class="math-stat-description">Distribution des compétences mathématiques</div>
+            </a>
+            
+            <a href="{{ url_for('assessment_calendar') }}" class="math-stat-card math-scale-in" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📊</div>
+                </div>
+                <div class="math-stat-label">Calendrier d'évaluations</div>
+                <div class="math-stat-description">Moments d'évaluation clés de l'année</div>
+            </a>
+            
+            <a href="{{ url_for('progress_dashboard') }}" class="math-stat-card math-scale-in" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📈</div>
+                </div>
+                <div class="math-stat-label">Tableau de bord</div>
+                <div class="math-stat-description">Suivi de votre progression personnelle</div>
+            </a>
+        </div>
+
+        <!-- Import Action -->
+        {% if not cycles %}
+            <div style="text-align: center; margin-top: var(--space-2xl); padding: var(--space-xl); background: var(--gray-100); border-radius: var(--radius-lg);">
+                <h3 style="color: var(--primary-color); margin-bottom: var(--space-md);">🚀 Commencer avec le programme de mathématiques</h3>
+                <p style="color: var(--gray-600); margin-bottom: var(--space-lg);">Importez le programme complet pour accéder aux 160 séances structurées.</p>
+                <a href="{{ url_for('import_math_schedule') }}" class="btn btn-primary btn-lg">
+                    📥 Importer le programme de mathématiques
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Staggered animation for cards
+        const cards = document.querySelectorAll('.math-stat-card, .math-lesson-card');
+        cards.forEach((card, index) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Interactive hover effects
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}

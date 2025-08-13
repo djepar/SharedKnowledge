@@ -89,10 +89,18 @@ def check_and_migrate_database():
                 materials TEXT,
                 objectives TEXT,
                 tags TEXT,
+                subject TEXT DEFAULT 'français',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        
+        # Add subject column if it doesn't exist (for existing databases)
+        try:
+            c.execute("ALTER TABLE lessons ADD COLUMN subject TEXT DEFAULT 'français'")
+        except sqlite3.OperationalError:
+            # Column already exists
+            pass
         
         c.execute('''
             CREATE TABLE IF NOT EXISTS student_progress (
@@ -238,8 +246,8 @@ def set_discipline(discipline):
     
     # Store the selected discipline in session
     session['discipline'] = discipline
-    flash(f"Discipline '{discipline.replace('_', ' ').title()}' sélectionnée!", 'success')
-    return redirect(url_for('index'))
+    # Redirect directly to discipline dashboard instead of index
+    return redirect(url_for('discipline_dashboard', discipline=discipline))
 
 @app.route('/calendar')
 def calendar():
@@ -362,55 +370,159 @@ def add_book():
 
 @app.route('/dashboard')
 def dashboard():
+    """Redirect to discipline-specific dashboard"""
     if 'user' not in session:
         return redirect(url_for('login'))
+    
+    # Get user's selected discipline
+    discipline = session.get('discipline', 'francais')
+    return redirect(url_for('discipline_dashboard', discipline=discipline))
+
+@app.route('/dashboard/<discipline>')
+def discipline_dashboard(discipline):
+    """Discipline-specific dashboard"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    # Validate discipline
+    valid_disciplines = ['mathematiques', 'francais', 'histoire', 'culture_citoyennete', 'geographie']
+    if discipline not in valid_disciplines:
+        flash("Discipline non reconnue", 'error')
+        return redirect(url_for('discipline_selection'))
     
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     
-    # Get user statistics
+    # Get discipline-specific statistics
+    user_id = session.get('user_id')
     completed_lessons = 0
+    total_lessons = 0
     books_read = 0
     avg_rating = 0
     
-    if 'user_id' in session:
-        # Get completed lessons count
-        c.execute("SELECT COUNT(*) FROM student_progress WHERE user_id=? AND completed=1", 
-                  (session['user_id'],))
-        completed_lessons = c.fetchone()[0]
+    if user_id:
+        # Get completed lessons count for this discipline
+        if discipline == 'mathematiques':
+            c.execute("""SELECT COUNT(*) FROM student_progress sp 
+                        JOIN lessons l ON sp.lesson_id = l.id 
+                        WHERE sp.user_id=? AND sp.completed=1 AND l.subject='mathématiques'""", 
+                     (user_id,))
+            completed_lessons = c.fetchone()[0]
+            
+            # Get total lessons for mathematics
+            c.execute("SELECT COUNT(*) FROM lessons WHERE subject='mathématiques'")
+            total_lessons = c.fetchone()[0]
+        else:
+            # For other disciplines, use general lesson count (adjust as needed)
+            c.execute("""SELECT COUNT(*) FROM student_progress sp 
+                        JOIN lessons l ON sp.lesson_id = l.id 
+                        WHERE sp.user_id=? AND sp.completed=1 AND (l.subject=? OR l.subject='français')""", 
+                     (user_id, discipline))
+            completed_lessons = c.fetchone()[0]
+            
+            # Get total lessons count
+            c.execute("SELECT COUNT(*) FROM lessons WHERE subject=? OR subject='français'", (discipline,))
+            total_lessons = c.fetchone()[0]
         
-        # Get books read count
-        c.execute("SELECT COUNT(*) FROM reading_log WHERE user_id=?", (session['user_id'],))
+        # Get books read count (common for all disciplines)
+        c.execute("SELECT COUNT(*) FROM reading_log WHERE user_id=?", (user_id,))
         books_read = c.fetchone()[0]
         
         # Get average rating
-        c.execute("SELECT AVG(rating) FROM reading_log WHERE user_id=? AND rating IS NOT NULL", 
-                  (session['user_id'],))
+        c.execute("SELECT AVG(rating) FROM reading_log WHERE user_id=? AND rating IS NOT NULL", (user_id,))
         avg_rating_result = c.fetchone()[0]
         avg_rating = round(avg_rating_result, 1) if avg_rating_result else 0
     
-    # Get total lessons count
-    c.execute("SELECT COUNT(*) FROM lessons")
-    total_lessons = c.fetchone()[0]
-    
     # Calculate progress percentage
-    if total_lessons > 0:
-        progress_percentage = round((completed_lessons / total_lessons * 100), 1)
+    progress_percentage = round((completed_lessons / total_lessons * 100), 1) if total_lessons > 0 else 0
+    
+    # Get discipline-specific competencies and recent activity
+    recent_activity = []
+    competencies = []
+    
+    if discipline == 'mathematiques':
+        # Get recent math activity
+        c.execute("""SELECT l.title, l.lesson_number, sp.completion_date
+                    FROM student_progress sp
+                    JOIN lessons l ON l.id = sp.lesson_id
+                    WHERE sp.user_id = ? AND sp.completed = 1 AND l.subject = 'mathématiques'
+                    ORDER BY sp.completion_date DESC LIMIT 5""", (user_id,))
+        recent_activity = c.fetchall()
+        
+        # Math competencies (PFEQ)
+        competencies = [
+            {'code': 'C1', 'title': 'Résoudre une situation-problème', 'progress': 45},
+            {'code': 'C2', 'title': 'Raisonnement mathématique', 'progress': 60},
+            {'code': 'C3', 'title': 'Communication mathématique', 'progress': 35}
+        ]
     else:
-        progress_percentage = 0
+        # Get recent activity for other disciplines
+        c.execute("""SELECT l.title, l.lesson_number, sp.completion_date
+                    FROM student_progress sp
+                    JOIN lessons l ON l.id = sp.lesson_id
+                    WHERE sp.user_id = ? AND sp.completed = 1
+                    ORDER BY sp.completion_date DESC LIMIT 5""", (user_id,))
+        recent_activity = c.fetchall()
+        
+        # French competencies (PFEQ)
+        if discipline == 'francais':
+            competencies = [
+                {'code': 'C1', 'title': 'Lire et apprécier des textes', 'progress': 70},
+                {'code': 'C2', 'title': 'Écrire des textes variés', 'progress': 55},
+                {'code': 'C3', 'title': 'Communiquer oralement', 'progress': 65}
+            ]
     
     conn.close()
     
+    # Discipline configuration
+    discipline_config = {
+        'mathematiques': {
+            'title': 'Mathématiques',
+            'icon': '🔢',
+            'theme': 'math',
+            'description': 'Algèbre, géométrie, statistiques et résolution de problèmes'
+        },
+        'francais': {
+            'title': 'Français',
+            'icon': '📖',
+            'theme': 'francais',
+            'description': 'Lecture, écriture, grammaire et littérature québécoise'
+        },
+        'histoire': {
+            'title': 'Histoire',
+            'icon': '🏛️',
+            'theme': 'histoire',
+            'description': 'Histoire du Québec, du Canada et civilisations anciennes'
+        },
+        'culture_citoyennete': {
+            'title': 'Culture et citoyenneté',
+            'icon': '🏳️',
+            'theme': 'culture',
+            'description': 'Éthique, culture québécoise et éducation à la citoyenneté'
+        },
+        'geographie': {
+            'title': 'Géographie',
+            'icon': '🌍',
+            'theme': 'geographie',
+            'description': 'Géographie du Québec, environnement et territoires'
+        }
+    }
+    
     # Prepare data for template
     data = {
+        'discipline': discipline,
+        'discipline_config': discipline_config[discipline],
         'completed_lessons': completed_lessons,
         'total_lessons': total_lessons,
         'books_read': books_read,
         'avg_rating': avg_rating,
-        'progress_percentage': progress_percentage
+        'progress_percentage': progress_percentage,
+        'recent_activity': recent_activity,
+        'competencies': competencies,
+        'available_disciplines': valid_disciplines
     }
     
-    return render_template('dashboard.html', **data)
+    return render_template('discipline_dashboard.html', **data)
 @app.route('/lessons')
 def lessons_list():
     """Display all lessons with filtering and search"""
@@ -803,6 +915,199 @@ def bulk_actions():
         conn.close()
     
     return redirect(url_for('lessons_list'))
+
+# Math Schedule Routes
+@app.route('/math/import')
+def import_math_schedule():
+    """Import the complete mathematics schedule into the database"""
+    try:
+        # Import the complete schedule
+        from complete_math_schedule import import_to_flask_db
+        import_to_flask_db()
+        
+        flash('Programme de mathématiques importé avec succès! 🎉', 'success')
+        return redirect(url_for('math_schedule_overview'))
+    except Exception as e:
+        flash(f'Erreur lors de l\'importation: {str(e)}', 'error')
+        return redirect(url_for('math_schedule_overview'))
+
+@app.route('/math/overview')
+def math_schedule_overview():
+    """Display overview of the mathematics curriculum"""
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        # Get lessons by cycle with tags
+        cursor.execute('''
+            SELECT week_number, COUNT(*) as lesson_count,
+                   GROUP_CONCAT(DISTINCT tags) as unit_tags
+            FROM lessons 
+            WHERE subject = 'mathématiques'
+            GROUP BY week_number 
+            ORDER BY week_number
+        ''')
+        cycles = cursor.fetchall()
+        
+        # Get competency distribution
+        cursor.execute('''
+            SELECT competences, COUNT(*) as count
+            FROM lessons
+            WHERE competences IS NOT NULL AND subject = 'mathématiques'
+            GROUP BY competences
+            ORDER BY count DESC
+        ''')
+        competencies = cursor.fetchall()
+        
+        # Get total statistics
+        cursor.execute('SELECT COUNT(*) FROM lessons WHERE subject = "mathématiques"')
+        total_lessons = cursor.fetchone()[0]
+        
+        cursor.execute('SELECT COUNT(DISTINCT week_number) FROM lessons WHERE subject = "mathématiques"')
+        total_cycles = cursor.fetchone()[0]
+        
+        conn.close()
+        
+        return render_template('math_schedule_overview.html', 
+                             cycles=cycles, 
+                             competencies=competencies,
+                             total_lessons=total_lessons,
+                             total_cycles=total_cycles)
+    except Exception as e:
+        flash(f'Erreur lors du chargement de l\'aperçu: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+
+@app.route('/math/units')
+def math_units():
+    """Redirect to math schedule overview for consolidated view"""
+    return redirect(url_for('math_schedule_overview'))
+
+@app.route('/math/competencies')
+def competencies_overview():
+    """Display overview of PFEQ competencies distribution"""
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        # Get competency distribution by cycle
+        cursor.execute('''
+            SELECT week_number, competences, COUNT(*) as count
+            FROM lessons
+            WHERE competences IS NOT NULL AND subject = 'mathématiques'
+            GROUP BY week_number, competences
+            ORDER BY week_number
+        ''')
+        
+        competency_data = cursor.fetchall()
+        
+        # Get overall competency statistics
+        cursor.execute('''
+            SELECT 
+                SUM(CASE WHEN competences LIKE '%C1%' THEN 1 ELSE 0 END) as c1_count,
+                SUM(CASE WHEN competences LIKE '%C2%' THEN 1 ELSE 0 END) as c2_count,
+                SUM(CASE WHEN competences LIKE '%C3%' THEN 1 ELSE 0 END) as c3_count,
+                COUNT(*) as total
+            FROM lessons
+            WHERE competences IS NOT NULL AND subject = 'mathématiques'
+        ''')
+        
+        overall_stats = cursor.fetchone()
+        
+        conn.close()
+        
+        competencies_info = {
+            'C1': {
+                'title': 'Résoudre une situation-problème mathématique',
+                'description': 'Développer des stratégies de résolution et appliquer différents processus mathématiques',
+                'color': '#3B82F6',
+                'count': overall_stats[0] if overall_stats else 0
+            },
+            'C2': {
+                'title': 'Utiliser un raisonnement mathématique',
+                'description': 'Développer et appliquer des stratégies liées aux concepts et processus mathématiques',
+                'color': '#10B981',
+                'count': overall_stats[1] if overall_stats else 0
+            },
+            'C3': {
+                'title': 'Communiquer à l\'aide du langage mathématique',
+                'description': 'Interpréter et produire des messages à caractère mathématique',
+                'color': '#F59E0B',
+                'count': overall_stats[2] if overall_stats else 0
+            }
+        }
+        
+        return render_template('competencies_overview.html',
+                             competency_data=competency_data,
+                             competencies_info=competencies_info,
+                             total_lessons=overall_stats[3] if overall_stats else 0)
+    except Exception as e:
+        flash(f'Erreur lors du chargement des compétences: {str(e)}', 'error')
+        return redirect(url_for('math_schedule_overview'))
+
+@app.route('/math/progress')
+def progress_dashboard():
+    """Display student progress dashboard"""
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        
+        user_id = session.get('user_id', 1)
+        
+        # Get overall progress
+        cursor.execute('''
+            SELECT 
+                COUNT(*) as total_lessons,
+                SUM(CASE WHEN sp.completed = 1 THEN 1 ELSE 0 END) as completed_lessons
+            FROM lessons l
+            LEFT JOIN student_progress sp ON l.id = sp.lesson_id AND sp.user_id = ?
+            WHERE l.subject = 'mathématiques'
+        ''', (user_id,))
+        
+        overall_progress = cursor.fetchone()
+        
+        # Get progress by unit
+        cursor.execute('''
+            SELECT 
+                CASE 
+                    WHEN l.week_number BETWEEN 1 AND 4 THEN 'Unité 1: Arithmétique'
+                    WHEN l.week_number BETWEEN 5 AND 8 THEN 'Unité 2: Algèbre'
+                    WHEN l.week_number BETWEEN 9 AND 13 THEN 'Unité 3: Géométrie'
+                    WHEN l.week_number BETWEEN 14 AND 16 THEN 'Unité 4: Statistiques'
+                    WHEN l.week_number BETWEEN 17 AND 20 THEN 'Unité 5: Intégration'
+                END as unit_name,
+                COUNT(*) as total_lessons,
+                SUM(CASE WHEN sp.completed = 1 THEN 1 ELSE 0 END) as completed_lessons
+            FROM lessons l
+            LEFT JOIN student_progress sp ON l.id = sp.lesson_id AND sp.user_id = ?
+            WHERE l.subject = 'mathématiques'
+            GROUP BY unit_name
+            ORDER BY MIN(l.week_number)
+        ''', (user_id,))
+        
+        unit_progress = cursor.fetchall()
+        
+        # Get recent activity
+        cursor.execute('''
+            SELECT l.title, l.lesson_number, sp.completion_date
+            FROM student_progress sp
+            JOIN lessons l ON l.id = sp.lesson_id
+            WHERE sp.user_id = ? AND sp.completed = 1 AND l.subject = 'mathématiques'
+            ORDER BY sp.completion_date DESC
+            LIMIT 5
+        ''', (user_id,))
+        
+        recent_activity = cursor.fetchall()
+        
+        conn.close()
+        
+        return render_template('progress_dashboard.html',
+                             overall_progress=overall_progress,
+                             unit_progress=unit_progress,
+                             recent_activity=recent_activity)
+    except Exception as e:
+        flash(f'Erreur lors du chargement du tableau de bord: {str(e)}', 'error')
+        return redirect(url_for('math_schedule_overview'))
+
 @app.route('/logout')
 def logout():
     session.clear()

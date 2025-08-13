@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord - Mathématiques{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/math-schedule.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    <!-- Main Container -->
+    <div class="math-overview-container math-fade-in">
+        <!-- Header -->
+        <div class="math-header">
+            <h1>📈 Mon Progrès en Mathématiques</h1>
+            <p>Suivi détaillé de votre avancement dans le programme</p>
+        </div>
+        
+        <!-- Overall Progress -->
+        {% set total = overall_progress[0] if overall_progress else 0 %}
+        {% set completed = overall_progress[1] if overall_progress else 0 %}
+        {% set percentage = (completed * 100 // total) if total > 0 else 0 %}
+        
+        <div class="math-stats-grid">
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">✅</div>
+                </div>
+                <div class="math-stat-value">{{ completed }}</div>
+                <div class="math-stat-label">Séances complétées</div>
+                <div class="math-stat-description">sur {{ total }} séances au total</div>
+            </div>
+            
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📊</div>
+                </div>
+                <div class="math-stat-value">{{ percentage }}%</div>
+                <div class="math-stat-label">Progression</div>
+                <div class="math-stat-description">du programme complet de mathématiques</div>
+            </div>
+            
+            <div class="math-stat-card math-slide-up">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">🎯</div>
+                </div>
+                <div class="math-stat-value">{{ total - completed }}</div>
+                <div class="math-stat-label">Séances restantes</div>
+                <div class="math-stat-description">pour terminer le programme</div>
+            </div>
+        </div>
+
+        <!-- Progress by Unit -->
+        {% if unit_progress %}
+            <div style="margin-top: var(--space-2xl);">
+                <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--primary-color); margin-bottom: var(--space-lg); text-align: center;">
+                    📚 Progrès par unité
+                </h2>
+                
+                <div class="math-lessons-grid">
+                    {% for unit in unit_progress %}
+                        {% if unit[0] %}
+                            {% set unit_total = unit[1] if unit[1] else 0 %}
+                            {% set unit_completed = unit[2] if unit[2] else 0 %}
+                            {% set unit_percentage = (unit_completed * 100 // unit_total) if unit_total > 0 else 0 %}
+                            
+                            <div class="math-lesson-card math-scale-in">
+                                <div class="math-lesson-header">
+                                    <div class="math-lesson-number">{{ unit_percentage }}%</div>
+                                    <div class="math-lesson-status {{ 'completed' if unit_percentage >= 100 else 'pending' }}">
+                                        {{ unit_completed }}/{{ unit_total }}
+                                    </div>
+                                </div>
+                                
+                                <h3 class="math-lesson-title">{{ unit[0] }}</h3>
+                                
+                                <div class="math-unit-progress" style="margin: var(--space-md) 0;">
+                                    <div class="math-unit-progress-bar" style="width: {{ unit_percentage }}%;"></div>
+                                </div>
+                                
+                                <div class="math-lesson-content">
+                                    {{ unit_completed }} séances terminées sur {{ unit_total }} • 
+                                    {% if unit_percentage >= 100 %}
+                                        Unité complétée! 🎉
+                                    {% elif unit_percentage >= 75 %}
+                                        Presque terminé!
+                                    {% elif unit_percentage >= 50 %}
+                                        Bon progrès
+                                    {% elif unit_percentage > 0 %}
+                                        En cours
+                                    {% else %}
+                                        À commencer
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Recent Activity -->
+        {% if recent_activity %}
+            <div style="margin-top: var(--space-2xl);">
+                <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--primary-color); margin-bottom: var(--space-lg); text-align: center;">
+                    📅 Activité récente
+                </h2>
+                
+                <div class="math-lessons-grid">
+                    {% for activity in recent_activity %}
+                        <div class="math-lesson-card completed math-scale-in">
+                            <div class="math-lesson-header">
+                                <div class="math-lesson-number">{{ activity[1] }}</div>
+                                <div class="math-lesson-status completed">Terminé</div>
+                            </div>
+                            
+                            <h3 class="math-lesson-title">{{ activity[0] }}</h3>
+                            
+                            <div class="math-lesson-content">
+                                Complété le {{ activity[2].split()[0] if activity[2] else 'récemment' }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Quick Actions -->
+        <div class="math-stats-grid" style="margin-top: var(--space-2xl);">
+            <a href="{{ url_for('math_schedule_overview') }}" class="math-stat-card" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📊</div>
+                </div>
+                <div class="math-stat-label">Aperçu général</div>
+                <div class="math-stat-description">Vue d'ensemble du programme</div>
+            </a>
+            
+            <a href="{{ url_for('math_units') }}" class="math-stat-card" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">📚</div>
+                </div>
+                <div class="math-stat-label">Unités thématiques</div>
+                <div class="math-stat-description">Explorer les domaines mathématiques</div>
+            </a>
+            
+            <a href="{{ url_for('competencies_overview') }}" class="math-stat-card" style="text-decoration: none; color: inherit;">
+                <div class="math-stat-header">
+                    <div class="math-stat-icon">🎯</div>
+                </div>
+                <div class="math-stat-label">Compétences PFEQ</div>
+                <div class="math-stat-description">Suivi des compétences développées</div>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bars
+        const progressBars = document.querySelectorAll('.math-unit-progress-bar');
+        progressBars.forEach((bar, index) => {
+            const targetWidth = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.transition = 'width 1s ease-out';
+                bar.style.width = targetWidth;
+            }, index * 200);
+        });
+    });
+</script>
+{% endblock %}

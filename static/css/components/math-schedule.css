@@ -1,0 +1,434 @@
+/* Math Schedule Components */
+
+/* Math Schedule Overview */
+.math-overview-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  padding: var(--space-xl);
+}
+
+.math-header {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.math-header h1 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--space-md);
+}
+
+.math-header p {
+  color: var(--gray-600);
+  font-size: var(--font-size-lg);
+}
+
+/* Statistics Cards */
+.math-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.math-stat-card {
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+  border: 2px solid transparent;
+}
+
+.math-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-color);
+}
+
+.math-stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.math-stat-icon {
+  font-size: var(--font-size-2xl);
+  background: var(--gradient-primary);
+  border-radius: var(--radius-full);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.math-stat-value {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  margin-bottom: var(--space-sm);
+}
+
+.math-stat-label {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-600);
+  margin-bottom: var(--space-sm);
+}
+
+.math-stat-description {
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+  line-height: 1.4;
+}
+
+/* Math Units Grid */
+.math-units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.math-unit-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.math-unit-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-color);
+}
+
+.math-unit-header {
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: var(--white);
+  position: relative;
+}
+
+.math-unit-number {
+  font-size: var(--font-size-sm);
+  opacity: 0.8;
+  margin-bottom: var(--space-xs);
+}
+
+.math-unit-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-sm);
+}
+
+.math-unit-icon {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  font-size: var(--font-size-2xl);
+  opacity: 0.7;
+}
+
+.math-unit-content {
+  padding: var(--space-lg);
+}
+
+.math-unit-description {
+  color: var(--gray-600);
+  margin-bottom: var(--space-md);
+  line-height: 1.5;
+}
+
+.math-unit-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.math-unit-cycles,
+.math-unit-lessons {
+  color: var(--gray-500);
+}
+
+.math-unit-progress {
+  background: var(--gray-200);
+  border-radius: var(--radius-sm);
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: var(--space-sm);
+}
+
+.math-unit-progress-bar {
+  height: 100%;
+  background: var(--gradient-success);
+  transition: width var(--transition-slow);
+  border-radius: var(--radius-sm);
+}
+
+/* Cycle Detail Layout */
+.math-cycle-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-2xl);
+  padding: var(--space-xl);
+}
+
+.math-cycle-header {
+  background: var(--gradient-primary);
+  color: var(--white);
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+.math-cycle-title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-sm);
+}
+
+.math-cycle-subtitle {
+  font-size: var(--font-size-lg);
+  opacity: 0.9;
+}
+
+/* Lesson Cards */
+.math-lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--space-lg);
+}
+
+.math-lesson-card {
+  background: var(--white);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: var(--transition-normal);
+  position: relative;
+}
+
+.math-lesson-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.math-lesson-card.completed {
+  border-color: var(--success-color);
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.05) 0%, rgba(40, 167, 69, 0.1) 100%);
+}
+
+.math-lesson-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md);
+}
+
+.math-lesson-number {
+  background: var(--primary-color);
+  color: var(--white);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.math-lesson-status {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.math-lesson-status.completed {
+  background: var(--success-color);
+  color: var(--white);
+}
+
+.math-lesson-status.pending {
+  background: var(--gray-200);
+  color: var(--gray-600);
+}
+
+.math-lesson-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--gray-600);
+  margin-bottom: var(--space-sm);
+  line-height: 1.3;
+}
+
+.math-lesson-content {
+  color: var(--gray-500);
+  margin-bottom: var(--space-md);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.math-lesson-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.math-lesson-duration,
+.math-lesson-competences {
+  background: var(--gray-100);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--gray-600);
+}
+
+.math-lesson-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Competencies Overview */
+.math-competencies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.math-competency-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-md);
+  border-left: 5px solid var(--primary-color);
+  transition: var(--transition-normal);
+}
+
+.math-competency-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.math-competency-code {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary-color);
+  margin-bottom: var(--space-sm);
+}
+
+.math-competency-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-sm);
+  color: var(--gray-600);
+}
+
+.math-competency-description {
+  color: var(--gray-500);
+  margin-bottom: var(--space-md);
+  line-height: 1.4;
+}
+
+.math-competency-count {
+  background: var(--gradient-primary);
+  color: var(--white);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-semibold);
+  display: inline-block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .math-overview-container,
+  .math-cycle-container {
+    padding: var(--space-md);
+    margin: var(--space-sm);
+  }
+  
+  .math-stats-grid,
+  .math-units-grid,
+  .math-lessons-grid,
+  .math-competencies-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .math-header h1 {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .math-cycle-header {
+    padding: var(--space-lg);
+  }
+  
+  .math-cycle-title {
+    font-size: var(--font-size-2xl);
+  }
+}
+
+/* Animation Classes */
+.math-fade-in {
+  animation: mathFadeIn 0.6s ease-out;
+}
+
+.math-slide-up {
+  animation: mathSlideUp 0.6s ease-out;
+}
+
+.math-scale-in {
+  animation: mathScaleIn 0.4s ease-out;
+}
+
+@keyframes mathFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mathSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mathScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

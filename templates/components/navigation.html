@@ -3,7 +3,7 @@
 <nav class="nav-bar">
     <div class="nav-links">
         <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">
-            �� Accueil
+            🏠 Accueil
         </a>
         <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
             📊 Tableau de bord
@@ -17,6 +17,33 @@
         <a href="{{ url_for('lessons_list') }}" class="nav-link {% if request.endpoint == 'lessons_list' %}active{% endif %}">
             📋 Gestion des leçons
         </a>
+        {% if session.discipline == 'mathematiques' %}
+        <a href="{{ url_for('math_schedule_overview') }}" class="nav-link {% if request.endpoint == 'math_schedule_overview' %}active{% endif %}">
+            🔢 Programme math
+        </a>
+        {% endif %}
+        <div class="nav-dropdown">
+            <a href="#" class="nav-link dropdown-toggle">
+                📚 Disciplines{% if session.discipline %} • {{ session.discipline.replace('_', ' ').title() }}{% endif %}
+            </a>
+            <div class="dropdown-menu">
+                <a href="{{ url_for('set_discipline', discipline='mathematiques') }}" class="dropdown-item {% if session.discipline == 'mathematiques' %}active{% endif %}">
+                    🔢 Mathématiques
+                </a>
+                <a href="{{ url_for('set_discipline', discipline='francais') }}" class="dropdown-item {% if session.discipline == 'francais' %}active{% endif %}">
+                    📖 Français
+                </a>
+                <a href="{{ url_for('set_discipline', discipline='histoire') }}" class="dropdown-item {% if session.discipline == 'histoire' %}active{% endif %}">
+                    🏛️ Histoire
+                </a>
+                <a href="{{ url_for('set_discipline', discipline='culture_citoyennete') }}" class="dropdown-item {% if session.discipline == 'culture_citoyennete' %}active{% endif %}">
+                    🏳️ Culture et citoyenneté
+                </a>
+                <a href="{{ url_for('set_discipline', discipline='geographie') }}" class="dropdown-item {% if session.discipline == 'geographie' %}active{% endif %}">
+                    🌍 Géographie
+                </a>
+            </div>
+        </div>
     </div>
     <div class="nav-user">
         <span class="user-greeting">👋 {{ session.user or name or 'Utilisateur' }}</span>
