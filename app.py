@@ -197,7 +197,7 @@ def login():
             session['user'] = name
             session['user_id'] = user[0]
             session['role'] = user[3] if len(user) > 3 else 'teacher'
-            return redirect(url_for('index'))
+            return redirect(url_for('discipline_selection'))
         else:
             flash("Nom d'utilisateur ou mot de passe incorrect", 'error')
             return render_template('login.html')
@@ -224,6 +224,22 @@ def register():
         finally:
             conn.close()
     return render_template('register.html')
+
+@app.route('/discipline-selection')
+def discipline_selection():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    return render_template('discipline_selection.html')
+
+@app.route('/set-discipline/<discipline>')
+def set_discipline(discipline):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    # Store the selected discipline in session
+    session['discipline'] = discipline
+    flash(f"Discipline '{discipline.replace('_', ' ').title()}' sélectionnée!", 'success')
+    return redirect(url_for('index'))
 
 @app.route('/calendar')
 def calendar():

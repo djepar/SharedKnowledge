@@ -18,9 +18,17 @@ def build_css():
     css_files = [
         'static/css/base/variables.css',
         'static/css/base/reset.css',
+        'static/css/components/buttons.css',
+        'static/css/components/forms.css',
         'static/css/components/navigation.css',
+        'static/css/components/auth.css',
+        'static/css/components/discipline-selection.css',
         'static/css/components/dashboard.css',
         'static/css/components/home.css',
+        'static/css/components/calendar.css',
+        'static/css/components/lesson-detail.css',
+        'static/css/components/add-book.css',
+        'static/css/components/reading-log.css',
     ]
     
     combined_css = f"""/*

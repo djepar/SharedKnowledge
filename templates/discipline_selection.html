@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sélection de discipline - Classe Virtuelle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+</head>
+<body class="discipline-body">
+    <div class="discipline-container">
+        <div class="discipline-header">
+            <h1>📚 Choisissez votre discipline</h1>
+            <p>Sélectionnez la matière que vous souhaitez étudier aujourd'hui</p>
+        </div>
+        
+        <div class="disciplines-grid">
+            <a href="{{ url_for('set_discipline', discipline='mathematiques') }}" class="discipline-card">
+                <span class="discipline-icon">🔢</span>
+                <div class="discipline-title">Mathématiques</div>
+                <div class="discipline-description">
+                    Algèbre, géométrie, statistiques et résolution de problèmes
+                </div>
+            </a>
+            
+            <a href="{{ url_for('set_discipline', discipline='francais') }}" class="discipline-card">
+                <span class="discipline-icon">📖</span>
+                <div class="discipline-title">Français</div>
+                <div class="discipline-description">
+                    Lecture, écriture, grammaire et littérature québécoise
+                </div>
+            </a>
+            
+            <a href="{{ url_for('set_discipline', discipline='histoire') }}" class="discipline-card">
+                <span class="discipline-icon">🏛️</span>
+                <div class="discipline-title">Histoire</div>
+                <div class="discipline-description">
+                    Histoire du Québec, du Canada et civilisations anciennes
+                </div>
+            </a>
+            
+            <a href="{{ url_for('set_discipline', discipline='culture_citoyennete') }}" class="discipline-card">
+                <span class="discipline-icon">🏳️</span>
+                <div class="discipline-title">Culture et citoyenneté québécoise</div>
+                <div class="discipline-description">
+                    Éthique, culture québécoise et éducation à la citoyenneté
+                </div>
+            </a>
+            
+            <a href="{{ url_for('set_discipline', discipline='geographie') }}" class="discipline-card">
+                <span class="discipline-icon">🌍</span>
+                <div class="discipline-title">Géographie</div>
+                <div class="discipline-description">
+                    Géographie du Québec, environnement et territoires
+                </div>
+            </a>
+        </div>
+        
+        <div class="discipline-back-link">
+            <a href="{{ url_for('logout') }}">← Retour à la connexion</a>
+        </div>
+    </div>
+</body>
+</html>
