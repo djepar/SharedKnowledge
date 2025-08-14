@@ -254,9 +254,22 @@ def calendar():
     if 'user' not in session:
         return redirect(url_for('login'))
     
+    # Get filter parameter
+    filter_subject = request.args.get('subject', '')
+    
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT * FROM lessons ORDER BY lesson_number")
+    
+    # Get all available subjects for the filter dropdown
+    c.execute("SELECT DISTINCT subject FROM lessons WHERE subject IS NOT NULL ORDER BY subject")
+    available_subjects = [row[0] for row in c.fetchall()]
+    
+    # Build query based on filter
+    if filter_subject and filter_subject != 'all':
+        c.execute("SELECT * FROM lessons WHERE subject=? ORDER BY lesson_number", (filter_subject,))
+    else:
+        c.execute("SELECT * FROM lessons ORDER BY subject, lesson_number")
+    
     lessons = c.fetchall()
     conn.close()
     
@@ -268,7 +281,10 @@ def calendar():
             lessons_by_month[month] = []
         lessons_by_month[month].append(lesson)
     
-    return render_template('calendar.html', lessons_by_month=lessons_by_month)
+    return render_template('calendar.html', 
+                         lessons_by_month=lessons_by_month,
+                         available_subjects=available_subjects,
+                         current_filter=filter_subject)
 
 @app.route('/lesson/<int:lesson_id>')
 def lesson_detail(lesson_id):
@@ -584,8 +600,17 @@ def create_lesson():
         return redirect(url_for('login'))
     
     if request.method == 'POST':
+        subject = request.form.get('subject', 'français')
+        
+        # Get next lesson number for this specific subject
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute("SELECT MAX(lesson_number) FROM lessons WHERE subject=?", (subject,))
+        result = c.fetchone()
+        next_lesson_number = (result[0] or 0) + 1
+        
         lesson_data = {
-            'lesson_number': request.form.get('lesson_number', type=int),
+            'lesson_number': next_lesson_number,
             'month': request.form['month'],
             'week_number': request.form.get('week_number', type=int),
             'day_number': request.form.get('day_number', type=int),
@@ -595,18 +620,16 @@ def create_lesson():
             'competences': request.form.get('competences', ''),
             'materials': request.form.get('materials', ''),
             'objectives': request.form.get('objectives', ''),
-            'tags': request.form.get('tags', '')
+            'tags': request.form.get('tags', ''),
+            'subject': subject
         }
-        
-        conn = sqlite3.connect(DB_FILE)
-        c = conn.cursor()
         
         try:
             c.execute('''
                 INSERT INTO lessons 
                 (lesson_number, month, week_number, day_number, title, content, 
-                 duration, competences, materials, objectives, tags)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 duration, competences, materials, objectives, tags, subject)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', tuple(lesson_data.values()))
             
             conn.commit()
@@ -620,15 +643,21 @@ def create_lesson():
         finally:
             conn.close()
     
-    # Get next lesson number
+    # Get available subjects for the dropdown
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT MAX(lesson_number) FROM lessons")
-    result = c.fetchone()
-    next_lesson_number = (result[0] or 0) + 1
+    c.execute("SELECT DISTINCT subject FROM lessons WHERE subject IS NOT NULL ORDER BY subject")
+    available_subjects = [row[0] for row in c.fetchall()]
+    
+    # Add the 5 main subjects if they don't exist yet
+    all_subjects = ['français', 'mathématiques', 'histoire', 'geographie', 'culture_citoyennete']
+    for subject in all_subjects:
+        if subject not in available_subjects:
+            available_subjects.append(subject)
+    
     conn.close()
     
-    return render_template('create_lesson.html', next_lesson_number=next_lesson_number)
+    return render_template('create_lesson.html', available_subjects=sorted(available_subjects))
 
 @app.route('/lesson/<int:lesson_id>/edit', methods=['GET', 'POST'])
 def edit_lesson(lesson_id):

@@ -45,45 +45,45 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Discipline theme colors */
+/* Discipline theme colors - Using global variables */
 .discipline-theme-math {
-  --discipline-primary: #3B82F6;
-  --discipline-secondary: #1E40AF;
-  --discipline-gradient: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-  --discipline-light: #EBF4FF;
-  --discipline-accent: #60A5FA;
+  --discipline-primary: var(--math-primary);
+  --discipline-secondary: var(--math-secondary);
+  --discipline-gradient: var(--math-gradient);
+  --discipline-light: var(--math-light);
+  --discipline-accent: var(--math-accent);
 }
 
 .discipline-theme-francais {
-  --discipline-primary: #10B981;
-  --discipline-secondary: #047857;
-  --discipline-gradient: linear-gradient(135deg, #10B981 0%, #047857 100%);
-  --discipline-light: #ECFDF5;
-  --discipline-accent: #34D399;
+  --discipline-primary: var(--francais-primary);
+  --discipline-secondary: var(--francais-secondary);
+  --discipline-gradient: var(--francais-gradient);
+  --discipline-light: var(--francais-light);
+  --discipline-accent: var(--francais-accent);
 }
 
 .discipline-theme-histoire {
-  --discipline-primary: #F59E0B;
-  --discipline-secondary: #D97706;
-  --discipline-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-  --discipline-light: #FFFBEB;
-  --discipline-accent: #FBBF24;
+  --discipline-primary: var(--histoire-primary);
+  --discipline-secondary: var(--histoire-secondary);
+  --discipline-gradient: var(--histoire-gradient);
+  --discipline-light: var(--histoire-light);
+  --discipline-accent: var(--histoire-accent);
 }
 
 .discipline-theme-culture {
-  --discipline-primary: #EF4444;
-  --discipline-secondary: #DC2626;
-  --discipline-gradient: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-  --discipline-light: #FEF2F2;
-  --discipline-accent: #F87171;
+  --discipline-primary: var(--culture-primary);
+  --discipline-secondary: var(--culture-secondary);
+  --discipline-gradient: var(--culture-gradient);
+  --discipline-light: var(--culture-light);
+  --discipline-accent: var(--culture-accent);
 }
 
 .discipline-theme-geographie {
-  --discipline-primary: #8B5CF6;
-  --discipline-secondary: #7C3AED;
-  --discipline-gradient: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-  --discipline-light: #F5F3FF;
-  --discipline-accent: #A78BFA;
+  --discipline-primary: var(--geographie-primary);
+  --discipline-secondary: var(--geographie-secondary);
+  --discipline-gradient: var(--geographie-gradient);
+  --discipline-light: var(--geographie-light);
+  --discipline-accent: var(--geographie-accent);
 }
 
 /* Apply theme colors */

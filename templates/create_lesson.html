@@ -40,10 +40,14 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="session_number">Numéro de séance *</label>
-                        <input type="number" id="session_number" name="session_number" min="1" max="160" required 
-                               placeholder="Ex: 15">
-                        <small>Séance dans le programme complet (1-160)</small>
+                        <label for="subject">Discipline *</label>
+                        <select id="subject" name="subject" required>
+                            <option value="">Choisir la discipline...</option>
+                            {% for subject in available_subjects %}
+                            <option value="{{ subject }}">{{ subject.replace('_', ' ').title() }}</option>
+                            {% endfor %}
+                        </select>
+                        <small>La séance sera automatiquement numérotée pour cette discipline</small>
                     </div>
                     
                     <div class="form-group">

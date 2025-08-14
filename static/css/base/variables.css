@@ -79,4 +79,40 @@
   --z-index-dropdown: 50;
   --z-index-overlay: 100;
   --z-index-modal: 1000;
+
+  /* Discipline theme colors */
+  /* Math - Blue tones */
+  --math-primary: #3B82F6;
+  --math-secondary: #1E40AF;
+  --math-gradient: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+  --math-light: #EBF4FF;
+  --math-accent: #60A5FA;
+
+  /* Français - Green tones */
+  --francais-primary: #10B981;
+  --francais-secondary: #047857;
+  --francais-gradient: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  --francais-light: #ECFDF5;
+  --francais-accent: #34D399;
+
+  /* Histoire - Orange/Amber tones */
+  --histoire-primary: #F59E0B;
+  --histoire-secondary: #D97706;
+  --histoire-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --histoire-light: #FFFBEB;
+  --histoire-accent: #FBBF24;
+
+  /* Culture et citoyenneté - Red tones */
+  --culture-primary: #EF4444;
+  --culture-secondary: #DC2626;
+  --culture-gradient: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  --culture-light: #FEF2F2;
+  --culture-accent: #F87171;
+
+  /* Géographie - Purple tones */
+  --geographie-primary: #8B5CF6;
+  --geographie-secondary: #7C3AED;
+  --geographie-gradient: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  --geographie-light: #F5F3FF;
+  --geographie-accent: #A78BFA;
 }

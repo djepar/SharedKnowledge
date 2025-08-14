@@ -180,3 +180,106 @@
     color: #5f3dc4;
     font-weight: var(--font-weight-bold);
 }
+
+/* Calendar filters */
+.calendar-filters {
+    background: var(--gray-50);
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    justify-content: center;
+}
+
+.filter-section label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-600);
+}
+
+.filter-section select {
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    color: var(--gray-700);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.filter-section select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.filter-section select:hover {
+    border-color: var(--primary-light);
+}
+
+/* Subject tags */
+.lesson-subject {
+    margin-bottom: var(--space-sm);
+}
+
+.subject-tag {
+    display: inline-block;
+    color: var(--white);
+    padding: 4px var(--space-sm);
+    border-radius: 15px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--gradient-primary); /* Default fallback */
+}
+
+/* Discipline-specific calendar styling using global variables */
+.lesson-card.discipline-mathematiques {
+    border-left-color: var(--math-primary);
+}
+
+.lesson-card.discipline-mathematiques .subject-tag,
+.lesson-card.discipline-mathematiques .lesson-number {
+    background: var(--math-gradient);
+}
+
+.lesson-card.discipline-francais {
+    border-left-color: var(--francais-primary);
+}
+
+.lesson-card.discipline-francais .subject-tag,
+.lesson-card.discipline-francais .lesson-number {
+    background: var(--francais-gradient);
+}
+
+.lesson-card.discipline-histoire {
+    border-left-color: var(--histoire-primary);
+}
+
+.lesson-card.discipline-histoire .subject-tag,
+.lesson-card.discipline-histoire .lesson-number {
+    background: var(--histoire-gradient);
+}
+
+.lesson-card.discipline-culture_citoyennete {
+    border-left-color: var(--culture-primary);
+}
+
+.lesson-card.discipline-culture_citoyennete .subject-tag,
+.lesson-card.discipline-culture_citoyennete .lesson-number {
+    background: var(--culture-gradient);
+}
+
+.lesson-card.discipline-geographie {
+    border-left-color: var(--geographie-primary);
+}
+
+.lesson-card.discipline-geographie .subject-tag,
+.lesson-card.discipline-geographie .lesson-number {
+    background: var(--geographie-gradient);
+}

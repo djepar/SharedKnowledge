@@ -14,8 +14,25 @@
     <div class="calendar-container">
         <!-- En-tête du calendrier -->
         <div class="calendar-header">
-            <h1>📚 Calendrier des 160 séances</h1>
-            <p>Français secondaire 2 | Programme complet PFEQ</p>
+            <h1>📚 Calendrier des séances</h1>
+            <p>Programme complet - Toutes disciplines</p>
+        </div>
+        
+        <!-- Filtrage par discipline -->
+        <div class="calendar-filters">
+            <div class="filter-section">
+                <label for="subject-filter">Filtrer par matière :</label>
+                <select id="subject-filter" onchange="filterBySubject()">
+                    <option value="all" {% if not current_filter or current_filter == 'all' %}selected{% endif %}>
+                        Toutes les matières
+                    </option>
+                    {% for subject in available_subjects %}
+                    <option value="{{ subject }}" {% if current_filter == subject %}selected{% endif %}>
+                        {{ subject.title() }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
         
         <!-- Navigation par mois -->
@@ -42,12 +59,16 @@
                 </div>
                 
                 {% for lesson in lessons %}
-                <div class="lesson-card">
+                <div class="lesson-card discipline-{{ lesson[14] if lesson[14] else 'default' }}">
                     <div class="lesson-header">
-                        <span class="lesson-number">Séance {{ lesson[1] }}</span>
+                        <span class="lesson-number">{{ lesson[14]|title if lesson[14] else 'Général' }} - Séance {{ lesson[1] }}</span>
                         <span style="color: var(--gray-500); font-size: var(--font-size-sm);">
                             Semaine {{ lesson[3] }} • Jour {{ lesson[4] }} • {{ lesson[7] }}min
                         </span>
+                    </div>
+                    
+                    <div class="lesson-subject">
+                        <span class="subject-tag">{{ lesson[14] if lesson[14] else 'Sans discipline' }}</span>
                     </div>
                     
                     <div class="lesson-title">{{ lesson[5] }}</div>
@@ -98,6 +119,22 @@
             
             // Activer le bouton cliqué
             event.target.classList.add('active');
+        }
+
+        function filterBySubject() {
+            const select = document.getElementById('subject-filter');
+            const selectedSubject = select.value;
+            
+            // Construire l'URL avec le paramètre de filtre
+            const currentUrl = new URL(window.location);
+            if (selectedSubject === 'all') {
+                currentUrl.searchParams.delete('subject');
+            } else {
+                currentUrl.searchParams.set('subject', selectedSubject);
+            }
+            
+            // Recharger la page avec le nouveau filtre
+            window.location.href = currentUrl.toString();
         }
 
         // Animation d'entrée
