@@ -20,13 +20,17 @@ def build_css():
         'static/css/components/navigation.css',  # Navigation (used everywhere)
         'static/css/components/buttons.css',     # Buttons (used everywhere)
         'static/css/components/forms.css',       # Forms (used in multiple pages)
+        'static/css/components/progress.css',    # Progress bars and indicators
         'static/css/components/home.css',        # Home page specific
         'static/css/components/dashboard.css',   # Dashboard page specific
+        'static/css/components/discipline-dashboard.css', # Discipline-specific dashboards
         'static/css/components/auth.css',        # Authentication pages
         'static/css/components/calendar.css',    # Calendar page
         'static/css/components/reading-log.css', # Reading log page
         'static/css/components/add-book.css',    # Add book page
         'static/css/components/lesson-detail.css', # Lesson detail page
+        'static/css/components/discipline-selection.css', # Discipline selection page
+        'static/css/components/math-schedule.css', # Math schedule components
     ]
     
     combined_css = f"""/*

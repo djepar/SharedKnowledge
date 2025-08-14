@@ -17,11 +17,7 @@
         <a href="{{ url_for('lessons_list') }}" class="nav-link {% if request.endpoint == 'lessons_list' %}active{% endif %}">
             📋 Gestion des leçons
         </a>
-        {% if session.discipline == 'mathematiques' %}
-        <a href="{{ url_for('math_schedule_overview') }}" class="nav-link {% if request.endpoint == 'math_schedule_overview' %}active{% endif %}">
-            🔢 Programme math
-        </a>
-        {% endif %}
+   
         <div class="nav-dropdown">
             <a href="#" class="nav-link dropdown-toggle">
                 📚 Disciplines{% if session.discipline %} • {{ session.discipline.replace('_', ' ').title() }}{% endif %}
