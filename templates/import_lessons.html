@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+
+{% block title %}Importer des leçons - Classroom App{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/buttons.css') }}">
+<style>
+.import-container {
+    max-width: 1000px;
+    margin: var(--space-2xl) auto;
+    padding: var(--space-xl);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.import-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.import-header h1 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color);
+    margin-bottom: var(--space-md);
+}
+
+.import-header p {
+    font-size: var(--font-size-lg);
+    color: var(--gray-600);
+}
+
+.import-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+}
+
+.method-card {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.method-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.method-card.active {
+    border-color: var(--primary-color);
+    background: var(--primary-50);
+}
+
+.method-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.method-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--gray-900);
+    margin-bottom: var(--space-sm);
+}
+
+.method-description {
+    color: var(--gray-600);
+    font-size: var(--font-size-md);
+}
+
+.upload-form {
+    background: var(--white);
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    transition: all 0.3s ease;
+}
+
+.upload-form.dragover {
+    border-color: var(--primary-color);
+    background: var(--primary-50);
+}
+
+.file-input-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: var(--space-lg) 0;
+}
+
+.file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+}
+
+.file-input-label {
+    display: inline-block;
+    padding: var(--space-md) var(--space-xl);
+    background: var(--primary-color);
+    color: var(--white);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-medium);
+    transition: background-color 0.3s ease;
+}
+
+.file-input-label:hover {
+    background: var(--primary-dark);
+}
+
+.file-selected {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: var(--success-50);
+    border: 1px solid var(--success-200);
+    border-radius: var(--radius-md);
+    color: var(--success-800);
+}
+
+.csv-template {
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.csv-template h3 {
+    color: var(--gray-900);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.csv-example {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: var(--font-size-sm);
+    color: var(--gray-800);
+    overflow-x: auto;
+    margin: var(--space-md) 0;
+}
+
+.field-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+}
+
+.field-item {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+}
+
+.field-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-color);
+}
+
+.field-description {
+    font-size: var(--font-size-sm);
+    color: var(--gray-600);
+    margin-top: var(--space-xs);
+}
+
+.required {
+    color: var(--danger-color);
+    font-weight: var(--font-weight-semibold);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    margin-top: var(--space-xl);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin: var(--space-md) 0;
+    display: none;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--success-color);
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+@media (max-width: 768px) {
+    .import-methods {
+        grid-template-columns: 1fr;
+    }
+    
+    .field-list {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="import-container">
+    <!-- Header -->
+    <div class="import-header">
+        <h1>📥 Importer des leçons</h1>
+        <p>Importez vos leçons en lot à partir d'un fichier CSV</p>
+    </div>
+
+    <!-- Import Methods -->
+    <div class="import-methods">
+        <div class="method-card active" id="csv-method">
+            <div class="method-icon">📊</div>
+            <div class="method-title">Fichier CSV</div>
+            <div class="method-description">
+                Importez plusieurs leçons à partir d'un fichier CSV structuré
+            </div>
+        </div>
+        
+        <div class="method-card" id="manual-method">
+            <div class="method-icon">✏️</div>
+            <div class="method-title">Saisie manuelle</div>
+            <div class="method-description">
+                Créez une nouvelle leçon manuellement
+            </div>
+        </div>
+    </div>
+
+    <!-- CSV Upload Form -->
+    <div id="csv-import-section">
+        <form method="POST" enctype="multipart/form-data" class="upload-form" id="upload-form">
+            <div class="upload-content">
+                <div style="font-size: 4rem; margin-bottom: var(--space-md);">📁</div>
+                <h3 style="margin-bottom: var(--space-md); color: var(--gray-700);">
+                    Glissez votre fichier CSV ici ou cliquez pour sélectionner
+                </h3>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="file" name="file" accept=".csv" class="file-input" required>
+                    <label for="file" class="file-input-label">
+                        📂 Choisir un fichier CSV
+                    </label>
+                </div>
+                
+                <div id="file-selected" class="file-selected" style="display: none;">
+                    <strong>Fichier sélectionné:</strong> <span id="file-name"></span>
+                </div>
+                
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                
+                <p style="color: var(--gray-500); font-size: var(--font-size-sm); margin-top: var(--space-md);">
+                    Formats acceptés: .csv (taille max: 5MB)
+                </p>
+            </div>
+        </form>
+
+        <!-- CSV Template Information -->
+        <div class="csv-template">
+            <h3>📋 Format du fichier CSV requis</h3>
+            <p>Votre fichier CSV doit contenir les colonnes suivantes (dans cet ordre exact):</p>
+            
+            <div class="csv-example">
+lesson_number,month,week_number,day_number,title,content,duration,competences,materials,objectives,tags,subject
+1,septembre,1,1,"Introduction au programme","Présentation des objectifs...",75,"Lecture","Manuel, tableau","Connaître le programme","introduction","français"
+2,septembre,1,2,"Évaluation diagnostique","Test de compréhension...",75,"Lecture","Tests, grilles","Évaluer le niveau","evaluation","français"
+            </div>
+
+            <div class="field-list">
+                <div class="field-item">
+                    <div class="field-name">lesson_number <span class="required">*</span></div>
+                    <div class="field-description">Numéro de la leçon (entier)</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">month <span class="required">*</span></div>
+                    <div class="field-description">Mois (septembre, octobre, etc.)</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">week_number <span class="required">*</span></div>
+                    <div class="field-description">Numéro de semaine (entier)</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">day_number <span class="required">*</span></div>
+                    <div class="field-description">Numéro du jour (1-5)</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">title <span class="required">*</span></div>
+                    <div class="field-description">Titre de la leçon</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">content</div>
+                    <div class="field-description">Déroulement détaillé</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">duration</div>
+                    <div class="field-description">Durée en minutes (défaut: 75)</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">competences</div>
+                    <div class="field-description">Compétences visées</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">materials</div>
+                    <div class="field-description">Matériel nécessaire</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">objectives</div>
+                    <div class="field-description">Objectifs d'apprentissage</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">tags</div>
+                    <div class="field-description">Mots-clés (séparés par des virgules)</div>
+                </div>
+                <div class="field-item">
+                    <div class="field-name">subject</div>
+                    <div class="field-description">Discipline (français, mathématiques, etc.)</div>
+                </div>
+            </div>
+
+            <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--warning-50); border: 1px solid var(--warning-200); border-radius: var(--radius-md);">
+                <strong>⚠️ Important:</strong> Les champs marqués d'un <span class="required">*</span> sont obligatoires. 
+                Assurez-vous que votre fichier respecte exactement ce format pour éviter les erreurs d'importation.
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" form="upload-form" class="btn btn-primary btn-lg" id="import-btn">
+                📥 Importer les leçons
+            </button>
+            <a href="{{ url_for('lessons_list') }}" class="btn btn-secondary btn-lg">
+                ← Retour à la liste
+            </a>
+            <a href="{{ url_for('create_lesson') }}" class="btn btn-success btn-lg" id="create-manual-btn" style="display: none;">
+                ✏️ Créer manuellement
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('upload-form');
+    const fileInput = document.getElementById('file');
+    const fileSelected = document.getElementById('file-selected');
+    const fileName = document.getElementById('file-name');
+    const progressBar = document.getElementById('progress-bar');
+    const progressFill = document.getElementById('progress-fill');
+    const importBtn = document.getElementById('import-btn');
+    const csvMethod = document.getElementById('csv-method');
+    const manualMethod = document.getElementById('manual-method');
+    const createManualBtn = document.getElementById('create-manual-btn');
+    const csvImportSection = document.getElementById('csv-import-section');
+
+    // Method selection
+    csvMethod.addEventListener('click', function() {
+        csvMethod.classList.add('active');
+        manualMethod.classList.remove('active');
+        csvImportSection.style.display = 'block';
+        createManualBtn.style.display = 'none';
+        importBtn.style.display = 'inline-block';
+    });
+
+    manualMethod.addEventListener('click', function() {
+        manualMethod.classList.add('active');
+        csvMethod.classList.remove('active');
+        csvImportSection.style.display = 'none';
+        createManualBtn.style.display = 'inline-block';
+        importBtn.style.display = 'none';
+    });
+
+    // File input handling
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            fileName.textContent = file.name;
+            fileSelected.style.display = 'block';
+            
+            // Validate file type
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('⚠️ Veuillez sélectionner un fichier CSV (.csv)');
+                this.value = '';
+                fileSelected.style.display = 'none';
+                return;
+            }
+            
+            // Validate file size (5MB max)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('⚠️ Le fichier est trop volumineux. Taille maximum: 5MB');
+                this.value = '';
+                fileSelected.style.display = 'none';
+                return;
+            }
+        } else {
+            fileSelected.style.display = 'none';
+        }
+    });
+
+    // Drag and drop functionality
+    uploadForm.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+
+    uploadForm.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+
+    uploadForm.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Form submission with progress
+    uploadForm.addEventListener('submit', function(e) {
+        if (!fileInput.files[0]) {
+            e.preventDefault();
+            alert('⚠️ Veuillez sélectionner un fichier CSV à importer');
+            return;
+        }
+
+        // Show progress bar
+        progressBar.style.display = 'block';
+        importBtn.disabled = true;
+        importBtn.textContent = '⏳ Importation en cours...';
+
+        // Simulate progress (in real implementation, this would be connected to actual upload progress)
+        let progress = 0;
+        const progressInterval = setInterval(function() {
+            progress += Math.random() * 30;
+            if (progress > 90) progress = 90;
+            progressFill.style.width = progress + '%';
+        }, 200);
+
+        // Clean up interval on form completion (this would normally be handled by the server response)
+        setTimeout(function() {
+            clearInterval(progressInterval);
+            progressFill.style.width = '100%';
+        }, 3000);
+    });
+
+    // Download template functionality
+    function downloadCSVTemplate() {
+        const csvContent = `lesson_number,month,week_number,day_number,title,content,duration,competences,materials,objectives,tags,subject
+1,septembre,1,1,"Introduction au programme français","Amorce (10 min) : Présentation des élèves et de leurs attentes\nDéveloppement (50 min) : Survol du programme PFEQ français secondaire 2\nIntégration (15 min) : Questions et planification",75,"Lire et apprécier des textes variés","Manuel de français, programme PFEQ","Connaître les objectifs du cours et créer un climat positif","introduction,programme","français"
+2,septembre,1,2,"Évaluation diagnostique en lecture","Amorce (5 min) : Rappel des stratégies de lecture\nDéveloppement (60 min) : Test de compréhension sur deux textes variés\nIntégration (10 min) : Autoévaluation et partage des stratégies utilisées",75,"Lire et apprécier des textes variés","Cahier de textes, grille d'évaluation","Évaluer le niveau de lecture des élèves","evaluation,lecture,diagnostic","français"`;
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'modele_lecons.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Add download template button
+    const templateSection = document.querySelector('.csv-template');
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'btn btn-outline btn-sm';
+    downloadBtn.innerHTML = '📥 Télécharger le modèle CSV';
+    downloadBtn.type = 'button';
+    downloadBtn.style.marginTop = 'var(--space-md)';
+    downloadBtn.addEventListener('click', downloadCSVTemplate);
+    templateSection.appendChild(downloadBtn);
+});
+</script>
+{% endblock %}

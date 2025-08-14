@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Importer le programme de mathématiques - Classroom App{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/math-schedule.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="math-overview-container math-fade-in">
+    <!-- Math Import Header -->
+    <div class="math-header">
+        <h1>🔢 Importer le programme de mathématiques</h1>
+        <p>Intégrez le curriculum complet de mathématiques PFEQ secondaire 2</p>
+    </div>
+
+    <!-- Import Options Grid -->
+    <div class="math-stats-grid">
+        <div class="math-stat-card import-option" data-type="complete">
+            <div class="math-stat-header">
+                <div class="math-stat-icon">📚</div>
+            </div>
+            <div class="math-stat-label">Programme complet</div>
+            <div class="math-stat-description">
+                Importez l'intégralité du programme de mathématiques PFEQ avec 160 séances structurées sur 20 cycles d'apprentissage.
+            </div>
+            <div class="math-competency-count" style="margin-top: var(--space-md);">
+                160 séances • 5 unités • 20 cycles
+            </div>
+        </div>
+
+        <div class="math-stat-card import-option" data-type="sample">
+            <div class="math-stat-header">
+                <div class="math-stat-icon">🎯</div>
+            </div>
+            <div class="math-stat-label">Échantillon démonstratif</div>
+            <div class="math-stat-description">
+                Importez un échantillon de 20 séances pour découvrir la structure et tester le système avant l'importation complète.
+            </div>
+            <div class="math-competency-count" style="margin-top: var(--space-md);">
+                20 séances d'exemple
+            </div>
+        </div>
+
+        <div class="math-stat-card import-option" data-type="custom">
+            <div class="math-stat-header">
+                <div class="math-stat-icon">⚙️</div>
+            </div>
+            <div class="math-stat-label">Import personnalisé</div>
+            <div class="math-stat-description">
+                Sélectionnez spécifiquement les unités et cycles à importer selon vos besoins pédagogiques.
+            </div>
+            <div class="math-competency-count" style="margin-top: var(--space-md);">
+                Import flexible
+            </div>
+        </div>
+    </div>
+
+    <!-- Math Units Preview -->
+    <div style="margin-bottom: var(--space-2xl);">
+        <h2 style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--primary-color); margin-bottom: var(--space-lg); text-align: center;">
+            📊 Aperçu du programme PFEQ
+        </h2>
+        
+        <div class="math-units-grid">
+            <div class="math-unit-card">
+                <div class="math-unit-header">
+                    <div class="math-unit-number">Unité 1</div>
+                    <div class="math-unit-title">Arithmétique et sens du nombre</div>
+                    <div class="math-unit-icon">🔢</div>
+                </div>
+                <div class="math-unit-content">
+                    <div class="math-unit-description">
+                        Fondements arithmétiques, nombres réels, proportionnalité
+                    </div>
+                    <div class="math-unit-info">
+                        <span class="math-unit-cycles">Cycles 1-4</span>
+                        <span class="math-unit-lessons">32 séances</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="math-unit-card">
+                <div class="math-unit-header">
+                    <div class="math-unit-number">Unité 2</div>
+                    <div class="math-unit-title">Introduction à l'algèbre</div>
+                    <div class="math-unit-icon">📊</div>
+                </div>
+                <div class="math-unit-content">
+                    <div class="math-unit-description">
+                        Pensée algébrique, expressions, équations de base
+                    </div>
+                    <div class="math-unit-info">
+                        <span class="math-unit-cycles">Cycles 5-8</span>
+                        <span class="math-unit-lessons">32 séances</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="math-unit-card">
+                <div class="math-unit-header">
+                    <div class="math-unit-number">Unité 3</div>
+                    <div class="math-unit-title">Géométrie et mesures</div>
+                    <div class="math-unit-icon">📐</div>
+                </div>
+                <div class="math-unit-content">
+                    <div class="math-unit-description">
+                        Figures planes, solides, constructions géométriques
+                    </div>
+                    <div class="math-unit-info">
+                        <span class="math-unit-cycles">Cycles 9-13</span>
+                        <span class="math-unit-lessons">40 séances</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="math-unit-card">
+                <div class="math-unit-header">
+                    <div class="math-unit-number">Unité 4</div>
+                    <div class="math-unit-title">Statistiques et probabilités</div>
+                    <div class="math-unit-icon">📈</div>
+                </div>
+                <div class="math-unit-content">
+                    <div class="math-unit-description">
+                        Analyse de données, sondages, probabilités de base
+                    </div>
+                    <div class="math-unit-info">
+                        <span class="math-unit-cycles">Cycles 14-16</span>
+                        <span class="math-unit-lessons">24 séances</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="math-unit-card">
+                <div class="math-unit-header">
+                    <div class="math-unit-number">Unité 5</div>
+                    <div class="math-unit-title">Intégration et projets</div>
+                    <div class="math-unit-icon">🎯</div>
+                </div>
+                <div class="math-unit-content">
+                    <div class="math-unit-description">
+                        Résolution de problèmes complexes, projets intégrateurs
+                    </div>
+                    <div class="math-unit-info">
+                        <span class="math-unit-cycles">Cycles 17-20</span>
+                        <span class="math-unit-lessons">32 séances</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Warning and Actions -->
+    <div style="background: var(--warning-50); border: 2px solid var(--warning-200); border-radius: var(--radius-lg); padding: var(--space-xl); margin-bottom: var(--space-xl);">
+        <h3 style="color: var(--warning-800); margin-bottom: var(--space-md); display: flex; align-items: center; gap: var(--space-sm);">
+            ⚠️ Important avant l'importation
+        </h3>
+        <ul style="color: var(--warning-700); margin: var(--space-sm) 0; padding-left: var(--space-lg);">
+            <li>L'importation peut prendre quelques minutes selon la taille du programme</li>
+            <li>Les séances existantes en mathématiques seront conservées (pas de duplication)</li>
+            <li>Vous pourrez modifier et personnaliser les séances après l'importation</li>
+            <li>Un backup automatique de votre base de données sera créé</li>
+        </ul>
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="text-align: center; margin-top: var(--space-xl);">
+        <div style="display: flex; gap: var(--space-md); justify-content: center; flex-wrap: wrap;">
+            <button class="btn btn-primary btn-lg" id="import-btn" onclick="confirmImport()">
+                📥 Importer le programme sélectionné
+            </button>
+            <a href="{{ url_for('math_schedule_overview') }}" class="btn btn-secondary btn-lg">
+                ← Retour à l'aperçu
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmation-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000;">
+    <div style="background: var(--white); border-radius: var(--radius-lg); padding: var(--space-2xl); max-width: 500px; margin: var(--space-md); text-align: center; box-shadow: var(--shadow-2xl);">
+        <div style="font-size: 4rem; margin-bottom: var(--space-md);">🔢</div>
+        <h3 id="modal-title" style="margin-bottom: var(--space-md); color: var(--gray-900);">Confirmer l'importation</h3>
+        <p id="modal-message" style="color: var(--gray-600); margin-bottom: var(--space-lg);">
+            Êtes-vous sûr de vouloir importer le programme de mathématiques complet ?
+        </p>
+        <div style="display: flex; gap: var(--space-md); justify-content: center;">
+            <button class="btn btn-primary" onclick="executeImport()" id="confirm-import-btn">
+                ✅ Confirmer l'importation
+            </button>
+            <button class="btn btn-secondary" onclick="hideConfirmation()">
+                ❌ Annuler
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedImportType = 'complete';
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Import option selection
+    const importOptions = document.querySelectorAll('.import-option');
+    
+    importOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove active state from all options
+            importOptions.forEach(opt => opt.style.borderColor = 'var(--gray-200)');
+            
+            // Add active state to selected option
+            this.style.borderColor = 'var(--primary-color)';
+            
+            // Update selected type
+            selectedImportType = this.dataset.type;
+            
+            // Update button text
+            updateImportButton();
+        });
+    });
+    
+    // Set default selection
+    document.querySelector('[data-type="complete"]').style.borderColor = 'var(--primary-color)';
+    updateImportButton();
+    
+    // Animation for cards
+    const cards = document.querySelectorAll('.math-stat-card, .math-unit-card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+
+function updateImportButton() {
+    const importBtn = document.getElementById('import-btn');
+    
+    switch(selectedImportType) {
+        case 'complete':
+            importBtn.innerHTML = '📥 Importer le programme complet (160 séances)';
+            break;
+        case 'sample':
+            importBtn.innerHTML = '📥 Importer l\'échantillon (20 séances)';
+            break;
+        case 'custom':
+            importBtn.innerHTML = '📥 Configuration personnalisée';
+            break;
+    }
+}
+
+function confirmImport() {
+    if (selectedImportType === 'custom') {
+        alert('🚧 L\'import personnalisé sera disponible dans une prochaine version.\n\nEn attendant, vous pouvez importer le programme complet et désactiver les unités non désirées depuis l\'aperçu du programme.');
+        return;
+    }
+    
+    const modal = document.getElementById('confirmation-modal');
+    const title = document.getElementById('modal-title');
+    const message = document.getElementById('modal-message');
+    const confirmBtn = document.getElementById('confirm-import-btn');
+    
+    switch(selectedImportType) {
+        case 'complete':
+            title.textContent = 'Importer le programme complet';
+            message.textContent = 'Êtes-vous sûr de vouloir importer les 160 séances du programme de mathématiques PFEQ ? Cette opération peut prendre quelques minutes.';
+            confirmBtn.innerHTML = '✅ Importer 160 séances';
+            break;
+        case 'sample':
+            title.textContent = 'Importer l\'échantillon démonstratif';
+            message.textContent = 'Voulez-vous importer un échantillon de 20 séances pour découvrir le programme ? Vous pourrez importer le programme complet plus tard.';
+            confirmBtn.innerHTML = '✅ Importer 20 séances';
+            break;
+    }
+    
+    modal.style.display = 'flex';
+}
+
+function hideConfirmation() {
+    document.getElementById('confirmation-modal').style.display = 'none';
+}
+
+function executeImport() {
+    const confirmBtn = document.getElementById('confirm-import-btn');
+    
+    // Show loading state
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '⏳ Importation en cours...';
+    
+    // Create form and submit
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("import_math_schedule") }}';
+    
+    const typeInput = document.createElement('input');
+    typeInput.type = 'hidden';
+    typeInput.name = 'import_type';
+    typeInput.value = selectedImportType;
+    form.appendChild(typeInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Close modal when clicking outside
+document.getElementById('confirmation-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideConfirmation();
+    }
+});
+</script>
+{% endblock %}
