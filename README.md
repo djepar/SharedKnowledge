@@ -10,12 +10,14 @@ Une plateforme web moderne pour la gestion de classe et le suivi pédagogique, s
 
 ## ✨ Fonctionnalités principales
 
-### 🎯 Programme de français secondaire 2 (NOUVEAU!)
+### 🎯 Gestion de leçons multi-matières (AMÉLIORÉ!)
 - **📅 Calendrier interactif** - 160 séances complètes du programme PFEQ
 - **📖 Plans de cours détaillés** - Objectifs, matériel, déroulement complet
+- **✏️ Édition complète des leçons** - Formulaire avancé avec tous les champs
+- **🎯 Filtrage par matière** - Organisation par français, mathématiques, etc.
 - **📊 Suivi de progression** - Marquez les leçons terminées, statistiques en temps réel
 - **📚 Carnet de lecture personnel** - Portfolio de lecture avec notes et évaluations
-- **🎯 Conformité PFEQ** - Respect complet du programme officiel du Québec
+- **🔄 Compétences dynamiques** - API pour charger les compétences par discipline
 
 ### 🎨 Interface moderne (RÉCEMMENT AMÉLIORÉ!)
 - ✅ **Architecture CSS composants** - BEM-like naming et isolation parfaite
@@ -58,6 +60,7 @@ static/css/
 │   ├── auth.css         # .auth-header__title, .auth-btn
 │   ├── buttons.css      # .btn-primary, .btn-outline-*
 │   ├── forms.css        # .form-group, .form-row
+│   ├── edit-lesson.css  # .edit-lesson-form, .field-group (NOUVEAU!)
 │   ├── progress.css     # .progress-bar, .progress-circle
 │   ├── dashboard.css    # .stat-card, .quick-actions
 │   └── [autres...]      # Components page-spécifiques
@@ -107,6 +110,9 @@ python simple_css_build.py
 - [x] **Build CSS optimisé** - Sans duplication ni !important
 - [x] **Layouts flexibles** - .layout-auth, .layout-main, .layout-discipline
 - [x] **Templates mis à jour** - login.html avec nouveaux composants
+- [x] **Édition complète des leçons** - Formulaire avancé avec tous les champs
+- [x] **Filtrage par matière** - Organisation par discipline avec API compétences
+- [x] **Composant edit-lesson.css** - Styles dédiés pour l'édition de leçons
 
 ### 📅 Court terme  
 - [ ] **Mise à jour templates restants** - Appliquer l'architecture aux autres pages

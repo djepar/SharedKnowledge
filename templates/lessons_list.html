@@ -182,6 +182,18 @@
                             {% endfor %}
                         </select>
                     </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="subject">Matière</label>
+                        <select id="subject" name="subject">
+                            {% for subject in available_subjects %}
+                                <option value="{{ subject }}"
+                                        {% if subject == current_filters.subject %}selected{% endif %}>
+                                    {{ subject.title() }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
                 
                 <div style="display: flex; gap: var(--space-sm);">

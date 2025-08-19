@@ -1,0 +1,247 @@
+/* static/css/components/edit-lesson.css - Edit Lesson Page Styles */
+
+.edit-lesson-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-normal);
+}
+
+.back-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateX(-2px);
+}
+
+.edit-lesson-header {
+    background: var(--gradient-main);
+    color: var(--white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+    box-shadow: var(--shadow-xl);
+}
+
+.edit-lesson-header .lesson-number-badge {
+    background: rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.edit-lesson-header h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-sm);
+}
+
+.edit-lesson-header p {
+    opacity: 0.9;
+    font-size: var(--font-size-lg);
+}
+
+.lesson-form {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    margin-bottom: var(--space-2xl);
+}
+
+.form-section {
+    padding: var(--space-2xl);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.form-section h2 {
+    color: var(--primary-color);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-sm);
+    border-bottom: 2px solid var(--primary-light);
+}
+
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--space-sm);
+    color: var(--gray-700);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: var(--space-md);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-md);
+    transition: all var(--transition-normal);
+    background: rgba(255, 255, 255, 0.9);
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: var(--white);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.form-group .content-textarea {
+    min-height: 300px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: var(--space-xs);
+    color: var(--gray-500);
+    font-size: var(--font-size-xs);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+}
+
+.form-row.triple {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.form-actions {
+    padding: var(--space-xl) var(--space-2xl);
+    background: var(--gray-50);
+    display: flex;
+    gap: var(--space-md);
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.char-counter {
+    text-align: right;
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    margin-top: var(--space-xs);
+}
+
+/* Danger Zone Styles */
+.danger-zone {
+    background: rgba(239, 68, 68, 0.05);
+    border: 2px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-top: var(--space-2xl);
+}
+
+.danger-zone h3 {
+    color: var(--danger-color);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-sm);
+}
+
+.danger-zone p {
+    color: var(--gray-700);
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-sm);
+}
+
+/* Enhanced form styling */
+.form-group input[type="number"] {
+    max-width: 150px;
+}
+
+.form-group select {
+    cursor: pointer;
+}
+
+.form-group textarea:focus {
+    min-height: 150px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .edit-lesson-container {
+        margin: 0 var(--space-sm);
+        padding: var(--space-md);
+    }
+    
+    .edit-lesson-header {
+        padding: var(--space-lg);
+    }
+    
+    .edit-lesson-header h1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .form-section {
+        padding: var(--space-lg);
+    }
+    
+    .form-row,
+    .form-row.triple {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+        padding: var(--space-lg);
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Animation classes */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Focus states for better accessibility */
+.form-group input:focus-visible,
+.form-group textarea:focus-visible,
+.form-group select:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}

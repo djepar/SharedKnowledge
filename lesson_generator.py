@@ -246,73 +246,7 @@ def delete_lesson(lesson_id):
     
     return redirect(url_for('lessons_list'))
 
-@app.route('/lessons/import', methods=['GET', 'POST'])
-def import_lessons():
-    """Import lessons from CSV or JSON"""
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('Aucun fichier sélectionné', 'error')
-            return redirect(request.url)
-        
-        file = request.files['file']
-        if file.filename == '':
-            flash('Aucun fichier sélectionné', 'error')
-            return redirect(request.url)
-        
-        try:
-            if file.filename.endswith('.csv'):
-                import csv
-                import io
-                
-                # Read CSV content
-                stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
-                csv_input = csv.DictReader(stream)
-                
-                lessons_imported = 0
-                conn = sqlite3.connect(DB_FILE)
-                c = conn.cursor()
-                
-                for row in csv_input:
-                    try:
-                        c.execute('''
-                            INSERT INTO lessons 
-                            (lesson_number, month, week_number, day_number, title, content, 
-                             duration, competences, materials, objectives, tags)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                        ''', (
-                            int(row.get('lesson_number', 0)),
-                            row.get('month', ''),
-                            int(row.get('week_number', 1)),
-                            int(row.get('day_number', 1)),
-                            row.get('title', ''),
-                            row.get('content', ''),
-                            int(row.get('duration', 75)),
-                            row.get('competences', ''),
-                            row.get('materials', ''),
-                            row.get('objectives', ''),
-                            row.get('tags', '')
-                        ))
-                        lessons_imported += 1
-                    except Exception as e:
-                        print(f"Error importing row: {e}")
-                        continue
-                
-                conn.commit()
-                conn.close()
-                
-                flash(f"{lessons_imported} leçons importées avec succès!", 'success')
-                return redirect(url_for('lessons_list'))
-            
-            else:
-                flash('Format de fichier non supporté. Utilisez CSV.', 'error')
-                
-        except Exception as e:
-            flash(f"Erreur lors de l'importation: {e}", 'error')
-    
-    return render_template('import_lessons.html')
+# Duplicate import route removed - using the one in app.py instead
 
 @app.route('/lessons/export')
 def export_lessons():

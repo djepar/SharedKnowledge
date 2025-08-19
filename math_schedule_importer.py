@@ -12,8 +12,12 @@ def import_math_schedule():
     """Import the complete mathematics schedule into the database"""
     try:
         # Import the complete schedule
-        from complete_math_schedule import import_to_flask_db
-        import_to_flask_db()
+        try:
+            from complete_math_schedule import import_to_flask_db
+            import_to_flask_db()
+        except ImportError:
+            flash('Module complete_math_schedule non trouvé. Utilisez l\'importation CSV standard avec subject="mathématiques"', 'warning')
+            return redirect(url_for('import_lessons'))
         
         flash('Programme de mathématiques importé avec succès! 🎉', 'success')
         return redirect(url_for('math_schedule_overview'))
@@ -455,9 +459,13 @@ def progress_dashboard():
 def initialize_math_database():
     """Initialize the database with the complete mathematics schedule"""
     try:
-        from complete_math_schedule import import_to_flask_db
-        import_to_flask_db()
-        return True
+        try:
+            from complete_math_schedule import import_to_flask_db
+            import_to_flask_db()
+            return True
+        except ImportError:
+            print("Module complete_math_schedule not found. Please use CSV import with subject='mathématiques'")
+            return False
     except Exception as e:
         print(f"Error initializing database: {e}")
         return False

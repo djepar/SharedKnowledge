@@ -27,6 +27,7 @@ def build_css():
         'static/css/components/home.css',
         'static/css/components/calendar.css',
         'static/css/components/lesson-detail.css',
+        'static/css/components/edit-lesson.css',
         'static/css/components/add-book.css',
         'static/css/components/reading-log.css',
     ]

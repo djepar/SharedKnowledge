@@ -10,6 +10,15 @@ app.secret_key = 'your_secret_key'
 
 DB_FILE = 'database.db'
 
+def get_competences_by_discipline(discipline):
+    """Get competences for a specific discipline from the competences table"""
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute("SELECT nom FROM competences WHERE discipline = ? ORDER BY ordre", (discipline,))
+    competences = [row[0] for row in c.fetchall()]
+    conn.close()
+    return competences
+
 def check_and_migrate_database():
     """
     Check if database needs migration and perform it if necessary
@@ -549,13 +558,14 @@ def lessons_list():
     month_filter = request.args.get('month', '')
     competence_filter = request.args.get('competence', '')
     search_query = request.args.get('search', '')
+    subject_filter = request.args.get('subject', session.get('discipline', 'français'))
     
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     
-    # Build query with filters
-    query = "SELECT * FROM lessons WHERE 1=1"
-    params = []
+    # Build query with filters - always filter by subject first
+    query = "SELECT * FROM lessons WHERE subject = ?"
+    params = [subject_filter]
     
     if month_filter:
         query += " AND month = ?"
@@ -569,17 +579,21 @@ def lessons_list():
         query += " AND (title LIKE ? OR content LIKE ?)"
         params.extend([f"%{search_query}%", f"%{search_query}%"])
     
-    query += " ORDER BY lesson_number"
+    query += " ORDER BY subject, lesson_number"
     
     c.execute(query, params)
     lessons = c.fetchall()
     
-    # Get unique months and competences for filters
-    c.execute("SELECT DISTINCT month FROM lessons ORDER BY lesson_number")
+    # Get unique months and competences for filters - filtered by subject
+    c.execute("SELECT DISTINCT month FROM lessons WHERE subject = ? ORDER BY lesson_number", (subject_filter,))
     months = [row[0] for row in c.fetchall()]
     
-    c.execute("SELECT DISTINCT competences FROM lessons WHERE competences IS NOT NULL")
-    competences = list(set([comp.strip() for row in c.fetchall() for comp in row[0].split(',') if comp.strip()]))
+    # Get competences from the competences table for the selected subject
+    competences = get_competences_by_discipline(subject_filter)
+    
+    # Get available subjects for filter dropdown
+    c.execute("SELECT DISTINCT subject FROM lessons WHERE subject IS NOT NULL ORDER BY subject")
+    available_subjects = [row[0] for row in c.fetchall()]
     
     conn.close()
     
@@ -587,10 +601,12 @@ def lessons_list():
                          lessons=lessons, 
                          months=months, 
                          competences=competences,
+                         available_subjects=available_subjects,
                          current_filters={
                              'month': month_filter,
                              'competence': competence_filter,
-                             'search': search_query
+                             'search': search_query,
+                             'subject': subject_filter
                          })
 
 @app.route('/lesson/create', methods=['GET', 'POST'])
@@ -669,28 +685,36 @@ def edit_lesson(lesson_id):
     c = conn.cursor()
     
     if request.method == 'POST':
-        lesson_data = {
-            'lesson_number': request.form.get('lesson_number', type=int),
-            'month': request.form['month'],
-            'week_number': request.form.get('week_number', type=int),
-            'day_number': request.form.get('day_number', type=int),
-            'title': request.form['title'],
-            'content': request.form['content'],
-            'duration': request.form.get('duration', 75, type=int),
-            'competences': request.form.get('competences', ''),
-            'materials': request.form.get('materials', ''),
-            'objectives': request.form.get('objectives', ''),
-            'tags': request.form.get('tags', '')
-        }
+        # Get the current lesson to preserve lesson_number
+        c.execute("SELECT lesson_number FROM lessons WHERE id=?", (lesson_id,))
+        current_lesson = c.fetchone()
+        current_lesson_number = current_lesson[0] if current_lesson else 1
         
         try:
             c.execute('''
                 UPDATE lessons SET 
                 lesson_number=?, month=?, week_number=?, day_number=?, title=?, 
                 content=?, duration=?, competences=?, materials=?, objectives=?, 
-                tags=?, updated_at=CURRENT_TIMESTAMP
+                subject=?, evaluation=?, homework=?, adaptations=?, notes=?, updated_at=CURRENT_TIMESTAMP
                 WHERE id=?
-            ''', tuple(lesson_data.values()) + (lesson_id,))
+            ''', (
+                current_lesson_number,
+                request.form['month'],
+                request.form.get('week', type=int),
+                request.form.get('day', type=int),
+                request.form['title'],
+                request.form['content'],
+                request.form.get('duration', 75, type=int),
+                request.form.get('competence', ''),
+                request.form.get('materials', ''),
+                request.form.get('objectives', ''),
+                request.form.get('subject', ''),
+                request.form.get('evaluation', ''),
+                request.form.get('homework', ''),
+                request.form.get('adaptations', ''),
+                request.form.get('notes', ''),
+                lesson_id
+            ))
             
             conn.commit()
             flash("Leçon mise à jour avec succès!", 'success')
@@ -702,13 +726,28 @@ def edit_lesson(lesson_id):
     # Get lesson data
     c.execute("SELECT * FROM lessons WHERE id=?", (lesson_id,))
     lesson = c.fetchone()
+    
+    # Get available subjects for dropdown
+    c.execute("SELECT DISTINCT subject FROM lessons WHERE subject IS NOT NULL ORDER BY subject")
+    available_subjects = [row[0] for row in c.fetchall()]
+    
     conn.close()
     
     if not lesson:
         flash("Leçon non trouvée", 'error')
         return redirect(url_for('lessons_list'))
     
-    return render_template('edit_lesson.html', lesson=lesson)
+    # Get competences for the lesson's discipline
+    lesson_discipline = lesson[14]  # subject column
+    competences = get_competences_by_discipline(lesson_discipline) if lesson_discipline else []
+    
+    return render_template('edit_lesson.html', lesson=lesson, available_subjects=available_subjects, competences=competences)
+
+@app.route('/api/competences/<discipline>')
+def get_competences_api(discipline):
+    """API endpoint to get competences for a specific discipline"""
+    competences = get_competences_by_discipline(discipline)
+    return {'competences': competences}
 
 @app.route('/lesson/<int:lesson_id>/duplicate', methods=['POST'])
 def duplicate_lesson(lesson_id):
@@ -727,8 +766,9 @@ def duplicate_lesson(lesson_id):
         flash("Leçon non trouvée", 'error')
         return redirect(url_for('lessons_list'))
     
-    # Get next lesson number
-    c.execute("SELECT MAX(lesson_number) FROM lessons")
+    # Get next lesson number for the original lesson's subject
+    subject = original[12] if len(original) > 12 else 'français'  # Get subject from original lesson
+    c.execute("SELECT MAX(lesson_number) FROM lessons WHERE subject = ?", (subject,))
     result = c.fetchone()
     next_lesson_number = (result[0] or 0) + 1
     
@@ -737,8 +777,8 @@ def duplicate_lesson(lesson_id):
         c.execute('''
             INSERT INTO lessons 
             (lesson_number, month, week_number, day_number, title, content, 
-             duration, competences, materials, objectives, tags)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             duration, competences, materials, objectives, tags, subject)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
             next_lesson_number,
             original[2],  # month
@@ -750,7 +790,8 @@ def duplicate_lesson(lesson_id):
             original[8],  # competences
             original[9],  # materials
             original[10], # objectives
-            original[11]  # tags
+            original[11], # tags
+            subject  # subject
         ))
         
         conn.commit()
@@ -829,8 +870,8 @@ def import_lessons():
                         c.execute('''
                             INSERT INTO lessons 
                             (lesson_number, month, week_number, day_number, title, content, 
-                             duration, competences, materials, objectives, tags)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                             duration, competences, materials, objectives, tags, subject)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         ''', (
                             int(row.get('lesson_number', 0)),
                             row.get('month', ''),
@@ -842,7 +883,8 @@ def import_lessons():
                             row.get('competences', ''),
                             row.get('materials', ''),
                             row.get('objectives', ''),
-                            row.get('tags', '')
+                            row.get('tags', ''),
+                            row.get('subject', 'français')
                         ))
                         lessons_imported += 1
                     except Exception as e:
@@ -946,19 +988,7 @@ def bulk_actions():
     return redirect(url_for('lessons_list'))
 
 # Math Schedule Routes
-@app.route('/math/import')
-def import_math_schedule():
-    """Import the complete mathematics schedule into the database"""
-    try:
-        # Import the complete schedule
-        from complete_math_schedule import import_to_flask_db
-        import_to_flask_db()
-        
-        flash('Programme de mathématiques importé avec succès! 🎉', 'success')
-        return redirect(url_for('math_schedule_overview'))
-    except Exception as e:
-        flash(f'Erreur lors de l\'importation: {str(e)}', 'error')
-        return redirect(url_for('math_schedule_overview'))
+# Math import route moved to math_schedule_importer.py to avoid duplication
 
 @app.route('/math/overview')
 def math_schedule_overview():

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Créer une leçon - Français Secondaire 2</title>
+    <title>Modifier la séance {{ lesson[1] }} - Français Secondaire 2</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
 </head>
 <body>
@@ -22,17 +22,18 @@
     {% endwith %}
 
     <!-- Container principal -->
-    <div class="create-lesson-container">
+    <div class="edit-lesson-container">
         <!-- Bouton retour -->
-        <a href="{{ url_for('lessons_list') }}" class="back-btn">← Retour à la liste des leçons</a>
+        <a href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}" class="back-btn">← Retour à la séance</a>
         
         <!-- En-tête -->
-        <div class="create-lesson-header">
-            <h1>📝 Créer une nouvelle leçon</h1>
-            <p>Concevoir une séance du programme PFEQ français secondaire 2</p>
+        <div class="edit-lesson-header">
+            <div class="lesson-number-badge">Séance {{ lesson[1] }}</div>
+            <h1>✏️ Modifier la leçon</h1>
+            <p>Modification du programme PFEQ français secondaire 2</p>
         </div>
         
-        <!-- Formulaire de création -->
+        <!-- Formulaire de modification -->
         <form method="POST" class="lesson-form">
             <!-- Informations générales -->
             <div class="form-section">
@@ -44,15 +45,17 @@
                         <select id="subject" name="subject" required>
                             <option value="">Choisir la discipline...</option>
                             {% for subject in available_subjects %}
-                            <option value="{{ subject }}">{{ subject.replace('_', ' ').title() }}</option>
+                            <option value="{{ subject }}" {{ 'selected' if lesson[14] == subject else '' }}>
+                                {{ subject.replace('_', ' ').title() }}
+                            </option>
                             {% endfor %}
                         </select>
-                        <small>La séance sera automatiquement numérotée pour cette discipline</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="title">Titre de la leçon *</label>
                         <input type="text" id="title" name="title" required 
+                               value="{{ lesson[5] }}"
                                placeholder="Ex: L'analyse littéraire - Les procédés stylistiques">
                     </div>
                 </div>
@@ -62,16 +65,11 @@
                         <label for="month">Mois *</label>
                         <select id="month" name="month" required>
                             <option value="">Choisir le mois...</option>
-                            <option value="septembre">Septembre</option>
-                            <option value="octobre">Octobre</option>
-                            <option value="novembre">Novembre</option>
-                            <option value="décembre">Décembre</option>
-                            <option value="janvier">Janvier</option>
-                            <option value="février">Février</option>
-                            <option value="mars">Mars</option>
-                            <option value="avril">Avril</option>
-                            <option value="mai">Mai</option>
-                            <option value="juin">Juin</option>
+                            {% for month in ['septembre', 'octobre', 'novembre', 'décembre', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin'] %}
+                            <option value="{{ month }}" {{ 'selected' if lesson[2] == month else '' }}>
+                                {{ month.title() }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                     
@@ -79,10 +77,11 @@
                         <label for="week">Semaine du mois *</label>
                         <select id="week" name="week" required>
                             <option value="">Choisir la semaine...</option>
-                            <option value="1">Semaine 1</option>
-                            <option value="2">Semaine 2</option>
-                            <option value="3">Semaine 3</option>
-                            <option value="4">Semaine 4</option>
+                            {% for week_num in range(1, 5) %}
+                            <option value="{{ week_num }}" {{ 'selected' if lesson[3] == week_num else '' }}>
+                                Semaine {{ week_num }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                     
@@ -90,11 +89,11 @@
                         <label for="day">Jour de la semaine *</label>
                         <select id="day" name="day" required>
                             <option value="">Choisir le jour...</option>
-                            <option value="1">Jour 1</option>
-                            <option value="2">Jour 2</option>
-                            <option value="3">Jour 3</option>
-                            <option value="4">Jour 4</option>
-                            <option value="5">Jour 5</option>
+                            {% for day_num in range(1, 6) %}
+                            <option value="{{ day_num }}" {{ 'selected' if lesson[4] == day_num else '' }}>
+                                Jour {{ day_num }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -103,7 +102,8 @@
                     <div class="form-group">
                         <label for="duration">Durée (minutes) *</label>
                         <input type="number" id="duration" name="duration" min="15" max="180" required 
-                               placeholder="75" value="75">
+                               value="{{ lesson[7] }}"
+                               placeholder="75">
                         <small>Durée habituelle : 75 minutes</small>
                     </div>
                     
@@ -111,6 +111,11 @@
                         <label for="competence">Compétence principale *</label>
                         <select id="competence" name="competence" required>
                             <option value="">Choisir la compétence...</option>
+                            {% for comp in competences %}
+                            <option value="{{ comp }}" {{ 'selected' if lesson[8] == comp else '' }}>
+                                {{ comp }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -123,45 +128,19 @@
                 <div class="form-group">
                     <label for="objectives">Objectifs d'apprentissage *</label>
                     <textarea id="objectives" name="objectives" required 
-                              placeholder="Décrivez les objectifs spécifiques de cette leçon...
-
-Exemples:
-• Identifier les procédés stylistiques dans un texte littéraire
-• Analyser l'effet des figures de style sur le sens
-• Rédiger une analyse structurée de 200 mots"></textarea>
+                              placeholder="Décrivez les objectifs spécifiques de cette leçon...">{{ lesson[10] or '' }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="content">Déroulement de la leçon *</label>
                     <textarea id="content" name="content" class="content-textarea" required 
-                              placeholder="Décrivez le déroulement détaillé de la séance...
-
-Structure suggérée:
-1. AMORCE (10 min) - Activation des connaissances
-2. EXPLORATION (25 min) - Découverte du concept
-3. PRATIQUE GUIDÉE (25 min) - Exercices avec accompagnement
-4. PRATIQUE AUTONOME (10 min) - Application individuelle
-5. OBJECTIVATION (5 min) - Retour sur les apprentissages
-
-Détaillez chaque étape avec:
-• Les activités proposées
-• Le matériel nécessaire
-• Les consignes précises
-• Les critères d'évaluation"></textarea>
+                              placeholder="Décrivez le déroulement détaillé de la séance...">{{ lesson[6] }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="materials">Matériel et ressources</label>
                     <textarea id="materials" name="materials" 
-                              placeholder="Listez le matériel nécessaire pour cette leçon...
-
-Exemples:
-• Manuel de français (pages XX à XX)
-• Extraits littéraires distribués
-• Grille d'analyse
-• Tableau interactif
-• Vidéo d'introduction (lien)
-• Cahier d'exercices"></textarea>
+                              placeholder="Listez le matériel nécessaire pour cette leçon...">{{ lesson[9] or '' }}</textarea>
                 </div>
                 
                 <div class="form-row">
@@ -169,17 +148,18 @@ Exemples:
                         <label for="evaluation">Évaluation</label>
                         <select id="evaluation" name="evaluation">
                             <option value="">Type d'évaluation...</option>
-                            <option value="formative">Évaluation formative</option>
-                            <option value="sommative">Évaluation sommative</option>
-                            <option value="autoévaluation">Autoévaluation</option>
-                            <option value="coévaluation">Coévaluation</option>
-                            <option value="observation">Observation</option>
+                            {% for eval_type in ['formative', 'sommative', 'autoévaluation', 'coévaluation', 'observation'] %}
+                            <option value="{{ eval_type }}" {{ 'selected' if lesson[12] == eval_type else '' }}>
+                                {{ eval_type.replace('é', 'É').title().replace('É', 'é') }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                     
                     <div class="form-group">
                         <label for="homework">Travaux à la maison</label>
                         <input type="text" id="homework" name="homework" 
+                               value="{{ lesson[13] or '' }}"
                                placeholder="Ex: Lire le chapitre 3, exercices 1-5">
                     </div>
                 </div>
@@ -192,57 +172,37 @@ Exemples:
                 <div class="form-group">
                     <label for="adaptations">Adaptations et soutien</label>
                     <textarea id="adaptations" name="adaptations" 
-                              placeholder="Décrivez les adaptations pour différents profils d'élèves...
-
-Exemples:
-• Pour les élèves en difficulté : support visuel supplémentaire, temps prolongé
-• Pour les élèves avancés : exercices d'enrichissement, rôle de tuteur
-• Pour les élèves ayant des besoins particuliers : consignes simplifiées
-• Stratégies d'enseignement universal (SEU)"></textarea>
+                              placeholder="Décrivez les adaptations pour différents profils d'élèves...">{{ lesson[15] or '' }}</textarea>
                 </div>
                 
                 <div class="form-group">
                     <label for="notes">Notes pédagogiques</label>
                     <textarea id="notes" name="notes" 
-                              placeholder="Ajoutez vos notes, réflexions et améliorations à apporter...
-
-• Points d'attention particuliers
-• Liens avec les leçons précédentes/suivantes
-• Suggestions d'activités alternatives
-• Observations sur l'efficacité de la leçon
-• Modifications à prévoir pour l'année suivante"></textarea>
+                              placeholder="Ajoutez vos notes, réflexions et améliorations à apporter...">{{ lesson[16] or '' }}</textarea>
                 </div>
             </div>
             
             <!-- Boutons d'action -->
             <div class="form-actions">
                 <button type="submit" name="action" value="save" class="btn btn-success btn-lg">
-                    💾 Enregistrer la leçon
+                    💾 Enregistrer les modifications
                 </button>
-                <button type="submit" name="action" value="save_and_continue" class="btn btn-primary btn-lg">
-                    ➡️ Enregistrer et créer la suivante
-                </button>
-                <a href="{{ url_for('lessons_list') }}" class="btn btn-secondary btn-lg">
+                <a href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}" class="btn btn-secondary btn-lg">
                     ❌ Annuler
                 </a>
             </div>
         </form>
         
-        <!-- Conseils pédagogiques -->
-        <div class="tips-section">
-            <h3>💡 Conseils pour créer une leçon efficace</h3>
-            <div class="tips-grid">
-                <ul>
-                    <li><strong>Objectifs clairs</strong> : Formulez des objectifs mesurables et observables</li>
-                    <li><strong>Structure équilibrée</strong> : Variez les modalités d'apprentissage</li>
-                    <li><strong>Progression logique</strong> : Du simple au complexe, du concret à l'abstrait</li>
-                </ul>
-                <ul>
-                    <li><strong>Engagement actif</strong> : Impliquez les élèves dans leur apprentissage</li>
-                    <li><strong>Évaluation intégrée</strong> : Prévoyez des moments d'évaluation formative</li>
-                    <li><strong>Différenciation</strong> : Adaptez selon les besoins de vos élèves</li>
-                </ul>
-            </div>
+        <!-- Zone de danger -->
+        <div class="danger-zone">
+            <h3>⚠️ Zone de danger</h3>
+            <p>Cette action est irréversible et supprimera définitivement la leçon.</p>
+            <form method="POST" action="{{ url_for('delete_lesson', lesson_id=lesson[0]) }}" 
+                  onsubmit="return confirm('⚠️ Êtes-vous absolument certain de vouloir supprimer cette leçon ?\n\nCette action est irréversible et supprimera :\n• Tout le contenu de la leçon\n• Votre progression associée\n• Les évaluations liées\n\nTapez \'SUPPRIMER\' dans la boîte de dialogue suivante pour confirmer.');">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Supprimer cette leçon
+                </button>
+            </form>
         </div>
     </div>
 
@@ -277,45 +237,30 @@ Exemples:
                     competenceSelect.innerHTML = '<option value="">Choisir la compétence...</option>';
                 }
             });
-            
             // Auto-sauvegarde en brouillon (localStorage)
-            const form = document.querySelector('form');
+            const form = document.querySelector('.lesson-form');
             const inputs = form.querySelectorAll('input, select, textarea');
-            
-            // Charger les données sauvegardées
-            inputs.forEach(input => {
-                const savedValue = localStorage.getItem(`lesson_draft_${input.name}`);
-                if (savedValue && !input.value) {
-                    input.value = savedValue;
-                }
-            });
             
             // Sauvegarder automatiquement les modifications
             inputs.forEach(input => {
                 input.addEventListener('input', function() {
-                    localStorage.setItem(`lesson_draft_${this.name}`, this.value);
+                    localStorage.setItem(`lesson_edit_draft_${this.name}_{{ lesson[0] }}`, this.value);
                 });
             });
             
             // Nettoyer le brouillon lors de la soumission
             form.addEventListener('submit', function() {
+                formModified = false; // Reset flag to prevent beforeunload warning
                 inputs.forEach(input => {
-                    localStorage.removeItem(`lesson_draft_${input.name}`);
+                    localStorage.removeItem(`lesson_edit_draft_${input.name}_{{ lesson[0] }}`);
                 });
             });
             
             // Validation avant soumission
             form.addEventListener('submit', function(e) {
-                const sessionNumber = document.getElementById('session_number').value;
                 const title = document.getElementById('title').value.trim();
                 const content = document.getElementById('content').value.trim();
                 const objectives = document.getElementById('objectives').value.trim();
-                
-                if (!sessionNumber || sessionNumber < 1 || sessionNumber > 160) {
-                    alert('⚠️ Le numéro de séance doit être entre 1 et 160');
-                    e.preventDefault();
-                    return;
-                }
                 
                 if (!title) {
                     alert('⚠️ Le titre de la leçon est obligatoire');
@@ -350,6 +295,35 @@ Exemples:
                 
                 textarea.addEventListener('input', updateCounter);
                 updateCounter();
+            });
+
+            // Animation d'entrée
+            const container = document.querySelector('.edit-lesson-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.5s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+
+            // Confirmation des modifications non sauvegardées
+            let formModified = false;
+            inputs.forEach(input => {
+                const originalValue = input.value;
+                input.addEventListener('input', function() {
+                    if (this.value !== originalValue) {
+                        formModified = true;
+                    }
+                });
+            });
+
+            window.addEventListener('beforeunload', function(e) {
+                if (formModified) {
+                    e.preventDefault();
+                    e.returnValue = 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter cette page ?';
+                }
             });
         });
     </script>
