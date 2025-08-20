@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Exercices de {{ subdiscipline_name }}{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/exercises.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="exercises-container">
+    <div class="page-header">
+        <h1>🔢 Exercices de {{ subdiscipline_name }}</h1>
+        <p class="page-description">
+            Découvrez et pratiquez les exercices de {{ subdiscipline_name }} en mathématiques
+        </p>
+        <div class="page-actions">
+            <a href="{{ url_for('create_exercise') }}" class="btn btn-primary">
+                ➕ Nouvel exercice
+            </a>
+            <a href="{{ url_for('exercises') }}" class="btn btn-secondary">
+                📝 Tous les exercices
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="exercises-grid">
+        {% if exercises %}
+            {% for exercise in exercises %}
+            <div class="exercise-card">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">{{ exercise[2] }}</h3>
+                    <span class="exercise-type">🔢 {{ exercise[4] }}</span>
+                </div>
+                
+                <div class="exercise-links">
+                    {% if exercise[11] %}
+                        <a href="#" class="exercise-link">📚 {{ exercise[11] }}</a>
+                    {% endif %}
+                    {% if exercise[12] %}
+                        <a href="#" class="exercise-link">📊 {{ exercise[12] }}</a>
+                    {% endif %}
+                </div>
+                
+                {% if exercise[3] %}
+                <p class="exercise-description">{{ exercise[3] }}</p>
+                {% endif %}
+                
+                <div class="exercise-content">
+                    <h4 class="exercise-content-title">Énoncé:</h4>
+                    <div class="exercise-text">{{ exercise[5]|safe }}</div>
+                </div>
+                
+                <div class="exercise-points">{{ exercise[7] }} points</div>
+                
+                <div class="exercise-footer">
+                    <span class="exercise-date">
+                        📅 {{ exercise[9][:10] if exercise[9] else 'Date inconnue' }}
+                    </span>
+                    <div class="exercise-actions">
+                        <a href="#" class="btn btn-small">✏️ Modifier</a>
+                        <a href="#" class="btn btn-small btn-secondary">🎯 Faire l'exercice</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-exercises">
+                <div class="empty-icon">🔢</div>
+                <h3 class="empty-title">Aucun exercice de {{ subdiscipline_name }}</h3>
+                <p class="empty-description">Commencez par créer votre premier exercice de {{ subdiscipline_name }}.</p>
+                <a href="{{ url_for('create_exercise') }}" class="btn btn-primary">
+                    ➕ Créer un exercice
+                </a>
+                <a href="{{ url_for('exercises') }}" class="btn btn-secondary">
+                    📝 Voir tous les exercices
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

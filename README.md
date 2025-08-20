@@ -19,11 +19,14 @@ Une plateforme web moderne pour la gestion de classe et le suivi pédagogique, s
 - **📚 Carnet de lecture personnel** - Portfolio de lecture avec notes et évaluations
 - **🔄 Compétences dynamiques** - API pour charger les compétences par discipline
 
-### 📝 Modules d'exercices et théorie (NOUVEAU!)
-- **🧠 Exercices de grammaire** - Questions interactives sur le genre des mots
-- **📖 Sections théoriques** - Contenu pédagogique organisé par leçons
-- **🎯 Gestion des questions** - Dashboard administrateur pour les exercices
-- **📊 Résultats et corrections** - Suivi des performances des élèves
+### 📝 Système d'exercices multi-disciplinaires (NOUVEAU!)
+- **🔢 Exercices mathématiques** - Algèbre, géométrie, arithmétique, probabilités
+- **📖 Exercices français** - Grammaire, orthographe, conjugaison, vocabulaire
+- **🏛️ Exercices histoire** - Analyse d'artéfacts, lignes du temps, caractéristiques historiques
+- **🌍 Exercices géographie** - Cartes et analyse territoriale
+- **🏳️ Culture et citoyenneté** - Exercices de réflexion et analyse critique
+- **🎯 Navigation organisée** - Menu déroulant avec sous-catégories par discipline
+- **📊 Suivi personnalisé** - Progression par compétences PFEQ détaillées
 - **📁 Portfolio personnel** - Collection de travaux et projets des élèves
 - **⚙️ Administration intégrée** - Interface de gestion des contenus pédagogiques
 
@@ -127,13 +130,13 @@ python css_builder.py
 - [x] **Édition complète des leçons** - Formulaire avancé avec tous les champs
 - [x] **Filtrage par matière** - Organisation par discipline avec API compétences
 - [x] **Composant edit-lesson.css** - Styles dédiés pour l'édition de leçons
-- [x] **Exercices de grammaire** - Système de questions interactives sur le genre
-- [x] **Gestion des questions** - Dashboard administrateur pour créer/modifier
-- [x] **Résultats et corrections** - Affichage des scores et bonnes réponses
-- [x] **Portfolio des élèves** - Collection de travaux et projets personnels
-- [x] **Sections théoriques** - Contenu pédagogique organisé par modules
-- [x] **Composants CSS étendus** - 7 nouveaux fichiers CSS pour les fonctionnalités
-- [x] **Templates complets** - 11 nouveaux templates pour toutes les fonctionnalités
+- [x] **Système d'exercices multi-disciplinaires** - Support complet PFEQ toutes matières
+- [x] **Navigation par sous-catégories** - Menu déroulant organisé par disciplines
+- [x] **Routes spécialisées** - URLs dédiées pour chaque type d'exercice
+- [x] **Compétences PFEQ détaillées** - Descriptions complètes par discipline
+- [x] **Templates spécialisés** - Pages dédiées par matière (math, français, histoire, etc.)
+- [x] **Formulaire de création étendu** - Types d'exercices organisés par discipline
+- [x] **Styles CSS adaptés** - Menus déroulants multi-niveaux avec animations
 
 ### 📅 Court terme  
 - [ ] **Mise à jour templates restants** - Appliquer l'architecture aux autres pages

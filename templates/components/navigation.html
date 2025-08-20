@@ -22,11 +22,82 @@
                 ✏️ Exercices
             </a>
             <div class="dropdown-menu">
+                <div class="dropdown-submenu">
+                    <a href="#" class="dropdown-item dropdown-toggle">
+                        🔢 Mathématiques
+                    </a>
+                    <div class="dropdown-submenu-content">
+                        <a href="{{ url_for('math_exercises', subdiscipline='algebre') }}" class="dropdown-subitem">
+                            📊 Algèbre
+                        </a>
+                        <a href="{{ url_for('math_exercises', subdiscipline='geometrie') }}" class="dropdown-subitem">
+                            📐 Géométrie  
+                        </a>
+                        <a href="{{ url_for('math_exercises', subdiscipline='arithmetique') }}" class="dropdown-subitem">
+                            🔢 Arithmétique
+                        </a>
+                        <a href="{{ url_for('math_exercises', subdiscipline='probabilites') }}" class="dropdown-subitem">
+                            🎲 Probabilités
+                        </a>
+                    </div>
+                </div>
+                <div class="dropdown-submenu">
+                    <a href="#" class="dropdown-item dropdown-toggle">
+                        📖 Français
+                    </a>
+                    <div class="dropdown-submenu-content">
+                        <a href="{{ url_for('grammar_gender_exercises') }}" class="dropdown-subitem {% if 'grammar_gender' in request.endpoint %}active{% endif %}">
+                            📚 Genre grammatical
+                        </a>
+                        <a href="{{ url_for('french_exercises', subdiscipline='orthographe') }}" class="dropdown-subitem">
+                            ✏️ Orthographe
+                        </a>
+                        <a href="{{ url_for('french_exercises', subdiscipline='conjugaison') }}" class="dropdown-subitem">
+                            🔄 Conjugaison
+                        </a>
+                        <a href="{{ url_for('french_exercises', subdiscipline='vocabulaire') }}" class="dropdown-subitem">
+                            📝 Vocabulaire
+                        </a>
+                    </div>
+                </div>
+                <div class="dropdown-submenu">
+                    <a href="#" class="dropdown-item dropdown-toggle">
+                        🏛️ Histoire
+                    </a>
+                    <div class="dropdown-submenu-content">
+                        <a href="{{ url_for('history_exercises', subdiscipline='analyse_artefact') }}" class="dropdown-subitem">
+                            🏺 Analyse d'artéfact
+                        </a>
+                        <a href="{{ url_for('history_exercises', subdiscipline='ligne_temps') }}" class="dropdown-subitem">
+                            📅 Ligne du temps
+                        </a>
+                        <a href="{{ url_for('history_exercises', subdiscipline='caracteristiques_historiques') }}" class="dropdown-subitem">
+                            📋 Caractéristiques historiques
+                        </a>
+                    </div>
+                </div>
+                <div class="dropdown-submenu">
+                    <a href="#" class="dropdown-item dropdown-toggle">
+                        🌍 Géographie
+                    </a>
+                    <div class="dropdown-submenu-content">
+                        <a href="{{ url_for('geography_exercises', subdiscipline='carte') }}" class="dropdown-subitem">
+                            🗺️ Cartes
+                        </a>
+                    </div>
+                </div>
+                <div class="dropdown-submenu">
+                    <a href="#" class="dropdown-item dropdown-toggle">
+                        🏳️ Culture et citoyenneté
+                    </a>
+                    <div class="dropdown-submenu-content">
+                        <a href="{{ url_for('ccq_exercises', subdiscipline='reflexion') }}" class="dropdown-subitem">
+                            💭 Réflexion
+                        </a>
+                    </div>
+                </div>
                 <a href="{{ url_for('exercises') }}" class="dropdown-item {% if request.endpoint == 'exercises' %}active{% endif %}">
-                    📝 Exercices généraux
-                </a>
-                <a href="{{ url_for('grammar_gender_exercises') }}" class="dropdown-item {% if 'grammar_gender' in request.endpoint %}active{% endif %}">
-                    📚 Genre grammatical
+                    📝 Tous les exercices
                 </a>
             </div>
         </div>

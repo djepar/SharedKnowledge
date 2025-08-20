@@ -107,9 +107,9 @@
             <div class="discipline-competency-grid">
                 {% for competency in competencies %}
                 {{ discipline_competency_card(
-                    icon=("🔢" if discipline == 'mathematiques' else "📖" if discipline == 'francais' else "🎯"),
+                    icon=("🔢" if discipline == 'mathematiques' else "📖" if discipline == 'francais' else "🏛️" if discipline == 'histoire' else "🏳️" if discipline == 'culture_citoyennete' else "🌍" if discipline == 'geographie' else "🎯"),
                     title=competency.title,
-                    description="Développement progressif selon le Programme de formation de l'école québécoise",
+                    description=competency.description,
                     progress_percentage=competency.progress,
                     competency_code=competency.code
                 ) }}

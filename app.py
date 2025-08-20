@@ -642,37 +642,53 @@ def discipline_dashboard(discipline):
     recent_activity = []
     competencies = []
     
+    # Get recent activity for the discipline
     if discipline == 'mathematiques':
-        # Get recent math activity
         c.execute("""SELECT l.title, l.lesson_number, sp.completion_date
                     FROM student_progress sp
                     JOIN lessons l ON l.id = sp.lesson_id
                     WHERE sp.user_id = ? AND sp.completed = 1 AND l.subject = 'mathématiques'
                     ORDER BY sp.completion_date DESC LIMIT 5""", (user_id,))
-        recent_activity = c.fetchall()
-        
-        # Math competencies (PFEQ)
-        competencies = [
-            {'code': 'C1', 'title': 'Résoudre une situation-problème', 'progress': 45},
-            {'code': 'C2', 'title': 'Raisonnement mathématique', 'progress': 60},
-            {'code': 'C3', 'title': 'Communication mathématique', 'progress': 35}
-        ]
     else:
-        # Get recent activity for other disciplines
         c.execute("""SELECT l.title, l.lesson_number, sp.completion_date
                     FROM student_progress sp
                     JOIN lessons l ON l.id = sp.lesson_id
                     WHERE sp.user_id = ? AND sp.completed = 1
                     ORDER BY sp.completion_date DESC LIMIT 5""", (user_id,))
-        recent_activity = c.fetchall()
-        
-        # French competencies (PFEQ)
-        if discipline == 'francais':
-            competencies = [
-                {'code': 'C1', 'title': 'Lire et apprécier des textes', 'progress': 70},
-                {'code': 'C2', 'title': 'Écrire des textes variés', 'progress': 55},
-                {'code': 'C3', 'title': 'Communiquer oralement', 'progress': 65}
-            ]
+    
+    recent_activity = c.fetchall()
+    
+    # Set competencies based on discipline with proper descriptions
+    if discipline == 'mathematiques':
+        competencies = [
+            {'code': 'C1', 'title': 'Résoudre une situation-problème mathématique', 'description': 'Mobiliser les savoirs mathématiques appropriés pour analyser et résoudre des situations-problèmes en utilisant une démarche structurée et des stratégies variées.', 'progress': 45},
+            {'code': 'C2', 'title': 'Raisonner à l\'aide de concepts et de processus mathématiques', 'description': 'Développer et appliquer un raisonnement mathématique rigoureux en utilisant les concepts et processus appropriés pour justifier ses actions et valider ses résultats.', 'progress': 60},
+            {'code': 'C3', 'title': 'Communiquer à l\'aide du langage mathématique', 'description': 'Interpréter et produire des messages en utilisant le langage mathématique pour partager des informations à caractère mathématique et argumenter.', 'progress': 35}
+        ]
+    elif discipline == 'francais':
+        competencies = [
+            {'code': 'C1', 'title': 'Lire et apprécier des textes variés', 'description': 'Comprendre et interpréter des textes de genres variés en mobilisant ses connaissances et stratégies de lecture pour construire du sens et développer sa culture.', 'progress': 70},
+            {'code': 'C2', 'title': 'Écrire des textes variés', 'description': 'Produire des textes de genres variés en mobilisant ses connaissances langagières et textuelles dans une démarche active de rédaction.', 'progress': 55},
+            {'code': 'C3', 'title': 'Communiquer oralement selon des modalités variées', 'description': 'Réaliser des communications orales de genres variés en mobilisant les ressources de la langue orale et en s\'adaptant à la situation de communication.', 'progress': 65}
+        ]
+    elif discipline == 'culture_citoyennete':
+        competencies = [
+            {'code': 'C1', 'title': 'Interroger une réalité sociale', 'description': 'Poser des questions pertinentes et formuler des hypothèses à propos de réalités sociales en mobilisant des concepts et des outils d\'analyse appropriés.', 'progress': 50},
+            {'code': 'C2', 'title': 'Interpréter une réalité sociale', 'description': 'Construire sa compréhension d\'une réalité sociale en analysant des sources variées et en établissant des liens significatifs entre les éléments étudiés.', 'progress': 45},
+            {'code': 'C3', 'title': 'Construire sa conscience citoyenne', 'description': 'Développer sa capacité d\'action citoyenne en s\'appuyant sur l\'analyse de réalités sociales et en considérant diverses perspectives dans une démarche démocratique.', 'progress': 40}
+        ]
+    elif discipline == 'histoire':
+        competencies = [
+            {'code': 'C1', 'title': 'Interroger les réalités sociales dans une perspective historique', 'description': 'Formuler des questions et des hypothèses pertinentes à propos de réalités sociales du passé en mobilisant la pensée historique.', 'progress': 55},
+            {'code': 'C2', 'title': 'Interpréter les réalités sociales à l\'aide de la méthode historique', 'description': 'Analyser et comprendre des réalités sociales du passé en utilisant la méthode historique et en établissant des liens avec le présent.', 'progress': 50},
+            {'code': 'C3', 'title': 'Construire sa conscience citoyenne à l\'aide de l\'histoire', 'description': 'Développer son identité sociale et sa capacité d\'action citoyenne en s\'appuyant sur la connaissance du passé et la compréhension du présent.', 'progress': 45}
+        ]
+    elif discipline == 'geographie':
+        competencies = [
+            {'code': 'C1', 'title': 'Lire l\'organisation d\'un territoire', 'description': 'Analyser l\'organisation spatiale d\'un territoire en mobilisant le raisonnement géographique et les outils appropriés pour comprendre les dynamiques territoriales.', 'progress': 48},
+            {'code': 'C2', 'title': 'Interpréter un enjeu territorial', 'description': 'Analyser un enjeu territorial en considérant les multiples perspectives des acteurs concernés et en établissant des liens entre les dimensions du développement durable.', 'progress': 42},
+            {'code': 'C3', 'title': 'Construire sa conscience citoyenne à l\'échelle planétaire', 'description': 'Développer sa capacité d\'action citoyenne responsable en s\'appuyant sur la compréhension des enjeux territoriaux locaux et mondiaux.', 'progress': 38}
+        ]
     
     conn.close()
     
@@ -1861,6 +1877,187 @@ def add_grammar_gender_question():
             conn.close()
     
     return render_template('add_grammar_question.html')
+
+# Mathematics Exercise Routes
+@app.route('/exercises/math/<subdiscipline>')
+def math_exercises(subdiscipline):
+    """Display mathematics exercises for a specific subdiscipline"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    valid_subdisciplines = ['algebre', 'geometrie', 'arithmetique', 'probabilites']
+    if subdiscipline not in valid_subdisciplines:
+        flash('Sous-discipline non valide', 'error')
+        return redirect(url_for('exercises'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Get exercises for mathematics with specific subdiscipline (stored in exercise_type or tags)
+    c.execute('''
+        SELECT * FROM exercises 
+        WHERE discipline = 'mathematiques' 
+        AND (exercise_type LIKE ? OR tags LIKE ?)
+        ORDER BY created_at DESC
+    ''', (f'%{subdiscipline}%', f'%{subdiscipline}%'))
+    
+    exercises_list = c.fetchall()
+    conn.close()
+    
+    subdiscipline_names = {
+        'algebre': 'Algèbre',
+        'geometrie': 'Géométrie', 
+        'arithmetique': 'Arithmétique',
+        'probabilites': 'Probabilités'
+    }
+    
+    return render_template('math_exercises.html', 
+                         exercises=exercises_list, 
+                         subdiscipline=subdiscipline,
+                         subdiscipline_name=subdiscipline_names[subdiscipline])
+
+# French Exercise Routes  
+@app.route('/exercises/french/<subdiscipline>')
+def french_exercises(subdiscipline):
+    """Display French exercises for a specific subdiscipline"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    valid_subdisciplines = ['orthographe', 'conjugaison', 'vocabulaire']
+    if subdiscipline not in valid_subdisciplines:
+        flash('Sous-discipline non valide', 'error')
+        return redirect(url_for('exercises'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    c.execute('''
+        SELECT * FROM exercises 
+        WHERE discipline = 'francais' 
+        AND (exercise_type LIKE ? OR tags LIKE ?)
+        ORDER BY created_at DESC
+    ''', (f'%{subdiscipline}%', f'%{subdiscipline}%'))
+    
+    exercises_list = c.fetchall()
+    conn.close()
+    
+    subdiscipline_names = {
+        'orthographe': 'Orthographe',
+        'conjugaison': 'Conjugaison',
+        'vocabulaire': 'Vocabulaire'
+    }
+    
+    return render_template('french_exercises.html', 
+                         exercises=exercises_list, 
+                         subdiscipline=subdiscipline,
+                         subdiscipline_name=subdiscipline_names[subdiscipline])
+
+# History Exercise Routes
+@app.route('/exercises/history/<subdiscipline>')
+def history_exercises(subdiscipline):
+    """Display History exercises for a specific subdiscipline"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    valid_subdisciplines = ['analyse_artefact', 'ligne_temps', 'caracteristiques_historiques', 'antiquite', 'moyen_age', 'moderne']
+    if subdiscipline not in valid_subdisciplines:
+        flash('Sous-discipline non valide', 'error')
+        return redirect(url_for('exercises'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    c.execute('''
+        SELECT * FROM exercises 
+        WHERE discipline = 'histoire' 
+        AND (exercise_type LIKE ? OR tags LIKE ?)
+        ORDER BY created_at DESC
+    ''', (f'%{subdiscipline}%', f'%{subdiscipline}%'))
+    
+    exercises_list = c.fetchall()
+    conn.close()
+    
+    subdiscipline_names = {
+        'analyse_artefact': 'Analyse d\'artéfact',
+        'ligne_temps': 'Ligne du temps',
+        'caracteristiques_historiques': 'Caractéristiques historiques',
+        'antiquite': 'Antiquité',
+        'moyen_age': 'Moyen-Âge',
+        'moderne': 'Histoire moderne'
+    }
+    
+    return render_template('history_exercises.html', 
+                         exercises=exercises_list, 
+                         subdiscipline=subdiscipline,
+                         subdiscipline_name=subdiscipline_names[subdiscipline])
+
+# Geography Exercise Routes
+@app.route('/exercises/geography/<subdiscipline>')
+def geography_exercises(subdiscipline):
+    """Display Geography exercises for a specific subdiscipline"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    valid_subdisciplines = ['carte']
+    if subdiscipline not in valid_subdisciplines:
+        flash('Sous-discipline non valide', 'error')
+        return redirect(url_for('exercises'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    c.execute('''
+        SELECT * FROM exercises 
+        WHERE discipline = 'geographie' 
+        AND (exercise_type LIKE ? OR tags LIKE ?)
+        ORDER BY created_at DESC
+    ''', (f'%{subdiscipline}%', f'%{subdiscipline}%'))
+    
+    exercises_list = c.fetchall()
+    conn.close()
+    
+    subdiscipline_names = {
+        'carte': 'Cartes'
+    }
+    
+    return render_template('geography_exercises.html', 
+                         exercises=exercises_list, 
+                         subdiscipline=subdiscipline,
+                         subdiscipline_name=subdiscipline_names[subdiscipline])
+
+# Culture and Citizenship Exercise Routes
+@app.route('/exercises/ccq/<subdiscipline>')
+def ccq_exercises(subdiscipline):
+    """Display Culture and Citizenship exercises for a specific subdiscipline"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    valid_subdisciplines = ['reflexion']
+    if subdiscipline not in valid_subdisciplines:
+        flash('Sous-discipline non valide', 'error')
+        return redirect(url_for('exercises'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    c.execute('''
+        SELECT * FROM exercises 
+        WHERE discipline = 'culture_citoyennete' 
+        AND (exercise_type LIKE ? OR tags LIKE ?)
+        ORDER BY created_at DESC
+    ''', (f'%{subdiscipline}%', f'%{subdiscipline}%'))
+    
+    exercises_list = c.fetchall()
+    conn.close()
+    
+    subdiscipline_names = {
+        'reflexion': 'Réflexion'
+    }
+    
+    return render_template('ccq_exercises.html', 
+                         exercises=exercises_list, 
+                         subdiscipline=subdiscipline,
+                         subdiscipline_name=subdiscipline_names[subdiscipline])
 
 @app.route('/logout')
 def logout():
