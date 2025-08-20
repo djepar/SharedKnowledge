@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response, jsonify
 import sqlite3
 import csv
 import io
@@ -154,7 +154,184 @@ def check_and_migrate_database():
             )
         ''')
         
+        # New tables for the three functionalities
+        
+        # Theory: Theoretical lessons with exercises
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS theory (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lesson_id INTEGER,
+                title TEXT NOT NULL,
+                description TEXT,
+                content TEXT,
+                powerpoint_file TEXT,
+                exercise_type TEXT,
+                discipline TEXT DEFAULT 'français',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (lesson_id) REFERENCES lessons (id)
+            )
+        ''')
+        
+        # Exercises linked to lessons
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS exercises (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                lesson_id INTEGER,
+                theory_id INTEGER,
+                title TEXT NOT NULL,
+                description TEXT,
+                exercise_type TEXT NOT NULL,
+                content TEXT NOT NULL,
+                answer_key TEXT,
+                points INTEGER DEFAULT 10,
+                discipline TEXT DEFAULT 'français',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (lesson_id) REFERENCES lessons (id),
+                FOREIGN KEY (theory_id) REFERENCES theory (id)
+            )
+        ''')
+        
+        # Portfolio, Examens et Travaux
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS portfolio_items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER,
+                lesson_id INTEGER,
+                item_type TEXT NOT NULL,
+                title TEXT NOT NULL,
+                description TEXT,
+                file_path TEXT,
+                content TEXT,
+                due_date DATE,
+                submission_date DATE,
+                grade REAL,
+                max_grade REAL,
+                feedback TEXT,
+                status TEXT DEFAULT 'en_cours',
+                discipline TEXT DEFAULT 'français',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (lesson_id) REFERENCES lessons (id)
+            )
+        ''')
+        
+        # User exercise attempts
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS exercise_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                exercise_id INTEGER NOT NULL,
+                attempt_number INTEGER DEFAULT 1,
+                user_answer TEXT,
+                is_correct BOOLEAN,
+                points_earned INTEGER DEFAULT 0,
+                time_taken INTEGER,
+                attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (exercise_id) REFERENCES exercises (id)
+            )
+        ''')
+        
+        # Grammar gender exercises - Question database
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS grammar_gender_questions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sub_question_id TEXT UNIQUE NOT NULL,
+                nom TEXT NOT NULL,
+                genre_du_nom TEXT NOT NULL CHECK(genre_du_nom IN ('masculin', 'féminin')),
+                niveau_difficulte INTEGER CHECK(niveau_difficulte >= 1 AND niveau_difficulte <= 3),
+                exemple_usage_courant TEXT,
+                exemple_usage_litteraire TEXT,
+                exemple_usage_universitaire TEXT,
+                terminaisons TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Grammar gender exercise sessions
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS grammar_gender_sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                session_type TEXT DEFAULT 'practice',
+                questions_count INTEGER DEFAULT 10,
+                score INTEGER DEFAULT 0,
+                total_questions INTEGER DEFAULT 0,
+                time_taken INTEGER,
+                started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                completed_at TIMESTAMP,
+                status TEXT DEFAULT 'active' CHECK(status IN ('active', 'completed', 'paused')),
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        
+        # Individual question attempts within sessions
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS grammar_gender_attempts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id INTEGER NOT NULL,
+                question_id INTEGER NOT NULL,
+                user_answer TEXT,
+                is_correct BOOLEAN,
+                time_taken INTEGER,
+                hints_used INTEGER DEFAULT 0,
+                score INTEGER DEFAULT 10,
+                attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (session_id) REFERENCES grammar_gender_sessions (id),
+                FOREIGN KEY (question_id) REFERENCES grammar_gender_questions (id)
+            )
+        ''')
+        
         conn.commit()
+        
+        # Add new columns for scoring system if they don't exist
+        try:
+            c.execute("ALTER TABLE grammar_gender_attempts ADD COLUMN hints_used INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+            
+        try:
+            c.execute("ALTER TABLE grammar_gender_attempts ADD COLUMN score INTEGER DEFAULT 10")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        
+        # Insert sample grammar gender questions if table is empty
+        c.execute("SELECT COUNT(*) FROM grammar_gender_questions")
+        if c.fetchone()[0] == 0:
+            sample_questions = [
+                ("QAG1-1", "soleil", "masculin", 3, "Un soleil radieux brille dans le ciel", 
+                 "Le soleil, ce dieu d'or, s'endort dans son royaume pourpre", 
+                 "L'imagerie solaire dans la poésie romantique française", 
+                 "-eil (exception car mots en -eil peuvent être féminins comme abeille)"),
+                ("QAG1-2", "amour", "masculin", 3, "Un grand amour de jeunesse", 
+                 "Les amours défuntes hantent ses vers (usage poétique au féminin)", 
+                 "L'amour courtois dans la littérature médiévale", 
+                 "exception"),
+                ("QAG1-3", "mer", "féminin", 3, "La mer est agitée aujourd'hui", 
+                 "La mer, la grande mer consolatrice (Baudelaire)", 
+                 "La symbolique de la mer dans l'œuvre de Victor Hugo", 
+                 "exception"),
+                ("QAG1-4", "automne", "masculin", 3, "Un automne pluvieux", 
+                 "L'automne languissant berçait leur rêverie", 
+                 "L'imaginaire de l'automne dans la poésie symboliste", 
+                 "ambigu"),
+                ("QAG1-5", "orchidée", "féminin", 1, "Une belle orchidée blanche", 
+                 "L'orchidée sauvage parsemait la forêt", 
+                 "Taxonomie des orchidées tropicales", 
+                 "typiquement féminin"),
+                ("QAG1-6", "pétale", "masculin", 3, "Un pétale de rose", 
+                 "Les pétales embaumés tombaient en pluie", 
+                 "Morphologie du pétale dans les angiospermes", 
+                 "ambigu"),
+            ]
+            
+            c.executemany('''
+                INSERT INTO grammar_gender_questions 
+                (sub_question_id, nom, genre_du_nom, niveau_difficulte, exemple_usage_courant, 
+                 exemple_usage_litteraire, exemple_usage_universitaire, terminaisons)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', sample_questions)
+            conn.commit()
         
         # Insert sample lesson data if table is empty
         c.execute("SELECT COUNT(*) FROM lessons")
@@ -1166,6 +1343,524 @@ def progress_dashboard():
     except Exception as e:
         flash(f'Erreur lors du chargement du tableau de bord: {str(e)}', 'error')
         return redirect(url_for('math_schedule_overview'))
+
+# Theory routes
+@app.route('/theory')
+def theory():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    discipline = session.get('discipline', 'français')
+    
+    c.execute('''
+        SELECT t.*, l.title as lesson_title 
+        FROM theory t
+        LEFT JOIN lessons l ON t.lesson_id = l.id
+        WHERE t.discipline = ?
+        ORDER BY t.created_at DESC
+    ''', (discipline,))
+    
+    theory_items = c.fetchall()
+    conn.close()
+    
+    return render_template('theory.html', theory_items=theory_items, discipline=discipline)
+
+@app.route('/theory/create', methods=['GET', 'POST'])
+def create_theory():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        lesson_id = request.form.get('lesson_id') if request.form.get('lesson_id') else None
+        title = request.form['title']
+        description = request.form.get('description', '')
+        content = request.form.get('content', '')
+        exercise_type = request.form.get('exercise_type', '')
+        discipline = session.get('discipline', 'français')
+        
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO theory (lesson_id, title, description, content, exercise_type, discipline)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (lesson_id, title, description, content, exercise_type, discipline))
+        conn.commit()
+        conn.close()
+        
+        flash('Ressource théorique créée avec succès!', 'success')
+        return redirect(url_for('theory'))
+    
+    # Get lessons for dropdown
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    discipline = session.get('discipline', 'français')
+    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY lesson_number', (discipline,))
+    lessons = c.fetchall()
+    conn.close()
+    
+    return render_template('create_theory.html', lessons=lessons)
+
+# Exercises routes
+@app.route('/exercises')
+def exercises():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    discipline = session.get('discipline', 'français')
+    
+    c.execute('''
+        SELECT e.*, l.title as lesson_title
+        FROM exercises e
+        LEFT JOIN lessons l ON e.lesson_id = l.id
+        WHERE e.discipline = ?
+        ORDER BY e.created_at DESC
+    ''', (discipline,))
+    
+    exercises_list = c.fetchall()
+    conn.close()
+    
+    return render_template('exercises.html', exercises=exercises_list, discipline=discipline)
+
+@app.route('/exercises/create', methods=['GET', 'POST'])
+def create_exercise():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        lesson_id = request.form.get('lesson_id') if request.form.get('lesson_id') else None
+        theory_id = request.form.get('theory_id') if request.form.get('theory_id') else None
+        title = request.form['title']
+        description = request.form.get('description', '')
+        exercise_type = request.form['exercise_type']
+        content = request.form['content']
+        answer_key = request.form.get('answer_key', '')
+        points = int(request.form.get('points', 10))
+        discipline = session.get('discipline', 'français')
+        
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO exercises (lesson_id, theory_id, title, description, exercise_type, content, answer_key, points, discipline)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (lesson_id, theory_id, title, description, exercise_type, content, answer_key, points, discipline))
+        conn.commit()
+        conn.close()
+        
+        flash('Exercice créé avec succès!', 'success')
+        return redirect(url_for('exercises'))
+    
+    # Get lessons and manuel items for dropdowns
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    discipline = session.get('discipline', 'français')
+    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY lesson_number', (discipline,))
+    lessons = c.fetchall()
+    c.execute('SELECT id, title FROM theory WHERE discipline = ? ORDER BY title', (discipline,))
+    theory_items = c.fetchall()
+    conn.close()
+    
+    return render_template('create_exercise.html', lessons=lessons, theory_items=theory_items)
+
+# Portfolio routes
+@app.route('/portfolio')
+def portfolio():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    discipline = session.get('discipline', 'français')
+    user_id = session.get('user_id')
+    
+    c.execute('''
+        SELECT p.*, l.title as lesson_title
+        FROM portfolio_items p
+        LEFT JOIN lessons l ON p.lesson_id = l.id
+        WHERE p.discipline = ? AND p.user_id = ?
+        ORDER BY p.created_at DESC
+    ''', (discipline, user_id))
+    
+    portfolio_items = c.fetchall()
+    conn.close()
+    
+    return render_template('portfolio.html', portfolio_items=portfolio_items, discipline=discipline)
+
+@app.route('/portfolio/create', methods=['GET', 'POST'])
+def create_portfolio_item():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        lesson_id = request.form.get('lesson_id') if request.form.get('lesson_id') else None
+        item_type = request.form['item_type']
+        title = request.form['title']
+        description = request.form.get('description', '')
+        content = request.form.get('content', '')
+        due_date = request.form.get('due_date')
+        discipline = session.get('discipline', 'français')
+        user_id = session.get('user_id')
+        
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO portfolio_items (user_id, lesson_id, item_type, title, description, content, due_date, discipline)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (user_id, lesson_id, item_type, title, description, content, due_date, discipline))
+        conn.commit()
+        conn.close()
+        
+        flash('Élément de portfolio créé avec succès!', 'success')
+        return redirect(url_for('portfolio'))
+    
+    # Get lessons for dropdown
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    discipline = session.get('discipline', 'français')
+    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY lesson_number', (discipline,))
+    lessons = c.fetchall()
+    conn.close()
+    
+    return render_template('create_portfolio_item.html', lessons=lessons)
+
+# Grammar Gender Exercise Routes
+@app.route('/exercises/grammar/gender')
+def grammar_gender_exercises():
+    """Display grammar gender exercise dashboard"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    user_id = session.get('user_id')
+    
+    # Get user statistics
+    c.execute('''
+        SELECT COUNT(*) as total_sessions,
+               AVG(CASE WHEN status = 'completed' THEN score * 100.0 / total_questions ELSE NULL END) as avg_score,
+               MAX(score * 100.0 / total_questions) as best_score
+        FROM grammar_gender_sessions 
+        WHERE user_id = ?
+    ''', (user_id,))
+    stats = c.fetchone()
+    
+    # Get recent sessions
+    c.execute('''
+        SELECT id, session_type, score, total_questions, 
+               ROUND(score * 100.0 / total_questions, 1) as percentage,
+               datetime(started_at, 'localtime') as started_at,
+               datetime(completed_at, 'localtime') as completed_at,
+               status
+        FROM grammar_gender_sessions 
+        WHERE user_id = ? 
+        ORDER BY started_at DESC 
+        LIMIT 10
+    ''', (user_id,))
+    recent_sessions = c.fetchall()
+    
+    # Get question count by difficulty
+    c.execute('''
+        SELECT niveau_difficulte, COUNT(*) as count
+        FROM grammar_gender_questions
+        GROUP BY niveau_difficulte
+        ORDER BY niveau_difficulte
+    ''')
+    question_distribution = c.fetchall()
+    
+    conn.close()
+    
+    return render_template('grammar_gender_dashboard.html', 
+                         stats=stats, 
+                         recent_sessions=recent_sessions,
+                         question_distribution=question_distribution)
+
+@app.route('/exercises/grammar/gender/practice')
+def start_grammar_gender_practice():
+    """Start a new grammar gender practice session"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    questions_count = request.args.get('count', 10, type=int)
+    difficulty = request.args.get('difficulty', 'all')
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Create new session
+    user_id = session.get('user_id')
+    c.execute('''
+        INSERT INTO grammar_gender_sessions (user_id, session_type, questions_count, total_questions)
+        VALUES (?, 'practice', ?, ?)
+    ''', (user_id, questions_count, questions_count))
+    session_id = c.lastrowid
+    
+    conn.commit()
+    conn.close()
+    
+    return redirect(url_for('grammar_gender_question', session_id=session_id, question_num=1))
+
+@app.route('/exercises/grammar/gender/session/<int:session_id>/question/<int:question_num>')
+def grammar_gender_question(session_id, question_num):
+    """Display a specific question in a session"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Verify session belongs to user
+    c.execute('SELECT * FROM grammar_gender_sessions WHERE id = ? AND user_id = ?', 
+              (session_id, session.get('user_id')))
+    session_data = c.fetchone()
+    
+    if not session_data:
+        flash('Session non trouvée', 'error')
+        return redirect(url_for('grammar_gender_exercises'))
+    
+    # Get random question not yet answered in this session
+    c.execute('''
+        SELECT gq.* FROM grammar_gender_questions gq
+        WHERE gq.id NOT IN (
+            SELECT question_id FROM grammar_gender_attempts 
+            WHERE session_id = ?
+        )
+        ORDER BY RANDOM()
+        LIMIT 1
+    ''', (session_id,))
+    question = c.fetchone()
+    
+    if not question:
+        # No more questions, redirect to results
+        return redirect(url_for('grammar_gender_results', session_id=session_id))
+    
+    # Get session progress
+    c.execute('SELECT COUNT(*) FROM grammar_gender_attempts WHERE session_id = ?', (session_id,))
+    answered_count = c.fetchone()[0]
+    
+    conn.close()
+    
+    progress = {
+        'current': answered_count + 1,
+        'total': session_data[3],  # total_questions
+        'percentage': round((answered_count / session_data[3]) * 100)
+    }
+    
+    return render_template('grammar_gender_question.html', 
+                         question=question, 
+                         session_id=session_id,
+                         question_num=question_num,
+                         progress=progress)
+
+@app.route('/exercises/grammar/gender/session/<int:session_id>/submit', methods=['POST'])
+def submit_grammar_gender_answer(session_id):
+    """Submit an answer for a grammar gender question"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    question_id = request.form.get('question_id')
+    user_answer = request.form.get('answer')
+    time_taken = request.form.get('time_taken', 0, type=int)
+    hints_used = request.form.get('hints_used', 0, type=int)
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Get question details including word and examples
+    c.execute('''
+        SELECT genre_du_nom, nom, terminaisons, exemple_usage_courant, exemple_usage_litteraire, exemple_usage_universitaire 
+        FROM grammar_gender_questions WHERE id = ?
+    ''', (question_id,))
+    question_data = c.fetchone()
+    correct_answer = question_data[0]
+    word = question_data[1]
+    explanation = question_data[2] if question_data[2] else None
+    usage_courant = question_data[3]
+    usage_litteraire = question_data[4]
+    usage_universitaire = question_data[5]
+    
+    is_correct = user_answer.lower() == correct_answer.lower()
+    
+    # Calculate score: base 10 points, -5 points per hint used
+    question_score = 10 - (hints_used * 5)
+    if not is_correct:
+        question_score = 0  # No points for incorrect answers
+    
+    # Save attempt
+    c.execute('''
+        INSERT INTO grammar_gender_attempts 
+        (session_id, question_id, user_answer, is_correct, time_taken, hints_used, score)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (session_id, question_id, user_answer, is_correct, time_taken, hints_used, question_score))
+    
+    # Update session score with points instead of just counting correct answers
+    c.execute('''
+        UPDATE grammar_gender_sessions 
+        SET score = score + ? 
+        WHERE id = ?
+    ''', (question_score, session_id))
+    
+    # Check if session is complete
+    c.execute('SELECT COUNT(*) FROM grammar_gender_attempts WHERE session_id = ?', (session_id,))
+    answered_count = c.fetchone()[0]
+    
+    c.execute('SELECT total_questions FROM grammar_gender_sessions WHERE id = ?', (session_id,))
+    total_questions = c.fetchone()[0]
+    
+    # Prepare JSON response with feedback data
+    response_data = {
+        'is_correct': is_correct,
+        'correct_answer': correct_answer,
+        'user_answer': user_answer,
+        'word': word,
+        'points_earned': question_score,
+        'explanation': explanation,
+        'examples': {
+            'usage_courant': usage_courant,
+            'usage_litteraire': usage_litteraire,
+            'usage_universitaire': usage_universitaire
+        },
+        'session_complete': answered_count >= total_questions,
+        'next_url': url_for('grammar_gender_results', session_id=session_id) if answered_count >= total_questions else url_for('grammar_gender_question', session_id=session_id, question_num=answered_count + 1)
+    }
+    
+    if answered_count >= total_questions:
+        # Mark session as completed
+        c.execute('''
+            UPDATE grammar_gender_sessions 
+            SET status = 'completed', completed_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        ''', (session_id,))
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify(response_data)
+
+@app.route('/exercises/grammar/gender/session/<int:session_id>/results')
+def grammar_gender_results(session_id):
+    """Display results for a completed session"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Get session data
+    c.execute('''
+        SELECT * FROM grammar_gender_sessions 
+        WHERE id = ? AND user_id = ?
+    ''', (session_id, session.get('user_id')))
+    session_data = c.fetchone()
+    
+    if not session_data:
+        flash('Session non trouvée', 'error')
+        return redirect(url_for('grammar_gender_exercises'))
+    
+    # Get detailed results
+    c.execute('''
+        SELECT ga.*, gq.nom, gq.genre_du_nom, gq.exemple_usage_courant
+        FROM grammar_gender_attempts ga
+        JOIN grammar_gender_questions gq ON ga.question_id = gq.id
+        WHERE ga.session_id = ?
+        ORDER BY ga.attempted_at
+    ''', (session_id,))
+    attempts = c.fetchall()
+    
+    conn.close()
+    
+    # Calculate statistics
+    total_questions = len(attempts)
+    correct_answers = sum(1 for attempt in attempts if attempt[4])  # is_correct
+    total_points = sum(attempt[8] if len(attempt) > 8 else 0 for attempt in attempts)  # score column
+    max_possible_points = total_questions * 10
+    total_time = sum(attempt[5] if attempt[5] else 0 for attempt in attempts)  # time_taken
+    total_hints = sum(attempt[7] if len(attempt) > 7 else 0 for attempt in attempts)  # hints_used
+    
+    percentage = round((correct_answers / total_questions) * 100) if total_questions > 0 else 0
+    points_percentage = round((total_points / max_possible_points) * 100) if max_possible_points > 0 else 0
+    
+    results = {
+        'session_id': session_id,
+        'score': correct_answers,
+        'total': total_questions,
+        'percentage': percentage,
+        'total_points': total_points,
+        'max_possible_points': max_possible_points,
+        'points_percentage': points_percentage,
+        'total_time': total_time,
+        'total_hints': total_hints,
+        'avg_time': round(total_time / total_questions) if total_questions > 0 else 0,
+        'attempts': attempts
+    }
+    
+    return render_template('grammar_gender_results.html', results=results)
+
+@app.route('/exercises/grammar/gender/manage')
+def manage_grammar_gender_questions():
+    """Manage grammar gender questions (admin only)"""
+    if 'user' not in session or session.get('role') != 'teacher':
+        flash('Accès non autorisé', 'error')
+        return redirect(url_for('grammar_gender_exercises'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    c.execute('''
+        SELECT * FROM grammar_gender_questions 
+        ORDER BY niveau_difficulte, nom
+    ''')
+    questions = c.fetchall()
+    
+    conn.close()
+    
+    return render_template('manage_grammar_questions.html', questions=questions)
+
+@app.route('/exercises/grammar/gender/add-question', methods=['GET', 'POST'])
+def add_grammar_gender_question():
+    """Add a new grammar gender question"""
+    if 'user' not in session or session.get('role') != 'teacher':
+        flash('Accès non autorisé', 'error')
+        return redirect(url_for('grammar_gender_exercises'))
+    
+    if request.method == 'POST':
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        
+        try:
+            c.execute('''
+                INSERT INTO grammar_gender_questions 
+                (sub_question_id, nom, genre_du_nom, niveau_difficulte, 
+                 exemple_usage_courant, exemple_usage_litteraire, 
+                 exemple_usage_universitaire, terminaisons)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                request.form['sub_question_id'],
+                request.form['nom'],
+                request.form['genre_du_nom'],
+                int(request.form['niveau_difficulte']),
+                request.form.get('exemple_usage_courant', ''),
+                request.form.get('exemple_usage_litteraire', ''),
+                request.form.get('exemple_usage_universitaire', ''),
+                request.form.get('terminaisons', '')
+            ))
+            conn.commit()
+            flash('Question ajoutée avec succès!', 'success')
+            return redirect(url_for('manage_grammar_gender_questions'))
+        except sqlite3.IntegrityError:
+            flash('ID de question déjà existant', 'error')
+        except Exception as e:
+            flash(f'Erreur: {e}', 'error')
+        finally:
+            conn.close()
+    
+    return render_template('add_grammar_question.html')
 
 @app.route('/logout')
 def logout():

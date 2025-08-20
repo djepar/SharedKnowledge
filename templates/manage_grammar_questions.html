@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% set title = "Gestion des Questions - Genre Grammatical" %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/grammar-admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">⚙️ Gestion des Questions</h1>
+        <p class="admin-description">Gérez les questions d'exercices de genre grammatical</p>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <div class="search-section">
+            <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par mot ou ID..." onkeyup="filterQuestions()">
+        </div>
+        <div class="action-buttons">
+            <a href="{{ url_for('add_grammar_gender_question') }}" class="form-button primary">
+                ➕ Ajouter une Question
+            </a>
+            <a href="{{ url_for('grammar_gender_exercises') }}" class="form-button secondary">
+                ⬅️ Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Questions Section -->
+    <div class="questions-section">
+        <div class="questions-header">
+            <h2 class="questions-title">📋 Liste des Questions</h2>
+            <span class="questions-count">{{ questions|length }} question(s)</span>
+        </div>
+
+        {% if questions %}
+        <div style="overflow-x: auto;">
+            <table class="questions-table" id="questionsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Mot</th>
+                        <th>Genre</th>
+                        <th>Difficulté</th>
+                        <th>Usage Courant</th>
+                        <th>Terminaisons</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question in questions %}
+                    <tr class="question-row">
+                        <td>
+                            <span class="question-id">{{ question[1] }}</span>
+                        </td>
+                        <td>
+                            <span class="question-word">{{ question[2] }}</span>
+                        </td>
+                        <td>
+                            <span class="gender-badge gender-{{ question[3] }}">
+                                {{ question[3] }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="difficulty-badge difficulty-{{ question[4] }}">
+                                Niveau {{ question[4] }}
+                            </span>
+                        </td>
+                        <td>
+                            <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ question[5] or 'N/A' }}">
+                                {{ question[5] or 'N/A' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ question[8] or 'N/A' }}">
+                                {{ question[8] or 'N/A' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-links">
+                                <a href="#" class="action-link" onclick="viewQuestion('{{ question[0] }}')">
+                                    👁️ Voir
+                                </a>
+                                <a href="#" class="action-link" onclick="editQuestion('{{ question[0] }}')">
+                                    ✏️ Modifier
+                                </a>
+                                <a href="#" class="action-link danger" onclick="deleteQuestion('{{ question[0] }}', '{{ question[2] }}')">
+                                    🗑️ Supprimer
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📝</div>
+            <h3 class="empty-title">Aucune question trouvée</h3>
+            <p class="empty-description">
+                Commencez par ajouter des questions d'exercices de genre grammatical.
+            </p>
+            <a href="{{ url_for('add_grammar_gender_question') }}" class="form-button primary">
+                Ajouter la première question
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Question Details Modal (for viewing) -->
+<div id="questionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: var(--z-index-modal);">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--white); border-radius: var(--radius-lg); padding: var(--space-xl); max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+            <h3 style="color: var(--francais-primary); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: 0;">
+                Détails de la Question
+            </h3>
+            <button onclick="closeModal()" style="background: none; border: none; font-size: var(--font-size-xl); cursor: pointer; color: var(--gray-500);">
+                ❌
+            </button>
+        </div>
+        <div id="modalContent">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Store questions data for filtering
+const questionsData = {{ questions | tojson }};
+
+function filterQuestions() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.question-row');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function viewQuestion(questionId) {
+    const question = questionsData.find(q => q[0] == questionId);
+    if (!question) return;
+    
+    const content = `
+        <div style="display: grid; gap: var(--space-md);">
+            <div>
+                <strong>ID:</strong> ${question[1]}
+            </div>
+            <div>
+                <strong>Mot:</strong> <span style="color: var(--francais-primary); font-size: var(--font-size-xl); font-weight: var(--font-weight-bold);">${question[2]}</span>
+            </div>
+            <div>
+                <strong>Genre:</strong> <span class="gender-badge gender-${question[3]}">${question[3]}</span>
+            </div>
+            <div>
+                <strong>Niveau de difficulté:</strong> <span class="difficulty-badge difficulty-${question[4]}">Niveau ${question[4]}</span>
+            </div>
+            <div>
+                <strong>Usage courant:</strong><br>
+                <em>${question[5] || 'Non spécifié'}</em>
+            </div>
+            <div>
+                <strong>Usage littéraire:</strong><br>
+                <em>${question[6] || 'Non spécifié'}</em>
+            </div>
+            <div>
+                <strong>Usage universitaire:</strong><br>
+                <em>${question[7] || 'Non spécifié'}</em>
+            </div>
+            <div>
+                <strong>Terminaisons:</strong><br>
+                <code>${question[8] || 'Non spécifié'}</code>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('modalContent').innerHTML = content;
+    document.getElementById('questionModal').style.display = 'block';
+}
+
+function editQuestion(questionId) {
+    // For now, just show an alert - you could implement inline editing here
+    alert('Fonctionnalité de modification à venir. ID: ' + questionId);
+}
+
+function deleteQuestion(questionId, word) {
+    if (confirm(`Êtes-vous sûr de vouloir supprimer la question pour le mot "${word}" ?`)) {
+        // Here you would make an AJAX call to delete the question
+        alert('Fonctionnalité de suppression à venir. ID: ' + questionId);
+    }
+}
+
+function closeModal() {
+    document.getElementById('questionModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+document.getElementById('questionModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}

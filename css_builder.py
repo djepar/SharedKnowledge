@@ -30,6 +30,9 @@ def build_css():
         'static/css/components/edit-lesson.css',
         'static/css/components/add-book.css',
         'static/css/components/reading-log.css',
+        'static/css/components/theory.css',
+        'static/css/components/exercises.css',
+        'static/css/components/portfolio.css',
     ]
     
     combined_css = f"""/*

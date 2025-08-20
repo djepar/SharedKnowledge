@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Créer une ressource théorique{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/manuel-powerpoint.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/edit-lesson.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-lesson-container">
+    <div class="edit-lesson-header">
+        <h1>📊 Créer une ressource théorique</h1>
+        <p>Ajoutez une nouvelle ressource théorique avec du contenu PowerPoint ou théorique</p>
+    </div>
+
+    <form method="POST" class="lesson-form">
+        <div class="form-section">
+            <div class="form-group">
+                <label for="title">Titre *</label>
+                <input type="text" id="title" name="title" required>
+        </div>
+
+            <div class="form-group">
+                <label for="lesson_id">Leçon associée (optionnel)</label>
+                <select id="lesson_id" name="lesson_id">
+                <option value="">Aucune leçon associée</option>
+                {% for lesson in lessons %}
+                    <option value="{{ lesson[0] }}">{{ lesson[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3"></textarea>
+        </div>
+
+            <div class="form-group">
+                <label for="content">Contenu théorique</label>
+                <textarea id="content" name="content" class="content-textarea" rows="10" placeholder="Saisissez le contenu de votre ressource théorique..."></textarea>
+        </div>
+
+            <div class="form-group">
+                <label for="exercise_type">Type d'exercice associé</label>
+                <select id="exercise_type" name="exercise_type">
+                <option value="">Aucun exercice</option>
+                <option value="comprehension">Compréhension</option>
+                <option value="analyse">Analyse</option>
+                <option value="synthese">Synthèse</option>
+                <option value="application">Application</option>
+                <option value="evaluation">Évaluation</option>
+            </select>
+        </div>
+
+        </div>
+        <div class="form-actions">
+            <a href="{{ url_for('theory') }}" class="btn btn-secondary">Annuler</a>
+            <button type="submit" class="btn btn-primary">Créer la ressource</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

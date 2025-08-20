@@ -118,6 +118,30 @@
                 {% endif %}
             </div>
             
+            <!-- Liens vers les nouvelles sections -->
+            <div class="related-sections">
+                <h3 style="color: var(--primary-color); margin-bottom: var(--space-md); text-align: center;">🔗 Sections liées</h3>
+                <div class="related-links-grid">
+                    <a href="{{ url_for('theory') }}" class="related-link">
+                        <div class="related-icon">📊</div>
+                        <div class="related-title">Ressources théoriques</div>
+                        <div class="related-description">Accédez aux contenus PowerPoint et théoriques</div>
+                    </a>
+                    
+                    <a href="{{ url_for('exercises') }}" class="related-link">
+                        <div class="related-icon">✏️</div>
+                        <div class="related-title">Exercices</div>
+                        <div class="related-description">Pratiquez avec des exercices ciblés</div>
+                    </a>
+                    
+                    <a href="{{ url_for('portfolio') }}" class="related-link">
+                        <div class="related-icon">📁</div>
+                        <div class="related-title">Portfolio & Travaux</div>
+                        <div class="related-description">Gérez vos travaux et examens</div>
+                    </a>
+                </div>
+            </div>
+            
             <!-- Navigation entre les séances -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 2px solid var(--gray-200);">
                 <div>

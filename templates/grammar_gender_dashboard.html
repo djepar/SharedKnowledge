@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% set title = "Exercices de Genre Grammatical" %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/grammar-exercises.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="grammar-container">
+    <!-- Header -->
+    <div class="grammar-header">
+        <h1>📚 Exercices de Genre Grammatical</h1>
+        <p class="grammar-description">Maîtrisez le genre des noms français avec nos exercices interactifs</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card stat-sessions">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <h3>Sessions Complétées</h3>
+                <p class="stat-value">{{ stats[0] or 0 }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-average">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+                <h3>Score Moyen</h3>
+                <p class="stat-value">{{ "%.1f"|format(stats[1] or 0) }}%</p>
+            </div>
+        </div>
+
+        <div class="stat-card stat-best">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-content">
+                <h3>Meilleur Score</h3>
+                <p class="stat-value">{{ "%.1f"|format(stats[2] or 0) }}%</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Practice Section -->
+    <div class="practice-section">
+        <div class="practice-header">
+            <h2>🚀 Commencer un Exercice</h2>
+        </div>
+        <div class="practice-form">
+            <div class="form-group">
+                <label class="form-label" for="questionCount">Nombre de questions</label>
+                <select id="questionCount" class="form-select">
+                    <option value="5">5 questions</option>
+                    <option value="10" selected>10 questions</option>
+                    <option value="15">15 questions</option>
+                    <option value="20">20 questions</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="difficulty">Niveau de difficulté</label>
+                <select id="difficulty" class="form-select">
+                    <option value="all">Tous les niveaux</option>
+                    <option value="1">Facile (Niveau 1)</option>
+                    <option value="2">Moyen (Niveau 2)</option>
+                    <option value="3">Difficile (Niveau 3)</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="startPractice()" class="start-button">
+            ▶️ Commencer l'Exercice
+        </button>
+    </div>
+
+    <!-- Question Distribution -->
+    <div class="distribution-section">
+        <div class="distribution-header">
+            <h2>📊 Distribution des Questions</h2>
+        </div>
+        <div class="difficulty-list">
+            {% for difficulty, count in question_distribution %}
+            <div class="difficulty-item">
+                <div class="difficulty-info">
+                    <span class="difficulty-badge level-{{ difficulty }}">
+                        Niveau {{ difficulty }}
+                    </span>
+                    <span class="difficulty-label">
+                        {% if difficulty == 1 %}Facile
+                        {% elif difficulty == 2 %}Moyen
+                        {% else %}Difficile{% endif %}
+                    </span>
+                </div>
+                <span class="difficulty-count">{{ count }} questions</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Sessions -->
+    {% if recent_sessions %}
+    <div class="sessions-section">
+        <div class="sessions-header">
+            <h2>📋 Sessions Récentes</h2>
+        </div>
+        <div style="overflow-x: auto;">
+            <table class="sessions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Score</th>
+                        <th>Pourcentage</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in recent_sessions %}
+                    <tr>
+                        <td>{{ session[5][:16] if session[5] else 'N/A' }}</td>
+                        <td>{{ session[2] }}/{{ session[3] }}</td>
+                        <td>
+                            <span class="score-badge {% if session[4] >= 80 %}score-excellent{% elif session[4] >= 60 %}score-good{% else %}score-poor{% endif %}">
+                                {{ session[4] }}%
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge {% if session[7] == 'completed' %}status-completed{% elif session[7] == 'active' %}status-active{% else %}status-paused{% endif %}">
+                                {% if session[7] == 'completed' %}Terminée
+                                {% elif session[7] == 'active' %}En cours
+                                {% else %}{{ session[7] }}{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if session[7] == 'completed' %}
+                            <a href="{{ url_for('grammar_gender_results', session_id=session[0]) }}" class="action-link">
+                                Voir les résultats
+                            </a>
+                            {% elif session[7] == 'active' %}
+                            <a href="{{ url_for('grammar_gender_question', session_id=session[0], question_num=1) }}" class="action-link">
+                                Continuer
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Admin Section -->
+    {% if session.role == 'teacher' %}
+    <div class="admin-section">
+        <div class="admin-header">
+            <h2>⚙️ Administration</h2>
+        </div>
+        <div class="admin-actions">
+            <a href="{{ url_for('manage_grammar_gender_questions') }}" class="admin-button primary">
+                Gérer les Questions
+            </a>
+            <a href="{{ url_for('add_grammar_gender_question') }}" class="admin-button success">
+                Ajouter une Question
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function startPractice() {
+    const count = document.getElementById('questionCount').value;
+    const difficulty = document.getElementById('difficulty').value;
+    
+    let url = "{{ url_for('start_grammar_gender_practice') }}?count=" + count;
+    if (difficulty !== 'all') {
+        url += "&difficulty=" + difficulty;
+    }
+    
+    window.location.href = url;
+}
+</script>
+{% endblock %}

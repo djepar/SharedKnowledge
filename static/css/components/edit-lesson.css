@@ -1,32 +1,45 @@
-/* static/css/components/edit-lesson.css - Edit Lesson Page Styles */
+/* static/css/components/edit-lesson.css - Edit and Create Lesson Page Styles */
 
-.edit-lesson-container {
+.edit-lesson-container,
+.create-lesson-container {
     max-width: 1000px;
     margin: 0 auto;
     padding: var(--space-lg);
+    
+    /* Component theme variables */
+    --back-btn-text: var(--white);
+    --back-btn-bg-base: rgba(255, 255, 255, 0.2);
+    --back-btn-bg-hover: rgba(255, 255, 255, 0.3);
+    --back-btn-border: rgba(255, 255, 255, 0.3);
+    --header-text: var(--white);
+    --header-text-secondary: rgba(255, 255, 255, 0.9);
 }
 
 .back-btn {
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    color: var(--primary-color);
+    color: var(--back-btn-text);
     text-decoration: none;
     font-weight: var(--font-weight-medium);
     margin-bottom: var(--space-lg);
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-sm);
     transition: all var(--transition-normal);
+    background: var(--back-btn-bg-base);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--back-btn-border);
 }
 
 .back-btn:hover {
-    background: rgba(102, 126, 234, 0.1);
+    background: var(--back-btn-bg-hover);
     transform: translateX(-2px);
 }
 
-.edit-lesson-header {
+.edit-lesson-header,
+.create-lesson-header {
     background: var(--gradient-main);
-    color: var(--white);
+    color: var(--header-text);
     padding: var(--space-xl);
     border-radius: var(--radius-lg);
     text-align: center;
@@ -48,8 +61,9 @@
     margin-bottom: var(--space-sm);
 }
 
-.edit-lesson-header p {
-    opacity: 0.9;
+.edit-lesson-header p,
+.create-lesson-header p {
+    color: var(--header-text-secondary);
     font-size: var(--font-size-lg);
 }
 
@@ -244,4 +258,55 @@
 .form-group select:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
+}
+
+/* Tips Section Styles */
+.tips-section {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-2xl);
+    margin-bottom: var(--space-2xl);
+}
+
+.tips-section h3 {
+    color: var(--primary-color);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-xl);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-xl);
+}
+
+.tips-grid ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tips-grid li {
+    padding: var(--space-md);
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+    border-left: 4px solid var(--primary-color);
+    transition: var(--transition-smooth);
+}
+
+.tips-grid li:hover {
+    background: var(--primary-light);
+    transform: translateX(4px);
+}
+
+.tips-grid li strong {
+    color: var(--primary-color);
+    font-weight: var(--font-weight-bold);
 }

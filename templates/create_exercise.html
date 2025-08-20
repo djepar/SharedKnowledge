@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un exercice{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/exercises.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/edit-lesson.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-lesson-container">
+    <div class="edit-lesson-header">
+        <h1>✏️ Créer un exercice</h1>
+        <p>Créez un nouvel exercice lié à une leçon ou ressource théorique</p>
+    </div>
+
+    <form method="POST" class="lesson-form">
+        <div class="form-section">
+            <div class="form-group">
+                <label for="title">Titre de l'exercice *</label>
+                <input type="text" id="title" name="title" required>
+        </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="lesson_id">Leçon associée</label>
+                    <select id="lesson_id" name="lesson_id">
+                    <option value="">Aucune leçon</option>
+                    {% for lesson in lessons %}
+                        <option value="{{ lesson[0] }}">{{ lesson[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+                <div class="form-group">
+                    <label for="theory_id">Ressource théorique</label>
+                    <select id="theory_id" name="theory_id">
+                    <option value="">Aucune ressource</option>
+                    {% for item in theory_items %}
+                        <option value="{{ item[0] }}">{{ item[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="exercise_type">Type d'exercice *</label>
+                    <select id="exercise_type" name="exercise_type" required>
+                    <option value="">Sélectionner un type</option>
+                    <option value="qcm">QCM</option>
+                    <option value="vrai_faux">Vrai/Faux</option>
+                    <option value="texte_a_trous">Texte à trous</option>
+                    <option value="redaction">Rédaction</option>
+                    <option value="analyse">Analyse de texte</option>
+                    <option value="comprehension">Compréhension</option>
+                    <option value="grammaire">Grammaire</option>
+                    <option value="vocabulaire">Vocabulaire</option>
+                </select>
+            </div>
+
+                <div class="form-group">
+                    <label for="points">Points</label>
+                    <input type="number" id="points" name="points" value="10" min="1" max="100">
+            </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="2" placeholder="Brève description de l'exercice..."></textarea>
+        </div>
+
+            <div class="form-group">
+                <label for="content">Énoncé de l'exercice *</label>
+                <textarea id="content" name="content" class="content-textarea" rows="8" required placeholder="Saisissez l'énoncé complet de l'exercice..."></textarea>
+        </div>
+
+            <div class="form-group">
+                <label for="answer_key">Corrigé</label>
+                <textarea id="answer_key" name="answer_key" rows="6" placeholder="Saisissez le corrigé ou les réponses attendues..."></textarea>
+        </div>
+
+        </div>
+        <div class="form-actions">
+            <a href="{{ url_for('exercises') }}" class="btn btn-secondary">Annuler</a>
+            <button type="submit" class="btn btn-primary">Créer l'exercice</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

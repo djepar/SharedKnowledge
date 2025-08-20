@@ -11,11 +11,27 @@
         <a href="{{ url_for('calendar') }}" class="nav-link {% if request.endpoint == 'calendar' %}active{% endif %}">
             📅 Calendrier
         </a>
-        <a href="{{ url_for('reading_log') }}" class="nav-link {% if request.endpoint == 'reading_log' %}active{% endif %}">
-            📚 Carnet de lecture
-        </a>
         <a href="{{ url_for('lessons_list') }}" class="nav-link {% if request.endpoint == 'lessons_list' %}active{% endif %}">
             📋 Gestion des leçons
+        </a>
+        <a href="{{ url_for('theory') }}" class="nav-link {% if request.endpoint == 'theory' %}active{% endif %}">
+            📊 Ressources théoriques
+        </a>
+        <div class="nav-dropdown">
+            <a href="#" class="nav-link dropdown-toggle {% if 'exercise' in request.endpoint or 'grammar_gender' in request.endpoint %}active{% endif %}">
+                ✏️ Exercices
+            </a>
+            <div class="dropdown-menu">
+                <a href="{{ url_for('exercises') }}" class="dropdown-item {% if request.endpoint == 'exercises' %}active{% endif %}">
+                    📝 Exercices généraux
+                </a>
+                <a href="{{ url_for('grammar_gender_exercises') }}" class="dropdown-item {% if 'grammar_gender' in request.endpoint %}active{% endif %}">
+                    📚 Genre grammatical
+                </a>
+            </div>
+        </div>
+        <a href="{{ url_for('portfolio') }}" class="nav-link {% if request.endpoint == 'portfolio' %}active{% endif %}">
+            📁 Portfolio & Travaux
         </a>
    
         <div class="nav-dropdown">

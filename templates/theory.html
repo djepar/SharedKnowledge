@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Ressources théoriques{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/theory.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="manuel-container">
+    <div class="page-header">
+        <h1>📊 Ressources théoriques</h1>
+        <p class="page-description">
+            Consultez les ressources théoriques et PowerPoint pour {{ discipline.replace('_', ' ').title() }}
+        </p>
+        <div class="page-actions">
+            <a href="{{ url_for('create_theory') }}" class="btn btn-primary">
+                ➕ Nouvelle ressource
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="resources-grid">
+        {% if manuel_items %}
+            {% for item in manuel_items %}
+            <div class="resource-card">
+                <div class="resource-header">
+                    <h3 class="resource-title">{{ item[2] }}</h3>
+                    {% if item[10] %}
+                        <span class="lesson-badge">📚 {{ item[10] }}</span>
+                    {% endif %}
+                </div>
+                
+                {% if item[3] %}
+                <p class="resource-description">{{ item[3] }}</p>
+                {% endif %}
+                
+                {% if item[4] %}
+                <div class="content-preview">
+                    <h4 class="content-preview-title">Contenu:</h4>
+                    <div class="content-text">{{ item[4]|safe }}</div>
+                </div>
+                {% endif %}
+                
+                {% if item[6] %}
+                <div class="exercise-type-badge">
+                    {{ item[6] }}
+                </div>
+                {% endif %}
+                
+                <div class="resource-footer">
+                    <span class="resource-date">
+                        📅 {{ item[8][:10] if item[8] else 'Date inconnue' }}
+                    </span>
+                    <div class="resource-actions">
+                        <a href="#" class="btn btn-small">✏️ Modifier</a>
+                        <a href="#" class="btn btn-small btn-secondary">👁️ Voir</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-resources">
+                <div class="empty-icon">📊</div>
+                <h3 class="empty-title">Aucune ressource théorique</h3>
+                <p class="empty-description">Commencez par créer votre première ressource théorique pour {{ discipline.replace('_', ' ').title() }}.</p>
+                <a href="{{ url_for('create_theory') }}" class="btn btn-primary">
+                    ➕ Créer une ressource
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

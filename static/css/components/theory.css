@@ -1,0 +1,160 @@
+/* Manuel-PowerPoint Component Styles */
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.page-header h1 {
+    color: var(--primary-color);
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-sm);
+    font-weight: var(--font-weight-bold);
+}
+
+.page-description {
+    color: var(--gray-500);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-lg);
+}
+
+.page-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.manuel-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    padding: var(--space-xl);
+}
+
+.resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+}
+
+.resource-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition-smooth);
+}
+
+.resource-card:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-2px);
+}
+
+.resource-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-md);
+}
+
+.resource-title {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.lesson-badge {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.resource-description {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-md);
+    line-height: var(--leading-relaxed);
+}
+
+.content-preview {
+    margin-bottom: var(--space-md);
+}
+
+.content-preview-title {
+    margin: 0 0 var(--space-xs) 0;
+    color: var(--primary-color);
+    font-size: var(--text-md);
+    font-weight: var(--font-weight-semibold);
+}
+
+.content-text {
+    background: var(--gray-100);
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.exercise-type-badge {
+    display: inline-block;
+    margin-bottom: var(--space-md);
+    background: var(--secondary-light);
+    color: var(--secondary-color);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.resource-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--gray-200);
+}
+
+.resource-date {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.resource-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.empty-resources {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-2xl);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.5;
+}
+
+.empty-title {
+    margin: 0 0 var(--space-sm) 0;
+    color: var(--primary-color);
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.empty-description {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+    line-height: var(--leading-relaxed);
+}

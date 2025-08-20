@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% set title = "Ajouter une Question - Genre Grammatical" %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/grammar-admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <!-- Header -->
+    <div class="admin-header">
+        <h1 class="admin-title">➕ Ajouter une Question</h1>
+        <p class="admin-description">Créez une nouvelle question d'exercice de genre grammatical</p>
+    </div>
+
+    <!-- Form -->
+    <form method="POST" class="form-container">
+        <h2 class="form-title">📝 Informations de la Question</h2>
+        
+        <div class="form-grid">
+            <!-- ID de la question -->
+            <div class="form-group">
+                <label for="sub_question_id" class="form-label required">ID de la Question</label>
+                <input type="text" id="sub_question_id" name="sub_question_id" class="form-input" 
+                       placeholder="Ex: QAG1-7" required>
+                <div class="form-help">Format recommandé: QAG1-{numéro}</div>
+            </div>
+
+            <!-- Mot -->
+            <div class="form-group">
+                <label for="nom" class="form-label required">Mot</label>
+                <input type="text" id="nom" name="nom" class="form-input" 
+                       placeholder="Ex: soleil" required>
+                <div class="form-help">Le nom dont on doit identifier le genre</div>
+            </div>
+
+            <!-- Genre -->
+            <div class="form-group">
+                <label for="genre_du_nom" class="form-label required">Genre</label>
+                <select id="genre_du_nom" name="genre_du_nom" class="form-select" required>
+                    <option value="">-- Choisir un genre --</option>
+                    <option value="masculin">Masculin</option>
+                    <option value="féminin">Féminin</option>
+                </select>
+                <div class="form-help">Le genre correct du nom</div>
+            </div>
+
+            <!-- Niveau de difficulté -->
+            <div class="form-group">
+                <label for="niveau_difficulte" class="form-label required">Niveau de Difficulté</label>
+                <select id="niveau_difficulte" name="niveau_difficulte" class="form-select" required>
+                    <option value="">-- Choisir un niveau --</option>
+                    <option value="1">Niveau 1 - Facile</option>
+                    <option value="2">Niveau 2 - Moyen</option>
+                    <option value="3">Niveau 3 - Difficile</option>
+                </select>
+                <div class="form-help">La difficulté de la question pour les étudiants</div>
+            </div>
+
+            <!-- Usage courant -->
+            <div class="form-group full-width">
+                <label for="exemple_usage_courant" class="form-label">Exemple d'Usage Courant</label>
+                <textarea id="exemple_usage_courant" name="exemple_usage_courant" class="form-input form-textarea" 
+                          placeholder="Ex: Un soleil radieux brille dans le ciel"></textarea>
+                <div class="form-help">Exemple d'utilisation dans le langage de tous les jours</div>
+            </div>
+
+            <!-- Usage littéraire -->
+            <div class="form-group full-width">
+                <label for="exemple_usage_litteraire" class="form-label">Exemple d'Usage Littéraire</label>
+                <textarea id="exemple_usage_litteraire" name="exemple_usage_litteraire" class="form-input form-textarea" 
+                          placeholder="Ex: Le soleil, ce dieu d'or, s'endort dans son royaume pourpre"></textarea>
+                <div class="form-help">Exemple d'utilisation dans la littérature</div>
+            </div>
+
+            <!-- Usage universitaire -->
+            <div class="form-group full-width">
+                <label for="exemple_usage_universitaire" class="form-label">Exemple d'Usage Universitaire</label>
+                <textarea id="exemple_usage_universitaire" name="exemple_usage_universitaire" class="form-input form-textarea" 
+                          placeholder="Ex: L'imagerie solaire dans la poésie romantique française"></textarea>
+                <div class="form-help">Exemple d'utilisation dans un contexte académique</div>
+            </div>
+
+            <!-- Terminaisons -->
+            <div class="form-group full-width">
+                <label for="terminaisons" class="form-label">Notes sur les Terminaisons</label>
+                <textarea id="terminaisons" name="terminaisons" class="form-input form-textarea" 
+                          placeholder="Ex: -eil (exception car mots en -eil peuvent être féminins comme abeille)"></textarea>
+                <div class="form-help">Informations sur les règles de terminaison ou exceptions</div>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div id="previewSection" style="display: none; background: var(--gray-50); border-radius: var(--radius-md); padding: var(--space-lg); margin: var(--space-xl) 0; border: 1px solid var(--gray-200);">
+            <h3 style="color: var(--text-primary); font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin: 0 0 var(--space-md) 0;">
+                👁️ Aperçu de la Question
+            </h3>
+            <div id="previewContent">
+                <!-- Preview will be generated here -->
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <button type="button" onclick="togglePreview()" class="form-button secondary">
+                👁️ Aperçu
+            </button>
+            <button type="submit" class="form-button primary">
+                ✅ Ajouter la Question
+            </button>
+            <a href="{{ url_for('manage_grammar_gender_questions') }}" class="form-button secondary">
+                ❌ Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function togglePreview() {
+    const previewSection = document.getElementById('previewSection');
+    const previewContent = document.getElementById('previewContent');
+    
+    if (previewSection.style.display === 'none') {
+        // Show preview
+        generatePreview();
+        previewSection.style.display = 'block';
+        document.querySelector('button[onclick="togglePreview()"]').textContent = '🙈 Masquer l\'aperçu';
+    } else {
+        // Hide preview
+        previewSection.style.display = 'none';
+        document.querySelector('button[onclick="togglePreview()"]').textContent = '👁️ Aperçu';
+    }
+}
+
+function generatePreview() {
+    const formData = {
+        id: document.getElementById('sub_question_id').value || '[ID]',
+        nom: document.getElementById('nom').value || '[MOT]',
+        genre: document.getElementById('genre_du_nom').value || '[GENRE]',
+        niveau: document.getElementById('niveau_difficulte').value || '[NIVEAU]',
+        courant: document.getElementById('exemple_usage_courant').value || 'Aucun exemple fourni',
+        litteraire: document.getElementById('exemple_usage_litteraire').value || 'Aucun exemple fourni',
+        universitaire: document.getElementById('exemple_usage_universitaire').value || 'Aucun exemple fourni',
+        terminaisons: document.getElementById('terminaisons').value || 'Aucune note fournie'
+    };
+    
+    const difficultyLabel = {
+        '1': 'Facile',
+        '2': 'Moyen',
+        '3': 'Difficile'
+    }[formData.niveau] || 'Non défini';
+    
+    const difficultyClass = {
+        '1': 'difficulty-1',
+        '2': 'difficulty-2',
+        '3': 'difficulty-3'
+    }[formData.niveau] || 'difficulty-1';
+    
+    const genderClass = {
+        'masculin': 'gender-masculin',
+        'féminin': 'gender-feminin'
+    }[formData.genre] || 'gender-masculin';
+    
+    document.getElementById('previewContent').innerHTML = `
+        <div style="display: grid; gap: var(--space-md);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="color: var(--francais-primary); font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: 0;">
+                    ${formData.nom}
+                </h4>
+                <div style="display: flex; gap: var(--space-sm);">
+                    <span class="gender-badge ${genderClass}">${formData.genre}</span>
+                    <span class="difficulty-badge ${difficultyClass}">Niveau ${formData.niveau} - ${difficultyLabel}</span>
+                </div>
+            </div>
+            
+            <div>
+                <strong>ID:</strong> <span class="question-id">${formData.id}</span>
+            </div>
+            
+            <div>
+                <strong>Usage courant:</strong><br>
+                <em style="color: var(--text-secondary);">${formData.courant}</em>
+            </div>
+            
+            <div>
+                <strong>Usage littéraire:</strong><br>
+                <em style="color: var(--text-secondary);">${formData.litteraire}</em>
+            </div>
+            
+            <div>
+                <strong>Usage universitaire:</strong><br>
+                <em style="color: var(--text-secondary);">${formData.universitaire}</em>
+            </div>
+            
+            <div>
+                <strong>Notes sur les terminaisons:</strong><br>
+                <code style="background: var(--gray-100); padding: var(--space-xs); border-radius: var(--radius-sm);">${formData.terminaisons}</code>
+            </div>
+        </div>
+    `;
+}
+
+// Auto-generate ID based on word
+document.getElementById('nom').addEventListener('input', function() {
+    const nom = this.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (nom && !document.getElementById('sub_question_id').value) {
+        // Find next available number
+        const nextNum = Math.floor(Math.random() * 100) + 7; // Start from 7 since we have 6 sample questions
+        document.getElementById('sub_question_id').value = `QAG1-${nextNum}`;
+    }
+});
+
+// Update preview automatically when fields change
+document.querySelectorAll('input, select, textarea').forEach(field => {
+    field.addEventListener('input', function() {
+        if (document.getElementById('previewSection').style.display !== 'none') {
+            generatePreview();
+        }
+    });
+});
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = ['sub_question_id', 'nom', 'genre_du_nom', 'niveau_difficulte'];
+    let isValid = true;
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (!field.value.trim()) {
+            field.style.borderColor = 'var(--danger-color)';
+            isValid = false;
+        } else {
+            field.style.borderColor = 'var(--gray-300)';
+        }
+    });
+    
+    if (!isValid) {
+        e.preventDefault();
+        alert('Veuillez remplir tous les champs obligatoires.');
+    }
+});
+</script>
+{% endblock %}

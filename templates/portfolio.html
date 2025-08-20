@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio & Travaux{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/portfolio.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-container">
+    <div class="page-header">
+        <h1>📁 Portfolio, Examens et Travaux</h1>
+        <p class="page-description">
+            Gérez votre portfolio, vos examens et travaux pour {{ discipline.replace('_', ' ').title() }}
+        </p>
+        <div class="page-actions">
+            <a href="{{ url_for('create_portfolio_item') }}" class="btn btn-primary">
+                ➕ Nouvel élément
+            </a>
+            <a href="{{ url_for('reading_log') }}" class="btn btn-secondary">
+                📚 Carnet de lecture
+            </a>
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="portfolio-grid">
+        {% if portfolio_items %}
+            {% for item in portfolio_items %}
+            <div class="portfolio-item">
+                <div class="portfolio-header">
+                    <h3 class="portfolio-title">{{ item[4] }}</h3>
+                    <span class="item-type-badge item-type-{{ item[3] }}">{{ item[3] }}</span>
+                </div>
+                
+                {% if item[5] %}
+                <p class="portfolio-description">{{ item[5] }}</p>
+                {% endif %}
+                
+                {% if item[7] %}
+                <div class="portfolio-content">{{ item[7]|safe }}</div>
+                {% endif %}
+                
+                <div class="portfolio-meta">
+                    {% if item[8] %}
+                    <div class="meta-item">
+                        <span class="meta-label">Échéance</span>
+                        <span class="meta-value">{{ item[8] }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="meta-item">
+                        <span class="meta-label">Statut</span>
+                        <span class="meta-value">
+                            <span class="status-badge status-{{ item[12] }}">{{ item[12] }}</span>
+                        </span>
+                    </div>
+                    
+                    {% if item[10] and item[11] %}
+                    <div class="meta-item">
+                        <span class="meta-label">Note</span>
+                        <span class="meta-value">
+                            <div class="grade-display">
+                                <span class="grade-score">{{ item[10] }}/{{ item[11] }}</span>
+                            </div>
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if item[16] %}
+                    <div class="meta-item">
+                        <span class="meta-label">Leçon liée</span>
+                        <span class="meta-value">{{ item[16] }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="portfolio-footer">
+                    <span class="portfolio-date">
+                        📅 {{ item[14][:10] if item[14] else 'Date inconnue' }}
+                    </span>
+                    <div class="portfolio-actions">
+                        <a href="#" class="btn btn-small">✏️ Modifier</a>
+                        <a href="#" class="btn btn-small btn-secondary">👁️ Voir</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-portfolio">
+                <div class="empty-icon">📁</div>
+                <h3 class="empty-title">Aucun élément de portfolio</h3>
+                <p class="empty-description">Commencez par créer votre premier élément de portfolio pour {{ discipline.replace('_', ' ').title() }}.</p>
+                <a href="{{ url_for('create_portfolio_item') }}" class="btn btn-primary">
+                    ➕ Créer un élément
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

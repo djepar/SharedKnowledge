@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% set title = "Résultats - Genre Grammatical" %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/grammar-results.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="results-container">
+    <!-- Header -->
+    <div class="results-header">
+        <h1 class="results-title">🎯 Résultats de l'Exercice</h1>
+        <p class="results-subtitle">Voici comment vous vous en êtes sorti !</p>
+    </div>
+
+    <!-- Score Section -->
+    <div class="score-section">
+        <div class="score-circle" style="background: conic-gradient(var(--francais-primary) 0deg, var(--francais-primary) {{ results.points_percentage * 3.6 }}deg, var(--gray-200) {{ results.points_percentage * 3.6 }}deg, var(--gray-200) 360deg);">
+            <div class="score-text">{{ results.total_points }}</div>
+            <div class="score-subtitle">pts</div>
+        </div>
+        <h2 class="score-label">{{ results.total_points }}/{{ results.max_possible_points }} points ({{ results.score }}/{{ results.total }} correctes)</h2>
+        <p class="score-details">
+            Vous avez obtenu {{ results.total_points }} points sur {{ results.max_possible_points }} possibles.
+        </p>
+        
+        <!-- Timer and Hint Statistics -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">{{ results.total_time // 60 }}:{{ '{:02d}'.format(results.total_time % 60) }}</div>
+                <div class="stat-label">Temps total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ results.avg_time }}s</div>
+                <div class="stat-label">Temps moyen</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ results.total_hints }}</div>
+                <div class="stat-label">Indices utilisés</div>
+            </div>
+        </div>
+        
+        <div class="performance-message {% if results.points_percentage >= 80 %}performance-excellent{% elif results.points_percentage >= 60 %}performance-good{% else %}performance-poor{% endif %}">
+            {% if results.points_percentage >= 80 %}
+                🏆 Excellent travail ! Vous maîtrisez très bien le genre grammatical.
+            {% elif results.points_percentage >= 60 %}
+                👍 Bon travail ! Continuez à vous exercer pour améliorer vos résultats.
+            {% else %}
+                💪 Ne vous découragez pas ! La pratique régulière vous aidera à progresser.
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Detailed Results -->
+    <div class="details-section">
+        <h2 class="details-header">📋 Détail des Réponses</h2>
+        <div class="attempts-list">
+            {% for attempt in results.attempts %}
+            <div class="attempt-item">
+                <div class="attempt-content">
+                    <h3 class="attempt-word">{{ attempt[9] }}</h3>
+                    <div class="attempt-details">
+                        {% if attempt[11] %}{{ attempt[11] }}{% endif %}
+                    </div>
+                    <div class="attempt-stats">
+                        <span class="time-taken">⏱️ {{ attempt[5] }}s</span>
+                        {% if attempt[7] > 0 %}
+                        <span class="hints-used">💡 {{ attempt[7] }} indice{{ 's' if attempt[7] > 1 else '' }}</span>
+                        {% endif %}
+                        <span class="points-earned">🎯 {{ attempt[8] if attempt|length > 8 else 0 }} pts</span>
+                    </div>
+                </div>
+                <div class="attempt-result">
+                    <div class="result-icon {% if attempt[4] %}result-correct{% else %}result-incorrect{% endif %}">
+                        {% if attempt[4] %}✓{% else %}✗{% endif %}
+                    </div>
+                    <div class="answer-labels">
+                        <div class="user-answer">Votre réponse: {{ attempt[3] }}</div>
+                        {% if not attempt[4] %}
+                        <div class="correct-answer">Bonne réponse: {{ attempt[10] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Actions Section -->
+    <div class="actions-section">
+        <h2 class="actions-header">🚀 Que voulez-vous faire maintenant ?</h2>
+        <div class="action-buttons">
+            <a href="{{ url_for('start_grammar_gender_practice') }}" class="action-button action-primary">
+                Refaire un Exercice
+            </a>
+            <a href="{{ url_for('grammar_gender_exercises') }}" class="action-button action-secondary">
+                Retour au Tableau de Bord
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

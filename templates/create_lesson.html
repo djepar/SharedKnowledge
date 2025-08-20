@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Créer une leçon - Français Secondaire 2</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/edit-lesson.css') }}">
 </head>
 <body>
     <!-- Navigation -->
@@ -100,6 +101,13 @@
                 </div>
                 
                 <div class="form-row">
+                    <div class="form-group">
+                        <label for="session_number">Numéro de séance *</label>
+                        <input type="number" id="session_number" name="session_number" min="1" required 
+                               placeholder="1">
+                        <small>Numéro de la séance</small>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="duration">Durée (minutes) *</label>
                         <input type="number" id="duration" name="duration" min="15" max="180" required 
@@ -311,8 +319,8 @@ Exemples:
                 const content = document.getElementById('content').value.trim();
                 const objectives = document.getElementById('objectives').value.trim();
                 
-                if (!sessionNumber || sessionNumber < 1 || sessionNumber > 160) {
-                    alert('⚠️ Le numéro de séance doit être entre 1 et 160');
+                if (!sessionNumber || sessionNumber < 1) {
+                    alert('⚠️ Le numéro de séance doit être supérieur à 0');
                     e.preventDefault();
                     return;
                 }

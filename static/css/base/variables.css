@@ -2,12 +2,20 @@
   /* Colors */
   --primary-color: #667eea;
   --primary-dark: #5a67d8;
+  --primary-light: #e6eaff;
   --secondary-color: #764ba2;
+  --secondary-light: #f0ecf7;
   --success-color: #28a745;
   --success-dark: #218838;
+  --success-light: #d4f4dd;
   --danger-color: #dc3545;
+  --danger-light: #f8d7da;
   --warning-color: #ffc107;
+  --warning-light: #fff3cd;
   --info-color: #17a2b8;
+  --info-light: #d1ecf1;
+  --accent-color: #f093fb;
+  --accent-light: #fce4ff;
   --gray-100: #f8f9fa;
   --gray-200: #e9ecef;
   --gray-300: #dee2e6;
@@ -64,6 +72,24 @@
   --font-size-3xl: 1.8em;
   --font-size-4xl: 2.5em;
   
+  /* Text sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  
+  /* Text colors */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  
+  /* Line heights */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+  
   /* Font weights */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
@@ -74,6 +100,7 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.8s ease;
+  --transition-smooth: all 0.2s ease-in-out;
   
   /* Z-index layers */
   --z-index-dropdown: 50;

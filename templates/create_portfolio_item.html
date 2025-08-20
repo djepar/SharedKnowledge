@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un élément de portfolio{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/portfolio.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/edit-lesson.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-lesson-container">
+    <div class="edit-lesson-header">
+        <h1>📁 Créer un élément de portfolio</h1>
+        <p>Ajoutez un nouvel élément à votre portfolio (travail, examen, projet, etc.)</p>
+    </div>
+
+    <form method="POST" class="lesson-form">
+        <div class="form-section">
+            <div class="form-group">
+                <label for="title">Titre *</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="item_type">Type d'élément *</label>
+                    <select id="item_type" name="item_type" required>
+                    <option value="">Sélectionner un type</option>
+                    <option value="portfolio">Élément de portfolio</option>
+                    <option value="examen">Examen</option>
+                    <option value="travail">Travail/Devoir</option>
+                    <option value="carnet">Carnet de lecture</option>
+                    <option value="projet">Projet</option>
+                    <option value="presentation">Présentation</option>
+                    <option value="evaluation">Évaluation</option>
+                </select>
+            </div>
+
+                <div class="form-group">
+                    <label for="lesson_id">Leçon associée</label>
+                    <select id="lesson_id" name="lesson_id">
+                    <option value="">Aucune leçon</option>
+                    {% for lesson in lessons %}
+                        <option value="{{ lesson[0] }}">{{ lesson[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="3" placeholder="Description de l'élément..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="content">Contenu</label>
+                <textarea id="content" name="content" class="content-textarea" rows="10" placeholder="Contenu détaillé de votre travail, notes, réflexions..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="due_date">Date d'échéance</label>
+                <input type="date" id="due_date" name="due_date">
+            </div>
+
+        </div>
+        <div class="form-actions">
+            <a href="{{ url_for('portfolio') }}" class="btn btn-secondary">Annuler</a>
+            <button type="submit" class="btn btn-primary">Créer l'élément</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

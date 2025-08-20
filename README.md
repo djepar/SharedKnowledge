@@ -19,6 +19,14 @@ Une plateforme web moderne pour la gestion de classe et le suivi pédagogique, s
 - **📚 Carnet de lecture personnel** - Portfolio de lecture avec notes et évaluations
 - **🔄 Compétences dynamiques** - API pour charger les compétences par discipline
 
+### 📝 Modules d'exercices et théorie (NOUVEAU!)
+- **🧠 Exercices de grammaire** - Questions interactives sur le genre des mots
+- **📖 Sections théoriques** - Contenu pédagogique organisé par leçons
+- **🎯 Gestion des questions** - Dashboard administrateur pour les exercices
+- **📊 Résultats et corrections** - Suivi des performances des élèves
+- **📁 Portfolio personnel** - Collection de travaux et projets des élèves
+- **⚙️ Administration intégrée** - Interface de gestion des contenus pédagogiques
+
 ### 🎨 Interface moderne (RÉCEMMENT AMÉLIORÉ!)
 - ✅ **Architecture CSS composants** - BEM-like naming et isolation parfaite
 - ✅ **Variables CSS complètes** - Design system unifié sans conflits
@@ -39,7 +47,7 @@ cd classroom-app
 pip install -r requirements.txt
 
 # Construire les assets CSS (NOUVEAU!)
-python simple_css_build.py
+python css_builder.py
 
 # Lancer l'application
 python app.py
@@ -60,10 +68,16 @@ static/css/
 │   ├── auth.css         # .auth-header__title, .auth-btn
 │   ├── buttons.css      # .btn-primary, .btn-outline-*
 │   ├── forms.css        # .form-group, .form-row
-│   ├── edit-lesson.css  # .edit-lesson-form, .field-group (NOUVEAU!)
+│   ├── edit-lesson.css  # .edit-lesson-form, .field-group
+│   ├── exercises.css    # .exercise-card, .exercise-result (NOUVEAU!)
+│   ├── grammar-admin.css # .admin-dashboard, .question-list (NOUVEAU!)
+│   ├── grammar-exercises.css # .grammar-form, .question-item (NOUVEAU!)
+│   ├── grammar-question.css # .question-container, .options (NOUVEAU!)
+│   ├── grammar-results.css # .results-summary, .score-display (NOUVEAU!)
+│   ├── portfolio.css    # .portfolio-grid, .portfolio-item (NOUVEAU!)
+│   ├── theory.css       # .theory-content, .theory-nav (NOUVEAU!)
 │   ├── progress.css     # .progress-bar, .progress-circle
-│   ├── dashboard.css    # .stat-card, .quick-actions
-│   └── [autres...]      # Components page-spécifiques
+│   └── dashboard.css    # .stat-card, .quick-actions
 └── dist/
     └── main.css        # Build final optimisé
 ```
@@ -71,7 +85,7 @@ static/css/
 ### Build CSS amélioré
 ```bash
 # Compiler avec validation et optimisation
-python simple_css_build.py
+python css_builder.py
 
 # ✅ Résout toutes les variables CSS
 # ✅ Élimine les duplications
@@ -113,6 +127,13 @@ python simple_css_build.py
 - [x] **Édition complète des leçons** - Formulaire avancé avec tous les champs
 - [x] **Filtrage par matière** - Organisation par discipline avec API compétences
 - [x] **Composant edit-lesson.css** - Styles dédiés pour l'édition de leçons
+- [x] **Exercices de grammaire** - Système de questions interactives sur le genre
+- [x] **Gestion des questions** - Dashboard administrateur pour créer/modifier
+- [x] **Résultats et corrections** - Affichage des scores et bonnes réponses
+- [x] **Portfolio des élèves** - Collection de travaux et projets personnels
+- [x] **Sections théoriques** - Contenu pédagogique organisé par modules
+- [x] **Composants CSS étendus** - 7 nouveaux fichiers CSS pour les fonctionnalités
+- [x] **Templates complets** - 11 nouveaux templates pour toutes les fonctionnalités
 
 ### 📅 Court terme  
 - [ ] **Mise à jour templates restants** - Appliquer l'architecture aux autres pages

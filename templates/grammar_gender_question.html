@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% set title = "Question de Genre Grammatical" %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/grammar-question.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="question-container">
+    <!-- Progress Section -->
+    <div class="progress-section">
+        <div class="progress-header">
+            <h2 class="progress-title">Question {{ progress.current }} sur {{ progress.total }}</h2>
+            <span class="timer-display" id="timer" style="display: none;">00:00</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: {{ progress.percentage }}%"></div>
+        </div>
+        <p class="progress-text">{{ progress.percentage }}% complété</p>
+    </div>
+
+    <!-- Question Section -->
+    <div class="question-section">
+        <div class="question-header">
+            <h1 class="question-title">Quel est le genre de ce mot ?</h1>
+        </div>
+
+        <div class="word-display">
+            <p class="word-text">{{ question[2] }}</p>
+        </div>
+
+        <form id="questionForm" method="POST" action="{{ url_for('submit_grammar_gender_answer', session_id=session_id) }}">
+            <input type="hidden" name="question_id" value="{{ question[0] }}">
+            <input type="hidden" name="time_taken" id="timeTaken" value="0">
+            <input type="hidden" name="hints_used" id="hintsUsed" value="0">
+            
+            <div class="answer-section">
+                <div class="answer-buttons">
+                    <button type="button" class="answer-button" onclick="selectAnswer('masculin')" data-answer="masculin">
+                        🔵 Masculin
+                    </button>
+                    <button type="button" class="answer-button" onclick="selectAnswer('féminin')" data-answer="féminin">
+                        🔴 Féminin
+                    </button>
+                </div>
+            </div>
+
+            <input type="hidden" name="answer" id="selectedAnswer" value="">
+
+            <div class="hint-section">
+                <button type="button" class="hint-button" id="hintButton" onclick="showHint()">
+                    💡 Voir les exemples d'usage (-5 points)
+                </button>
+                <div class="hint-content" id="hintContent" style="display: none;">
+                    <div class="examples-hint">
+                        {% if question[5] %}
+                        <div class="example-item">
+                            <div class="example-label">Usage courant :</div>
+                            <div class="example-text">{{ question[5] }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if question[6] %}
+                        <div class="example-item">
+                            <div class="example-label">Usage littéraire :</div>
+                            <div class="example-text">{{ question[6] }}</div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if question[7] %}
+                        <div class="example-item">
+                            <div class="example-label">Usage universitaire :</div>
+                            <div class="example-text">{{ question[7] }}</div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" class="submit-button" id="submitButton" disabled>
+                    Valider ma réponse
+                </button>
+            </div>
+        </form>
+
+        <!-- Feedback Section (Initially Hidden) -->
+        <div class="feedback-section" id="feedbackSection" style="display: none;">
+            <div class="feedback-content">
+                <div class="feedback-result" id="feedbackResult">
+                    <!-- Result will be populated by JavaScript -->
+                </div>
+                <div class="feedback-explanation" id="feedbackExplanation">
+                    <!-- Explanation will be populated by JavaScript -->
+                </div>
+                <div class="feedback-examples" id="feedbackExamples">
+                    <!-- Examples will be populated by JavaScript -->
+                </div>
+                <div class="feedback-actions">
+                    <button type="button" class="continue-button" id="continueButton" onclick="continueToNext()">
+                        Continuer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let startTime = Date.now();
+let timerInterval;
+let selectedAnswer = null;
+let hintsUsed = 0;
+
+// Timer functionality
+function updateTimer() {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    document.getElementById('timer').textContent = 
+        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    document.getElementById('timeTaken').value = elapsed;
+}
+
+function selectAnswer(answer) {
+    // Remove previous selection
+    document.querySelectorAll('.answer-button').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Add selection to clicked button
+    document.querySelector(`[data-answer="${answer}"]`).classList.add('selected');
+    
+    // Store selected answer
+    selectedAnswer = answer;
+    document.getElementById('selectedAnswer').value = answer;
+    document.getElementById('submitButton').disabled = false;
+}
+
+function showHint() {
+    hintsUsed++;
+    document.getElementById('hintsUsed').value = hintsUsed;
+    document.getElementById('hintContent').style.display = 'block';
+    document.getElementById('hintButton').textContent = `💡 Exemples affichés (-5 points)`;
+    document.getElementById('hintButton').disabled = true;
+}
+
+// Start timer
+timerInterval = setInterval(updateTimer, 1000);
+
+// Form submission
+document.getElementById('questionForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Always prevent default form submission
+    
+    if (!selectedAnswer) {
+        alert('Veuillez sélectionner une réponse avant de continuer.');
+        return;
+    }
+    
+    clearInterval(timerInterval);
+    submitAnswer();
+});
+
+// Submit answer and show immediate feedback
+function submitAnswer() {
+    const formData = new FormData(document.getElementById('questionForm'));
+    
+    fetch('{{ url_for("submit_grammar_gender_answer", session_id=session_id) }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        showFeedback(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue. Veuillez réessayer.');
+    });
+}
+
+// Show immediate feedback
+function showFeedback(data) {
+    const feedbackSection = document.getElementById('feedbackSection');
+    const feedbackResult = document.getElementById('feedbackResult');
+    const feedbackExplanation = document.getElementById('feedbackExplanation');
+    const feedbackExamples = document.getElementById('feedbackExamples');
+    
+    // Hide question form
+    document.getElementById('questionForm').style.display = 'none';
+    
+    // Show result
+    if (data.is_correct) {
+        feedbackResult.innerHTML = `
+            <div class="feedback-correct">
+                <div class="feedback-icon">✅</div>
+                <div class="feedback-text">
+                    <h3>Bonne réponse !</h3>
+                    <p>Le mot "${data.word}" est effectivement ${data.correct_answer}.</p>
+                    <p class="score-info">+${data.points_earned} points</p>
+                </div>
+            </div>
+        `;
+    } else {
+        feedbackResult.innerHTML = `
+            <div class="feedback-incorrect">
+                <div class="feedback-icon">❌</div>
+                <div class="feedback-text">
+                    <h3>Réponse incorrecte</h3>
+                    <p>Le mot "${data.word}" est ${data.correct_answer}, pas ${data.user_answer}.</p>
+                    <p class="score-info">0 points</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Show explanation if available
+    if (data.explanation) {
+        feedbackExplanation.innerHTML = `
+            <div class="explanation-section">
+                <h4>💡 Explication</h4>
+                <p>${data.explanation}</p>
+            </div>
+        `;
+    }
+    
+    // Show examples
+    let examplesHtml = '<div class="examples-section"><h4>📝 Exemples d\'usage</h4>';
+    if (data.examples.usage_courant) {
+        examplesHtml += `<div class="example-item"><strong>Usage courant :</strong> ${data.examples.usage_courant}</div>`;
+    }
+    if (data.examples.usage_litteraire) {
+        examplesHtml += `<div class="example-item"><strong>Usage littéraire :</strong> ${data.examples.usage_litteraire}</div>`;
+    }
+    if (data.examples.usage_universitaire) {
+        examplesHtml += `<div class="example-item"><strong>Usage universitaire :</strong> ${data.examples.usage_universitaire}</div>`;
+    }
+    examplesHtml += '</div>';
+    feedbackExamples.innerHTML = examplesHtml;
+    
+    // Show feedback section
+    feedbackSection.style.display = 'block';
+}
+
+// Continue to next question or results
+function continueToNext() {
+    window.location.href = '{{ url_for("grammar_gender_question", session_id=session_id, question_num=question_num+1) }}';
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.key === '1' || e.key === 'm' || e.key === 'M') {
+        selectAnswer('masculin');
+    } else if (e.key === '2' || e.key === 'f' || e.key === 'F') {
+        selectAnswer('féminin');
+    } else if (e.key === 'Enter' && selectedAnswer) {
+        document.getElementById('questionForm').submit();
+    }
+});
+</script>
+{% endblock %}
