@@ -282,6 +282,24 @@ def check_and_migrate_database():
             )
         ''')
         
+        # Question flagging system
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS question_flags (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                question_id TEXT NOT NULL,
+                question_type TEXT NOT NULL,
+                user_id INTEGER NOT NULL,
+                flag_reason TEXT NOT NULL,
+                description TEXT,
+                status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'reviewed', 'resolved', 'dismissed')),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                reviewed_at TIMESTAMP,
+                reviewed_by INTEGER,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (reviewed_by) REFERENCES users (id)
+            )
+        ''')
+        
         conn.commit()
         
         # Add new columns for scoring system if they don't exist
@@ -1548,7 +1566,7 @@ def create_portfolio_item():
 # Grammar Gender Exercise Routes
 @app.route('/exercises/grammar/gender')
 def grammar_gender_exercises():
-    """Display grammar gender exercise dashboard"""
+    """Display grammar gender exercise dashboard with literature-based exercises"""
     if 'user' not in session:
         return redirect(url_for('login'))
     
@@ -1640,32 +1658,59 @@ def grammar_gender_question(session_id, question_num):
         flash('Session non trouvée', 'error')
         return redirect(url_for('grammar_gender_exercises'))
     
-    # Get random question not yet answered in this session
+    # Check if we've already reached the question limit
+    c.execute('SELECT COUNT(*) FROM grammar_gender_attempts WHERE session_id = ?', (session_id,))
+    answered_count = c.fetchone()[0]
+    total_questions = session_data[3]  # total_questions from session
+    
+    if answered_count >= total_questions:
+        # Session is complete, redirect to results
+        return redirect(url_for('grammar_gender_results', session_id=session_id))
+    
+    # Get random question from literature-based exercises, not yet answered
     c.execute('''
-        SELECT gq.* FROM grammar_gender_questions gq
-        WHERE gq.id NOT IN (
-            SELECT question_id FROM grammar_gender_attempts 
-            WHERE session_id = ?
+        SELECT e.id, e.content, e.answer_key, e.title
+        FROM exercises e
+        WHERE e.exercise_type = 'gender_identification' 
+        AND e.discipline = 'français'
+        AND e.id NOT IN (
+            SELECT CAST(SUBSTR(question_id, 2) AS INTEGER) FROM grammar_gender_attempts 
+            WHERE session_id = ? AND question_id LIKE 'L%'
         )
         ORDER BY RANDOM()
         LIMIT 1
     ''', (session_id,))
-    question = c.fetchone()
+    literature_exercise = c.fetchone()
     
-    if not question:
+    if not literature_exercise:
         # No more questions, redirect to results
         return redirect(url_for('grammar_gender_results', session_id=session_id))
     
-    # Get session progress
-    c.execute('SELECT COUNT(*) FROM grammar_gender_attempts WHERE session_id = ?', (session_id,))
-    answered_count = c.fetchone()[0]
+    # Parse the literature exercise data
+    import json
+    exercise_id, content_json, answer_key_json, title = literature_exercise
+    content = json.loads(content_json)
+    answer_key = json.loads(answer_key_json)
+    
+    # Format as traditional question for existing template
+    question = (
+        f"L{exercise_id}",  # Prefix L for Literature exercise
+        f"L{exercise_id}",  # sub_question_id
+        content['word'],    # The word to identify
+        answer_key['correct_answer'],  # Correct gender
+        1,  # difficulty level
+        content['sentence'],  # Full sentence as "usage_courant"
+        f"Extrait de {content.get('book_reference', 'littérature française')}",  # usage_litteraire
+        f"Analyse littéraire: {content['word']} dans son contexte",  # usage_universitaire
+        answer_key.get('feedback', {}).get('general_rule', '')  # terminaisons/rule
+    )
     
     conn.close()
     
     progress = {
         'current': answered_count + 1,
-        'total': session_data[3],  # total_questions
-        'percentage': round((answered_count / session_data[3]) * 100)
+        'total': total_questions,
+        'percentage': round((answered_count / total_questions) * 100)
     }
     
     return render_template('grammar_gender_question.html', 
@@ -1688,18 +1733,59 @@ def submit_grammar_gender_answer(session_id):
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     
-    # Get question details including word and examples
-    c.execute('''
-        SELECT genre_du_nom, nom, terminaisons, exemple_usage_courant, exemple_usage_litteraire, exemple_usage_universitaire 
-        FROM grammar_gender_questions WHERE id = ?
-    ''', (question_id,))
-    question_data = c.fetchone()
-    correct_answer = question_data[0]
-    word = question_data[1]
-    explanation = question_data[2] if question_data[2] else None
-    usage_courant = question_data[3]
-    usage_litteraire = question_data[4]
-    usage_universitaire = question_data[5]
+    # Check if this is a literature exercise (prefixed with L)
+    if question_id.startswith('L'):
+        # Handle literature exercise
+        exercise_id = question_id[1:]  # Remove L prefix
+        c.execute('''
+            SELECT content, answer_key
+            FROM exercises 
+            WHERE id = ? AND exercise_type = 'gender_identification'
+        ''', (exercise_id,))
+        exercise_data = c.fetchone()
+        
+        if exercise_data:
+            import json
+            content = json.loads(exercise_data[0])
+            answer_key = json.loads(exercise_data[1])
+            
+            correct_answer = answer_key['correct_answer']
+            word = content['word']
+            explanation = answer_key.get('feedback', {}).get('general_rule', '')
+            usage_courant = content['sentence']  # Full sentence
+            usage_litteraire = f"Extrait de {content.get('book_reference', 'littérature française')}"
+            usage_universitaire = f"Analyse du genre de '{word}' en contexte littéraire"
+        else:
+            # Fallback if exercise not found
+            correct_answer = 'masculin'
+            word = 'inconnu'
+            explanation = ''
+            usage_courant = ''
+            usage_litteraire = ''
+            usage_universitaire = ''
+    else:
+        # Handle traditional grammar questions
+        c.execute('''
+            SELECT genre_du_nom, nom, terminaisons, exemple_usage_courant, exemple_usage_litteraire, exemple_usage_universitaire 
+            FROM grammar_gender_questions WHERE id = ?
+        ''', (question_id,))
+        question_data = c.fetchone()
+        
+        if question_data:
+            correct_answer = question_data[0]
+            word = question_data[1]
+            explanation = question_data[2] if question_data[2] else None
+            usage_courant = question_data[3]
+            usage_litteraire = question_data[4] 
+            usage_universitaire = question_data[5]
+        else:
+            # Fallback
+            correct_answer = 'masculin'
+            word = 'inconnu'
+            explanation = ''
+            usage_courant = ''
+            usage_litteraire = ''
+            usage_universitaire = ''
     
     is_correct = user_answer.lower() == correct_answer.lower()
     
@@ -1818,6 +1904,54 @@ def grammar_gender_results(session_id):
     
     return render_template('grammar_gender_results.html', results=results)
 
+# Conjugation Exercise Routes
+@app.route('/exercises/conjugation')
+def conjugation_exercises():
+    """Display conjugation exercise dashboard"""
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    user_id = session.get('user_id')
+    
+    # Get conjugation exercise statistics
+    c.execute('''
+        SELECT COUNT(*) FROM exercises 
+        WHERE exercise_type = 'verb_conjugation' AND discipline = 'français'
+    ''')
+    total_exercises = c.fetchone()[0]
+    
+    # Get user's attempt statistics for conjugation
+    c.execute('''
+        SELECT COUNT(*) as total_attempts,
+               AVG(CASE WHEN is_correct = 1 THEN 100.0 ELSE 0.0 END) as avg_score,
+               SUM(points_earned) as total_points
+        FROM exercise_attempts ea
+        JOIN exercises e ON ea.exercise_id = e.id
+        WHERE ea.user_id = ? AND e.exercise_type = 'verb_conjugation'
+    ''', (user_id,))
+    user_stats = c.fetchone() or (0, 0, 0)
+    
+    # Get recent attempts
+    c.execute('''
+        SELECT e.title, ea.is_correct, ea.points_earned, 
+               datetime(ea.attempted_at, 'localtime') as attempted_at
+        FROM exercise_attempts ea
+        JOIN exercises e ON ea.exercise_id = e.id
+        WHERE ea.user_id = ? AND e.exercise_type = 'verb_conjugation'
+        ORDER BY ea.attempted_at DESC
+        LIMIT 5
+    ''', (user_id,))
+    recent_attempts = c.fetchall()
+    
+    conn.close()
+    
+    return render_template('conjugation_dashboard.html',
+                         total_exercises=total_exercises,
+                         user_stats=user_stats,
+                         recent_attempts=recent_attempts)
+
 @app.route('/exercises/grammar/gender/manage')
 def manage_grammar_gender_questions():
     """Manage grammar gender questions (admin only)"""
@@ -1837,6 +1971,39 @@ def manage_grammar_gender_questions():
     conn.close()
     
     return render_template('manage_grammar_questions.html', questions=questions)
+
+@app.route('/flag-question', methods=['POST'])
+def flag_question():
+    """Handle question flagging by users"""
+    if 'user' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'})
+    
+    question_id = request.form.get('question_id')
+    question_type = request.form.get('question_type')
+    flag_reason = request.form.get('flag_reason')
+    description = request.form.get('description', '')
+    
+    if not all([question_id, question_type, flag_reason]):
+        return jsonify({'success': False, 'error': 'Missing required fields'})
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    try:
+        c.execute('''
+            INSERT INTO question_flags 
+            (question_id, question_type, user_id, flag_reason, description)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (question_id, question_type, session.get('user_id'), flag_reason, description))
+        
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Question flagged successfully'})
+        
+    except Exception as e:
+        logger.error(f"Error flagging question: {e}")
+        return jsonify({'success': False, 'error': 'Database error'})
+    finally:
+        conn.close()
 
 @app.route('/exercises/grammar/gender/add-question', methods=['GET', 'POST'])
 def add_grammar_gender_question():

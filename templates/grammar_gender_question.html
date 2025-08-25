@@ -49,28 +49,26 @@
 
             <div class="hint-section">
                 <button type="button" class="hint-button" id="hintButton" onclick="showHint()">
-                    💡 Voir les exemples d'usage (-5 points)
+                    💡 Voir la phrase complète (-5 points)
                 </button>
                 <div class="hint-content" id="hintContent" style="display: none;">
                     <div class="examples-hint">
                         {% if question[5] %}
                         <div class="example-item">
-                            <div class="example-label">Usage courant :</div>
-                            <div class="example-text">{{ question[5] }}</div>
+                            <div class="example-label">📖 Phrase complète :</div>
+                            <div class="example-text"><strong>{{ question[5] }}</strong></div>
                         </div>
                         {% endif %}
                         
                         {% if question[6] %}
                         <div class="example-item">
-                            <div class="example-label">Usage littéraire :</div>
                             <div class="example-text">{{ question[6] }}</div>
                         </div>
                         {% endif %}
                         
                         {% if question[7] %}
                         <div class="example-item">
-                            <div class="example-label">Usage universitaire :</div>
-                            <div class="example-text">{{ question[7] }}</div>
+                            <div class="example-text">🎓 Analyse du genre de 'dîner' en contexte littéraire</div>
                         </div>
                         {% endif %}
                     </div>
@@ -100,10 +98,52 @@
                     <button type="button" class="continue-button" id="continueButton" onclick="continueToNext()">
                         Continuer
                     </button>
+                    <button type="button" class="flag-button" onclick="flagQuestion()">
+                        🚩 Signaler un problème
+                    </button>
                 </div>
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Flag Question Modal -->
+<div id="flagModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🚩 Signaler un problème avec cette question</h3>
+            <span class="close" onclick="closeFlagModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="flagForm">
+                <input type="hidden" name="question_id" id="flagQuestionId" value="{{ question[0] }}">
+                <input type="hidden" name="question_type" value="grammar_gender">
+                
+                <div class="form-group">
+                    <label for="flagReason">Type de problème :</label>
+                    <select name="flag_reason" id="flagReason" required>
+                        <option value="">Sélectionnez...</option>
+                        <option value="wrong_answer">Réponse incorrecte</option>
+                        <option value="proper_noun">Nom propre inapproprié</option>
+                        <option value="unclear_sentence">Phrase peu claire</option>
+                        <option value="grammar_error">Erreur grammaticale</option>
+                        <option value="inappropriate_content">Contenu inapproprié</option>
+                        <option value="other">Autre</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="flagDescription">Description détaillée (optionnel) :</label>
+                    <textarea name="description" id="flagDescription" rows="3" placeholder="Décrivez le problème en détail..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="closeFlagModal()">Annuler</button>
+                    <button type="submit">Signaler</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -144,7 +184,7 @@ function showHint() {
     hintsUsed++;
     document.getElementById('hintsUsed').value = hintsUsed;
     document.getElementById('hintContent').style.display = 'block';
-    document.getElementById('hintButton').textContent = `💡 Exemples affichés (-5 points)`;
+    document.getElementById('hintButton').textContent = `💡 Phrase complète affichée (-5 points)`;
     document.getElementById('hintButton').disabled = true;
 }
 
@@ -230,13 +270,13 @@ function showFeedback(data) {
     // Show examples
     let examplesHtml = '<div class="examples-section"><h4>📝 Exemples d\'usage</h4>';
     if (data.examples.usage_courant) {
-        examplesHtml += `<div class="example-item"><strong>Usage courant :</strong> ${data.examples.usage_courant}</div>`;
+        examplesHtml += `<div class="example-item">${data.examples.usage_courant}</div>`;
     }
     if (data.examples.usage_litteraire) {
-        examplesHtml += `<div class="example-item"><strong>Usage littéraire :</strong> ${data.examples.usage_litteraire}</div>`;
+        examplesHtml += `<div class="example-item">${data.examples.usage_litteraire}</div>`;
     }
     if (data.examples.usage_universitaire) {
-        examplesHtml += `<div class="example-item"><strong>Usage universitaire :</strong> ${data.examples.usage_universitaire}</div>`;
+        examplesHtml += `<div class="example-item">Analyse du genre de 'dîner' en contexte littéraire</div>`;
     }
     examplesHtml += '</div>';
     feedbackExamples.innerHTML = examplesHtml;
@@ -249,6 +289,49 @@ function showFeedback(data) {
 function continueToNext() {
     window.location.href = '{{ url_for("grammar_gender_question", session_id=session_id, question_num=question_num+1) }}';
 }
+
+// Flag question functionality
+function flagQuestion() {
+    document.getElementById('flagModal').style.display = 'block';
+}
+
+function closeFlagModal() {
+    document.getElementById('flagModal').style.display = 'none';
+    document.getElementById('flagForm').reset();
+}
+
+// Handle flag form submission
+document.getElementById('flagForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch('{{ url_for("flag_question") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Merci pour votre signalement ! Il sera examiné par notre équipe.');
+            closeFlagModal();
+        } else {
+            alert('❌ Erreur lors du signalement. Veuillez réessayer.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Erreur lors du signalement. Veuillez réessayer.');
+    });
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('flagModal');
+    if (event.target === modal) {
+        closeFlagModal();
+    }
+});
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
