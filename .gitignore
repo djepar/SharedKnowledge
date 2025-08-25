@@ -1,6 +1,9 @@
 # Database files
 database.db
 database_backup_*.db
+*.sqlite
+*.sqlite3
+*.db-journal
 
 # Python cache
 __pycache__/
@@ -12,6 +15,7 @@ __pycache__/
 .env
 .venv/
 venv/
+classroom-app-venv/
 
 # IDE files
 .vscode/
