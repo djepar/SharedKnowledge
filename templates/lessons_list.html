@@ -88,14 +88,6 @@
             white-space: nowrap;
         }
         
-        .competence-tag {
-            background: var(--primary-color);
-            color: var(--white);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: var(--font-size-sm);
-            margin-right: 4px;
-        }
     </style>
 </head>
 <body>
@@ -170,18 +162,6 @@
                         </select>
                     </div>
                     
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="competence">Compétence</label>
-                        <select id="competence" name="competence">
-                            <option value="">Toutes les compétences</option>
-                            {% for comp in competences %}
-                                <option value="{{ comp }}"
-                                        {% if comp == current_filters.competence %}selected{% endif %}>
-                                    {{ comp }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
                     
                     <div class="form-group" style="margin-bottom: 0;">
                         <label for="subject">Matière</label>
@@ -215,11 +195,9 @@
                         <option value="">Choisir une action...</option>
                         <option value="delete">🗑️ Supprimer</option>
                         <option value="update_month">📅 Changer le mois</option>
-                        <option value="update_competence">🎯 Changer la compétence</option>
                     </select>
                     
                     <input type="text" name="new_month" placeholder="Nouveau mois" style="display: none;">
-                    <input type="text" name="new_competence" placeholder="Nouvelle compétence" style="display: none;">
                     
                     <button type="submit" class="btn btn-warning">Appliquer</button>
                     <button type="button" onclick="clearSelection()" class="btn btn-secondary">Annuler</button>
@@ -265,9 +243,7 @@
                             <td>S{{ lesson[3] }} - J{{ lesson[4] }}</td>
                             <td>{{ lesson[7] }}min</td>
                             <td>
-                                {% if lesson[8] %}
-                                    <span class="competence-tag">{{ lesson[8] }}</span>
-                                {% endif %}
+                                <span class="text-muted">-</span>
                             </td>
                             <td>
                                 <div class="lesson-content-preview">

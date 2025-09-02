@@ -11,6 +11,10 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Notes
+./Notes
+
+
 # Environment files
 .env
 .venv/

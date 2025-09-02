@@ -25,12 +25,22 @@
     <!-- Container principal -->
     <div class="create-lesson-container">
         <!-- Bouton retour -->
-        <a href="{{ url_for('lessons_list') }}" class="back-btn">← Retour à la liste des leçons</a>
+        {% if calendar_data %}
+            <a href="{{ url_for('calendar') }}" class="back-btn">← Retour au calendrier</a>
+        {% else %}
+            <a href="{{ url_for('lessons_list') }}" class="back-btn">← Retour à la liste des leçons</a>
+        {% endif %}
         
         <!-- En-tête -->
         <div class="create-lesson-header">
             <h1>📝 Créer une nouvelle leçon</h1>
             <p>Concevoir une séance du programme PFEQ français secondaire 2</p>
+            {% if calendar_data %}
+                <div class="calendar-info" style="background: var(--primary-light); color: var(--primary-dark); padding: var(--space-sm); border-radius: var(--radius-sm); margin-top: var(--space-sm);">
+                    📅 <strong>Leçon pré-remplie depuis le calendrier</strong><br>
+                    Date: {{ calendar_data.date }} | Cours: {{ calendar_data.course }} | Période: {{ calendar_data.period }}
+                </div>
+            {% endif %}
         </div>
         
         <!-- Formulaire de création -->
@@ -54,60 +64,77 @@
                     <div class="form-group">
                         <label for="title">Titre de la leçon *</label>
                         <input type="text" id="title" name="title" required 
-                               placeholder="Ex: L'analyse littéraire - Les procédés stylistiques">
+                               placeholder="Ex: L'analyse littéraire - Les procédés stylistiques"
+                               value="{{ calendar_data.suggested_title if calendar_data else '' }}">
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="month">Mois *</label>
+                        <label for="lesson_date">Date de la leçon *</label>
+                        <input type="date" id="lesson_date" name="lesson_date" required 
+                               value="{{ calendar_data.date if calendar_data else '' }}">
+                        <small>Date exacte de la leçon</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="month">Mois (auto-rempli) *</label>
                         <select id="month" name="month" required>
                             <option value="">Choisir le mois...</option>
-                            <option value="septembre">Septembre</option>
-                            <option value="octobre">Octobre</option>
-                            <option value="novembre">Novembre</option>
-                            <option value="décembre">Décembre</option>
-                            <option value="janvier">Janvier</option>
-                            <option value="février">Février</option>
-                            <option value="mars">Mars</option>
-                            <option value="avril">Avril</option>
-                            <option value="mai">Mai</option>
-                            <option value="juin">Juin</option>
+                            <option value="septembre" {{ 'selected' if calendar_data.month == 'septembre' else '' }}>Septembre</option>
+                            <option value="octobre" {{ 'selected' if calendar_data.month == 'octobre' else '' }}>Octobre</option>
+                            <option value="novembre" {{ 'selected' if calendar_data.month == 'novembre' else '' }}>Novembre</option>
+                            <option value="décembre" {{ 'selected' if calendar_data.month == 'décembre' else '' }}>Décembre</option>
+                            <option value="janvier" {{ 'selected' if calendar_data.month == 'janvier' else '' }}>Janvier</option>
+                            <option value="février" {{ 'selected' if calendar_data.month == 'février' else '' }}>Février</option>
+                            <option value="mars" {{ 'selected' if calendar_data.month == 'mars' else '' }}>Mars</option>
+                            <option value="avril" {{ 'selected' if calendar_data.month == 'avril' else '' }}>Avril</option>
+                            <option value="mai" {{ 'selected' if calendar_data.month == 'mai' else '' }}>Mai</option>
+                            <option value="juin" {{ 'selected' if calendar_data.month == 'juin' else '' }}>Juin</option>
                         </select>
+                        <small>Sera automatiquement mis à jour selon la date</small>
                     </div>
                     
                     <div class="form-group">
-                        <label for="week">Semaine du mois *</label>
-                        <select id="week" name="week" required>
-                            <option value="">Choisir la semaine...</option>
-                            <option value="1">Semaine 1</option>
-                            <option value="2">Semaine 2</option>
-                            <option value="3">Semaine 3</option>
-                            <option value="4">Semaine 4</option>
+                        <label for="week">Semaine du mois</label>
+                        <select id="week" name="week">
+                            <option value="">Auto-calculé...</option>
+                            <option value="1" {{ 'selected' if calendar_data.week_number == 1 else '' }}>Semaine 1</option>
+                            <option value="2" {{ 'selected' if calendar_data.week_number == 2 else '' }}>Semaine 2</option>
+                            <option value="3" {{ 'selected' if calendar_data.week_number == 3 else '' }}>Semaine 3</option>
+                            <option value="4" {{ 'selected' if calendar_data.week_number == 4 else '' }}>Semaine 4</option>
                         </select>
+                        <small>Calculé automatiquement depuis la date</small>
                     </div>
                     
                     <div class="form-group">
-                        <label for="day">Jour de la semaine *</label>
-                        <select id="day" name="day" required>
-                            <option value="">Choisir le jour...</option>
-                            <option value="1">Jour 1</option>
-                            <option value="2">Jour 2</option>
-                            <option value="3">Jour 3</option>
-                            <option value="4">Jour 4</option>
-                            <option value="5">Jour 5</option>
+                        <label for="day">Jour de la semaine</label>
+                        <select id="day" name="day">
+                            <option value="">Auto-calculé...</option>
+                            <option value="1" {{ 'selected' if calendar_data.day_number == 1 else '' }}>Jour 1</option>
+                            <option value="2" {{ 'selected' if calendar_data.day_number == 2 else '' }}>Jour 2</option>
+                            <option value="3" {{ 'selected' if calendar_data.day_number == 3 else '' }}>Jour 3</option>
+                            <option value="4" {{ 'selected' if calendar_data.day_number == 4 else '' }}>Jour 4</option>
+                            <option value="5" {{ 'selected' if calendar_data.day_number == 5 else '' }}>Jour 5</option>
                         </select>
+                        <small>Calculé automatiquement depuis la date</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="period">Période</label>
+                        <select id="period" name="period">
+                            <option value="">Choisir la période...</option>
+                            <option value="1" {{ 'selected' if calendar_data.period == '1' else '' }}>Période 1</option>
+                            <option value="2" {{ 'selected' if calendar_data.period == '2' else '' }}>Période 2</option>
+                            <option value="3" {{ 'selected' if calendar_data.period == '3' else '' }}>Période 3</option>
+                            <option value="4" {{ 'selected' if calendar_data.period == '4' else '' }}>Période 4</option>
+                            <option value="5" {{ 'selected' if calendar_data.period == '5' else '' }}>Période 5</option>
+                        </select>
+                        <small>Période de la journée</small>
                     </div>
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="session_number">Numéro de séance *</label>
-                        <input type="number" id="session_number" name="session_number" min="1" required 
-                               placeholder="1">
-                        <small>Numéro de la séance</small>
-                    </div>
-                    
                     <div class="form-group">
                         <label for="duration">Durée (minutes) *</label>
                         <input type="number" id="duration" name="duration" min="15" max="180" required 
@@ -115,12 +142,6 @@
                         <small>Durée habituelle : 75 minutes</small>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="competence">Compétence principale *</label>
-                        <select id="competence" name="competence" required>
-                            <option value="">Choisir la compétence...</option>
-                        </select>
-                    </div>
                 </div>
             </div>
 
@@ -257,34 +278,36 @@ Exemples:
     <!-- JavaScript pour améliorer l'expérience utilisateur -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Dynamic competences loading based on selected discipline
-            const subjectSelect = document.getElementById('subject');
-            const competenceSelect = document.getElementById('competence');
+            // Auto-populate month/week/day based on lesson date
+            const lessonDateInput = document.getElementById('lesson_date');
+            const monthSelect = document.getElementById('month');
+            const weekSelect = document.getElementById('week');
+            const daySelect = document.getElementById('day');
             
-            subjectSelect.addEventListener('change', async function() {
-                const discipline = this.value;
-                if (discipline) {
-                    try {
-                        const response = await fetch(`/api/competences/${discipline}`);
-                        const data = await response.json();
-                        
-                        // Clear existing options except the first one
-                        competenceSelect.innerHTML = '<option value="">Choisir la compétence...</option>';
-                        
-                        // Add new options
-                        data.competences.forEach(comp => {
-                            const option = document.createElement('option');
-                            option.value = comp;
-                            option.textContent = comp;
-                            competenceSelect.appendChild(option);
-                        });
-                    } catch (error) {
-                        console.error('Erreur lors du chargement des compétences:', error);
-                    }
-                } else {
-                    competenceSelect.innerHTML = '<option value="">Choisir la compétence...</option>';
+            const monthNames = {
+                0: 'janvier', 1: 'février', 2: 'mars', 3: 'avril', 4: 'mai', 5: 'juin',
+                6: 'juillet', 7: 'août', 8: 'septembre', 9: 'octobre', 10: 'novembre', 11: 'décembre'
+            };
+            
+            lessonDateInput.addEventListener('change', function() {
+                if (this.value) {
+                    const date = new Date(this.value);
+                    const month = monthNames[date.getMonth()];
+                    const weekNumber = Math.ceil(date.getDate() / 7);
+                    const dayNumber = date.getDay(); // 0=Sunday, 1=Monday, etc.
+                    
+                    // Set month
+                    monthSelect.value = month;
+                    
+                    // Set week (1-4)
+                    weekSelect.value = weekNumber.toString();
+                    
+                    // Set day (convert Sunday=0 to a better mapping for school days)
+                    const schoolDay = dayNumber === 0 ? 5 : dayNumber; // Sunday becomes 5, Monday=1, etc.
+                    daySelect.value = schoolDay.toString();
                 }
             });
+            
             
             // Auto-sauvegarde en brouillon (localStorage)
             const form = document.querySelector('form');
@@ -314,16 +337,9 @@ Exemples:
             
             // Validation avant soumission
             form.addEventListener('submit', function(e) {
-                const sessionNumber = document.getElementById('session_number').value;
                 const title = document.getElementById('title').value.trim();
                 const content = document.getElementById('content').value.trim();
                 const objectives = document.getElementById('objectives').value.trim();
-                
-                if (!sessionNumber || sessionNumber < 1) {
-                    alert('⚠️ Le numéro de séance doit être supérieur à 0');
-                    e.preventDefault();
-                    return;
-                }
                 
                 if (!title) {
                     alert('⚠️ Le titre de la leçon est obligatoire');

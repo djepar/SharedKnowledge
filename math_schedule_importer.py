@@ -115,18 +115,18 @@ def cycle_detail(cycle_number):
         for lesson in lessons:
             lesson_dict = {
                 'id': lesson[0],
-                'lesson_number': lesson[1],
-                'month': lesson[2],
-                'week_number': lesson[3],
-                'day_number': lesson[4],
-                'title': lesson[5],
-                'content': lesson[6],
-                'duration': lesson[7],
-                'competences': lesson[8],
-                'materials': lesson[9],
-                'objectives': lesson[10],
-                'tags': lesson[11],
-                'subject': lesson[12],
+                'lesson_number': lesson[0],  # Use ID as display number
+                'month': lesson[1],  # Adjusted index after removing lesson_number
+                'week_number': lesson[2],
+                'day_number': lesson[3],
+                'title': lesson[4],
+                'content': lesson[5],  # Adjusted after removing lesson_number
+                'duration': lesson[6],
+                'competences': lesson[7],
+                'materials': lesson[8],
+                'objectives': lesson[9],
+                'tags': lesson[10],
+                'subject': lesson[11],
                 'progress': progress_data.get(lesson[0], (False, None, None))
             }
             lessons_with_progress.append(lesson_dict)
@@ -435,7 +435,7 @@ def progress_dashboard():
         
         # Get recent activity
         cursor.execute('''
-            SELECT l.title, l.lesson_number, sp.completion_date
+            SELECT l.title, l.id as lesson_number, sp.completion_date
             FROM student_progress sp
             JOIN lessons l ON l.id = sp.lesson_id
             WHERE sp.user_id = ? AND sp.completed = 1 AND l.subject = 'mathématiques'

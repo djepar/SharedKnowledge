@@ -23,6 +23,7 @@ def build_css():
         'static/css/components/navigation.css',
         'static/css/components/auth.css',
         'static/css/components/discipline-selection.css',
+        'static/css/components/discipline-dashboard.css',
         'static/css/components/dashboard.css',
         'static/css/components/home.css',
         'static/css/components/calendar.css',
@@ -33,6 +34,12 @@ def build_css():
         'static/css/components/theory.css',
         'static/css/components/exercises.css',
         'static/css/components/portfolio.css',
+        'static/css/components/math-schedule.css',
+        'static/css/components/grammar-admin.css',
+        'static/css/components/grammar-exercises.css',
+        'static/css/components/grammar-question.css',
+        'static/css/components/grammar-results.css',
+        'static/css/components/progress.css',
     ]
     
     combined_css = f"""/*

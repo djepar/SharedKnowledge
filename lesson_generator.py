@@ -30,13 +30,13 @@ def lessons_list():
         query += " AND (title LIKE ? OR content LIKE ?)"
         params.extend([f"%{search_query}%", f"%{search_query}%"])
     
-    query += " ORDER BY lesson_number"
+    query += " ORDER BY id"
     
     c.execute(query, params)
     lessons = c.fetchall()
     
     # Get unique months and competences for filters
-    c.execute("SELECT DISTINCT month FROM lessons ORDER BY lesson_number")
+    c.execute("SELECT DISTINCT month FROM lessons ORDER BY id")
     months = [row[0] for row in c.fetchall()]
     
     c.execute("SELECT DISTINCT competences FROM lessons WHERE competences IS NOT NULL")
@@ -62,7 +62,6 @@ def create_lesson():
     
     if request.method == 'POST':
         lesson_data = {
-            'lesson_number': request.form.get('lesson_number', type=int),
             'month': request.form['month'],
             'week_number': request.form.get('week_number', type=int),
             'day_number': request.form.get('day_number', type=int),
@@ -81,31 +80,23 @@ def create_lesson():
         try:
             c.execute('''
                 INSERT INTO lessons 
-                (lesson_number, month, week_number, day_number, title, content, 
+                (month, week_number, day_number, title, content, 
                  duration, competences, materials, objectives, tags)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', tuple(lesson_data.values()))
             
             conn.commit()
             flash(f"Leçon '{lesson_data['title']}' créée avec succès!", 'success')
             return redirect(url_for('lessons_list'))
             
-        except sqlite3.IntegrityError:
-            flash("Erreur: Une leçon avec ce numéro existe déjà", 'error')
+        except sqlite3.IntegrityError as e:
+            flash(f"Erreur d'intégrité de la base de données: {e}", 'error')
         except Exception as e:
             flash(f"Erreur lors de la création: {e}", 'error')
         finally:
             conn.close()
     
-    # Get next lesson number
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT MAX(lesson_number) FROM lessons")
-    result = c.fetchone()
-    next_lesson_number = (result[0] or 0) + 1
-    conn.close()
-    
-    return render_template('create_lesson.html', next_lesson_number=next_lesson_number)
+    return render_template('create_lesson.html')
 
 @app.route('/lesson/<int:lesson_id>/edit', methods=['GET', 'POST'])
 def edit_lesson(lesson_id):
@@ -118,7 +109,6 @@ def edit_lesson(lesson_id):
     
     if request.method == 'POST':
         lesson_data = {
-            'lesson_number': request.form.get('lesson_number', type=int),
             'month': request.form['month'],
             'week_number': request.form.get('week_number', type=int),
             'day_number': request.form.get('day_number', type=int),
@@ -134,7 +124,7 @@ def edit_lesson(lesson_id):
         try:
             c.execute('''
                 UPDATE lessons SET 
-                lesson_number=?, month=?, week_number=?, day_number=?, title=?, 
+                month=?, week_number=?, day_number=?, title=?, 
                 content=?, duration=?, competences=?, materials=?, objectives=?, 
                 tags=?, updated_at=CURRENT_TIMESTAMP
                 WHERE id=?
@@ -175,30 +165,24 @@ def duplicate_lesson(lesson_id):
         flash("Leçon non trouvée", 'error')
         return redirect(url_for('lessons_list'))
     
-    # Get next lesson number
-    c.execute("SELECT MAX(lesson_number) FROM lessons")
-    result = c.fetchone()
-    next_lesson_number = (result[0] or 0) + 1
-    
     try:
-        # Create duplicate with new lesson number
+        # Create duplicate without lesson number
         c.execute('''
             INSERT INTO lessons 
-            (lesson_number, month, week_number, day_number, title, content, 
+            (month, week_number, day_number, title, content, 
              duration, competences, materials, objectives, tags)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            next_lesson_number,
-            original[2],  # month
-            original[3],  # week_number
-            original[4],  # day_number
-            f"[COPIE] {original[5]}",  # title
-            original[6],  # content
-            original[7],  # duration
-            original[8],  # competences
-            original[9],  # materials
-            original[10], # objectives
-            original[11]  # tags
+            original[1],  # month
+            original[2],  # week_number
+            original[3],  # day_number
+            f"[COPIE] {original[4]}",  # title
+            original[5],  # content
+            original[6],  # duration
+            original[7],  # competences
+            original[8],  # materials
+            original[9], # objectives
+            original[10]  # tags
         ))
         
         conn.commit()
@@ -256,7 +240,7 @@ def export_lessons():
     
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT * FROM lessons ORDER BY lesson_number")
+    c.execute("SELECT * FROM lessons ORDER BY id")
     lessons = c.fetchall()
     conn.close()
     
@@ -269,7 +253,7 @@ def export_lessons():
     
     # Write header
     writer.writerow([
-        'id', 'lesson_number', 'month', 'week_number', 'day_number', 
+        'id', 'month', 'week_number', 'day_number', 
         'title', 'content', 'duration', 'competences', 'materials', 
         'objectives', 'tags', 'created_at', 'updated_at'
     ])

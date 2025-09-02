@@ -285,21 +285,17 @@
             <p>Votre fichier CSV doit contenir les colonnes suivantes (dans cet ordre exact):</p>
             
             <div class="csv-example">
-lesson_number,month,week_number,day_number,title,content,duration,competences,materials,objectives,tags,subject
-1,septembre,1,1,"Introduction au programme","Présentation des objectifs...",75,"Lecture","Manuel, tableau","Connaître le programme","introduction","français"
-2,septembre,1,2,"Évaluation diagnostique","Test de compréhension...",75,"Lecture","Tests, grilles","Évaluer le niveau","evaluation","français"
+month,week_number,day_number,title,content,duration,materials,objectives,tags,subject
+septembre,1,1,"Introduction au programme","Présentation des objectifs...",75,"Manuel, tableau","Connaître le programme","introduction","français"
+septembre,1,2,"Évaluation diagnostique","Test de compréhension...",75,"Tests, grilles","Évaluer le niveau","evaluation","français"
             </div>
 
             <div class="field-list">
                 <div class="field-item">
-                    <div class="field-name">lesson_number <span class="required">*</span></div>
-                    <div class="field-description">Numéro de la leçon (entier)</div>
-                </div>
-                <div class="field-item">
                     <div class="field-name">month <span class="required">*</span></div>
                     <div class="field-description">Mois (septembre, octobre, etc.)</div>
                 </div>
-                <div class="field-item">
+                 <div class="field-item">
                     <div class="field-name">week_number <span class="required">*</span></div>
                     <div class="field-description">Numéro de semaine (entier)</div>
                 </div>
@@ -318,10 +314,6 @@ lesson_number,month,week_number,day_number,title,content,duration,competences,ma
                 <div class="field-item">
                     <div class="field-name">duration</div>
                     <div class="field-description">Durée en minutes (défaut: 75)</div>
-                </div>
-                <div class="field-item">
-                    <div class="field-name">competences</div>
-                    <div class="field-description">Compétences visées</div>
                 </div>
                 <div class="field-item">
                     <div class="field-name">materials</div>
@@ -343,7 +335,7 @@ lesson_number,month,week_number,day_number,title,content,duration,competences,ma
 
             <div style="margin-top: var(--space-lg); padding: var(--space-md); background: var(--warning-50); border: 1px solid var(--warning-200); border-radius: var(--radius-md);">
                 <strong>⚠️ Important:</strong> Les champs marqués d'un <span class="required">*</span> sont obligatoires. 
-                Assurez-vous que votre fichier respecte exactement ce format pour éviter les erreurs d'importation.
+                Les leçons seront automatiquement numérotées lors de l'importation.
             </div>
         </div>
 
@@ -474,9 +466,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Download template functionality
     function downloadCSVTemplate() {
-        const csvContent = `lesson_number,month,week_number,day_number,title,content,duration,competences,materials,objectives,tags,subject
-1,septembre,1,1,"Introduction au programme français","Amorce (10 min) : Présentation des élèves et de leurs attentes\nDéveloppement (50 min) : Survol du programme PFEQ français secondaire 2\nIntégration (15 min) : Questions et planification",75,"Lire et apprécier des textes variés","Manuel de français, programme PFEQ","Connaître les objectifs du cours et créer un climat positif","introduction,programme","français"
-2,septembre,1,2,"Évaluation diagnostique en lecture","Amorce (5 min) : Rappel des stratégies de lecture\nDéveloppement (60 min) : Test de compréhension sur deux textes variés\nIntégration (10 min) : Autoévaluation et partage des stratégies utilisées",75,"Lire et apprécier des textes variés","Cahier de textes, grille d'évaluation","Évaluer le niveau de lecture des élèves","evaluation,lecture,diagnostic","français"`;
+        const csvContent = `month,week_number,day_number,title,content,duration,materials,objectives,tags,subject
+septembre,1,1,"Introduction au programme français","Amorce (10 min) : Présentation des élèves et de leurs attentes\nDéveloppement (50 min) : Survol du programme PFEQ français secondaire 2\nIntégration (15 min) : Questions et planification",75,"Manuel de français, programme PFEQ","Connaître les objectifs du cours et créer un climat positif","introduction,programme","français"
+septembre,1,2,"Évaluation diagnostique en lecture","Amorce (5 min) : Rappel des stratégies de lecture\nDéveloppement (60 min) : Test de compréhension sur deux textes variés\nIntégration (10 min) : Autoévaluation et partage des stratégies utilisées",75,"Cahier de textes, grille d'évaluation","Évaluer le niveau de lecture des élèves","evaluation,lecture,diagnostic","français"`;
         
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');

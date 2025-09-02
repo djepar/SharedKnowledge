@@ -107,17 +107,6 @@
                         <small>Durée habituelle : 75 minutes</small>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="competence">Compétence principale *</label>
-                        <select id="competence" name="competence" required>
-                            <option value="">Choisir la compétence...</option>
-                            {% for comp in competences %}
-                            <option value="{{ comp }}" {{ 'selected' if lesson[8] == comp else '' }}>
-                                {{ comp }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
                 </div>
             </div>
 
@@ -209,34 +198,6 @@
     <!-- JavaScript pour améliorer l'expérience utilisateur -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Dynamic competences loading based on selected discipline
-            const subjectSelect = document.getElementById('subject');
-            const competenceSelect = document.getElementById('competence');
-            
-            subjectSelect.addEventListener('change', async function() {
-                const discipline = this.value;
-                if (discipline) {
-                    try {
-                        const response = await fetch(`/api/competences/${discipline}`);
-                        const data = await response.json();
-                        
-                        // Clear existing options except the first one
-                        competenceSelect.innerHTML = '<option value="">Choisir la compétence...</option>';
-                        
-                        // Add new options
-                        data.competences.forEach(comp => {
-                            const option = document.createElement('option');
-                            option.value = comp;
-                            option.textContent = comp;
-                            competenceSelect.appendChild(option);
-                        });
-                    } catch (error) {
-                        console.error('Erreur lors du chargement des compétences:', error);
-                    }
-                } else {
-                    competenceSelect.innerHTML = '<option value="">Choisir la compétence...</option>';
-                }
-            });
             // Auto-sauvegarde en brouillon (localStorage)
             const form = document.querySelector('.lesson-form');
             const inputs = form.querySelectorAll('input, select, textarea');

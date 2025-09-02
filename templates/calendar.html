@@ -3,148 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendrier - Français Secondaire 2</title>
+    <title>Calendrier - Vue Hebdomadaire</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dist/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/calendar.css') }}">
 </head>
 <body>
     <!-- Navigation -->
     {% include 'components/navigation.html' %}
 
-    <!-- Container principal -->
-    <div class="calendar-container">
-        <!-- En-tête du calendrier -->
-        <div class="calendar-header">
-            <h1>📚 Calendrier des séances</h1>
-            <p>Programme complet - Toutes disciplines</p>
-        </div>
-        
-        <!-- Filtrage par discipline -->
-        <div class="calendar-filters">
-            <div class="filter-section">
-                <label for="subject-filter">Filtrer par matière :</label>
-                <select id="subject-filter" onchange="filterBySubject()">
-                    <option value="all" {% if not current_filter or current_filter == 'all' %}selected{% endif %}>
-                        Toutes les matières
-                    </option>
-                    {% for subject in available_subjects %}
-                    <option value="{{ subject }}" {% if current_filter == subject %}selected{% endif %}>
-                        {{ subject.title() }}
-                    </option>
-                    {% endfor %}
-                </select>
+    <div class="week-container">
+        <!-- Week Header -->
+        <div class="week-header">
+            <div class="week-info">
+                <h1 class="week-title">📅 Calendrier Hebdomadaire</h1>
+                <p class="current-week">
+                    {% if current_week_offset == 0 %}
+                        Semaine courante
+                    {% elif current_week_offset > 0 %}
+                        Dans {{ current_week_offset }} semaine{{ 's' if current_week_offset > 1 else '' }}
+                    {% else %}
+                        Il y a {{ -current_week_offset }} semaine{{ 's' if current_week_offset < -1 else '' }}
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="week-navigation">
+                <a href="{{ url_for('calendar', week=current_week_offset-1) }}" class="nav-btn nav-btn--previous">← Précédente</a>
+                <a href="{{ url_for('calendar', week=0) }}" class="nav-btn nav-btn--current">Cette semaine</a>
+                <a href="{{ url_for('calendar', week=current_week_offset+1) }}" class="nav-btn nav-btn--next">Suivante →</a>
             </div>
         </div>
         
-        <!-- Navigation par mois -->
-        <div class="calendar-navigation">
-            <button class="nav-btn active" onclick="showSection('septembre')">Septembre</button>
-            <button class="nav-btn" onclick="showSection('octobre')">Octobre</button>
-            <button class="nav-btn" onclick="showSection('novembre')">Novembre</button>
-            <button class="nav-btn" onclick="showSection('decembre')">Décembre</button>
-            <button class="nav-btn" onclick="showSection('janvier')">Janvier</button>
-            <button class="nav-btn" onclick="showSection('fevrier')">Février</button>
-            <button class="nav-btn" onclick="showSection('mars')">Mars</button>
-            <button class="nav-btn" onclick="showSection('avril')">Avril</button>
-            <button class="nav-btn" onclick="showSection('mai')">Mai</button>
-            <button class="nav-btn" onclick="showSection('juin')">Juin</button>
-        </div>
-        
-        <!-- Contenu du calendrier -->
-        <div class="calendar-content">
-            {% for month, lessons in lessons_by_month.items() %}
-            <div id="{{ month }}" class="month-section {% if loop.first %}active{% endif %}">
-                <div class="month-header">
-                    <div class="month-title">{{ month.title() }}</div>
-                    <div>{{ lessons|length }} leçons</div>
-                </div>
-                
-                {% for lesson in lessons %}
-                <div class="lesson-card discipline-{{ lesson[14] if lesson[14] else 'default' }}">
-                    <div class="lesson-header">
-                        <span class="lesson-number">{{ lesson[14]|title if lesson[14] else 'Général' }} - Séance {{ lesson[1] }}</span>
-                        <span style="color: var(--gray-500); font-size: var(--font-size-sm);">
-                            Semaine {{ lesson[3] }} • Jour {{ lesson[4] }} • {{ lesson[7] }}min
-                        </span>
+        <!-- Week Grid -->
+        <div class="week-grid">
+            {% for date_str in week_dates %}
+                {% set day_info = week_schedule[date_str.strftime('%Y-%m-%d')] %}
+                <div class="day-card {% if day_info.date == current_date %}day-card--today{% endif %}">
+                    <div class="day-header">
+                        <div class="day-name">{{ day_info.day_name }}</div>
+                        <div class="day-date">{{ day_info.day_number }} {{ day_info.month_name }}</div>
                     </div>
                     
-                    <div class="lesson-subject">
-                        <span class="subject-tag">{{ lesson[14] if lesson[14] else 'Sans discipline' }}</span>
-                    </div>
-                    
-                    <div class="lesson-title">{{ lesson[5] }}</div>
-                    
-                    <div class="lesson-preview">
-                        {{ lesson[6][:150] }}{% if lesson[6]|length > 150 %}...{% endif %}
-                    </div>
-                    
-                    <!-- Tags des compétences -->
-                    <div style="margin-bottom: var(--space-md);">
-                        {% if lesson[8] %}
-                            <span class="tag tag-{{ lesson[8].lower().replace(' ', '-') }}">{{ lesson[8] }}</span>
+                    <div class="day-content">
+                        {% if day_info.data %}
+                            <!-- Event Type Badge -->
+                            {% if day_info.data[4] == 'Holiday' %}
+                                <div class="event-badge event-badge--holiday">🏖️ Congé</div>
+                            {% elif day_info.data[4] == 'Pédagogique' %}
+                                <div class="event-badge event-badge--pedagogique">📚 Pédagogique</div>
+                            {% elif day_info.data[4] == 'Class Day' %}
+                                <div class="event-badge event-badge--class">📖 Cours - Jour {{ day_info.data[3] }}</div>
+                            {% elif day_info.data[4] == 'Summer Break' %}
+                                <div class="event-badge event-badge--holiday">☀️ Vacances d'été</div>
+                            {% endif %}
+                            
+                            <!-- Course Periods -->
+                            {% if day_info.data[4] == 'Class Day' %}
+                                {% if day_info.data[5] %}
+                                    <div class="course-slot course-slot--p1 clickable-course" 
+                                         data-date="{{ day_info.date.strftime('%Y-%m-%d') }}" 
+                                         data-period="1" 
+                                         data-course="{{ day_info.data[5] }}">
+                                        <div class="course-period">Période 1</div>
+                                        <div class="course-name">{{ day_info.data[5] }}</div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if day_info.data[6] %}
+                                    <div class="course-slot course-slot--p2 clickable-course" 
+                                         data-date="{{ day_info.date.strftime('%Y-%m-%d') }}" 
+                                         data-period="2" 
+                                         data-course="{{ day_info.data[6] }}">
+                                        <div class="course-period">Période 2</div>
+                                        <div class="course-name">{{ day_info.data[6] }}</div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if day_info.data[7] %}
+                                    <div class="course-slot course-slot--p3 clickable-course" 
+                                         data-date="{{ day_info.date.strftime('%Y-%m-%d') }}" 
+                                         data-period="3" 
+                                         data-course="{{ day_info.data[7] }}">
+                                        <div class="course-period">Période 3</div>
+                                        <div class="course-name">{{ day_info.data[7] }}</div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if day_info.data[8] %}
+                                    <div class="course-slot course-slot--p4 clickable-course" 
+                                         data-date="{{ day_info.date.strftime('%Y-%m-%d') }}" 
+                                         data-period="4" 
+                                         data-course="{{ day_info.data[8] }}">
+                                        <div class="course-period">Période 4</div>
+                                        <div class="course-name">{{ day_info.data[8] }}</div>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if not (day_info.data[5] or day_info.data[6] or day_info.data[7] or day_info.data[8]) %}
+                                    <div class="no-classes">Pas de cours</div>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <!-- Handle days without data (weekends, etc.) -->
+                            {% if day_info.day_name in ['Saturday', 'Sunday'] or day_info.day_name in ['Samedi', 'Dimanche'] %}
+                                <div class="event-badge event-badge--weekend">🏠 Week-end</div>
+                            {% else %}
+                                <div class="no-classes">Jour libre</div>
+                            {% endif %}
                         {% endif %}
-                        {% if lesson[10] %}
-                            {% for tag in lesson[10].split(',') %}
-                                <span class="tag tag-{{ tag.strip() }}">{{ tag.strip().title() }}</span>
-                            {% endfor %}
-                        {% endif %}
                     </div>
-                    
-                    <a href="{{ url_for('lesson_detail', lesson_id=lesson[0]) }}" class="lesson-link">
-                        Voir les détails →
-                    </a>
                 </div>
-                {% endfor %}
-            </div>
             {% endfor %}
         </div>
     </div>
-    
-    <!-- JavaScript pour la navigation -->
+
+    <!-- JavaScript for enhanced interactions -->
     <script>
-        function showSection(section) {
-            // Masquer toutes les sections
-            const sections = document.querySelectorAll('.month-section');
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Désactiver tous les boutons
-            const buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach(button => {
-                button.classList.remove('active');
-            });
-            
-            // Afficher la section sélectionnée
-            document.getElementById(section).classList.add('active');
-            
-            // Activer le bouton cliqué
-            event.target.classList.add('active');
-        }
-
-        function filterBySubject() {
-            const select = document.getElementById('subject-filter');
-            const selectedSubject = select.value;
-            
-            // Construire l'URL avec le paramètre de filtre
-            const currentUrl = new URL(window.location);
-            if (selectedSubject === 'all') {
-                currentUrl.searchParams.delete('subject');
-            } else {
-                currentUrl.searchParams.set('subject', selectedSubject);
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                window.location.href = "{{ url_for('calendar', week=current_week_offset-1) }}";
+            } else if (e.key === 'ArrowRight') {
+                window.location.href = "{{ url_for('calendar', week=current_week_offset+1) }}";
+            } else if (e.key === 'Home') {
+                window.location.href = "{{ url_for('calendar', week=0) }}";
             }
-            
-            // Recharger la page avec le nouveau filtre
-            window.location.href = currentUrl.toString();
-        }
+        });
 
-        // Animation d'entrée
+        // Animation for day cards
         document.addEventListener('DOMContentLoaded', function() {
-            const lessonCards = document.querySelectorAll('.lesson-card');
-            lessonCards.forEach((card, index) => {
+            const dayCards = document.querySelectorAll('.day-card');
+            dayCards.forEach((card, index) => {
                 setTimeout(() => {
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
                 }, index * 50);
+            });
+            
+            // Handle course slot clicks
+            const courseSlots = document.querySelectorAll('.clickable-course');
+            courseSlots.forEach(slot => {
+                slot.addEventListener('click', function() {
+                    const date = this.dataset.date;
+                    const period = this.dataset.period;
+                    const course = this.dataset.course;
+                    
+                    // Show loading state
+                    this.style.opacity = '0.7';
+                    this.style.cursor = 'wait';
+                    
+                    // Check if a lesson exists for this date/period/course
+                    fetch(`/api/lesson-for-slot?date=${date}&period=${period}&course=${encodeURIComponent(course)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.lesson_id) {
+                                // Navigate to existing lesson
+                                window.location.href = `/lesson/${data.lesson_id}`;
+                            } else {
+                                // Navigate to creation page with pre-filled data
+                                const params = new URLSearchParams({
+                                    date: date,
+                                    period: period,
+                                    course: course
+                                });
+                                window.location.href = `/lesson/create?${params.toString()}`;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error checking lesson:', error);
+                            // Fallback to creation page
+                            const params = new URLSearchParams({
+                                date: date,
+                                period: period,
+                                course: course
+                            });
+                            window.location.href = `/lesson/create?${params.toString()}`;
+                        })
+                        .finally(() => {
+                            // Reset loading state
+                            this.style.opacity = '1';
+                            this.style.cursor = 'pointer';
+                        });
+                });
+                
+                // Add hover effect
+                slot.style.cursor = 'pointer';
+                slot.title = 'Cliquer pour voir ou créer la leçon';
             });
         });
     </script>

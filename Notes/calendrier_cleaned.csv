@@ -1,0 +1,23 @@
+Date,Day_of_Week,Day_Number,Event_Type,P1_Course,P2_Course,P3_Course,P4_Course
+2025-09-01,Monday,,Holiday,,,,
+2025-09-02,Tuesday,6,Class Day,,687270-08: Histoire MA2,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2
+2025-09-03,Wednesday,7,Class Day,695270-08: Géo MA2,,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732
+2025-09-04,Thursday,8,Class Day,,632270-08: Français MA2,,AMA732-12: Atelier Math DGA 732
+2025-09-05,Friday,9,Class Day,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732,680270-08: CCO MA2,
+2025-09-08,Monday,1,Class Day,AMA732-12: Atelier Math DGA 732,,,632270-08: Français MA2
+2025-09-09,Tuesday,2,Class Day,695270-08: Géo MA2,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732,
+2025-09-10,Wednesday,3,Class Day,687270-08: Histoire MA2,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2,687270-08: Histoire MA2
+2025-09-11,Thursday,4,Class Day,,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2,
+2025-09-12,Friday,5,Class Day,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732,,680270-08: CCQ MA2
+2025-09-15,Monday,1,Class Day,AMA732-12: Atelier Math DGA 732,,,632270-08: Français MA2
+2025-09-16,Tuesday,6,Class Day,,687270-08: Histoire MA2,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2
+2025-09-17,Wednesday,7,Class Day,695270-08: Géo MA2,,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732
+2025-09-18,Thursday,8,Class Day,,632270-08: Français MA2,,AMA732-12: Atelier Math DGA 732
+2025-09-19,Friday,,Pédagogique,,,,
+2025-09-22,Monday,9,Class Day,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732,680270-08: CCO MA2,
+2025-09-23,Tuesday,2,Class Day,695270-08: Géo MA2,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732,
+2025-09-24,Wednesday,3,Class Day,687270-08: Histoire MA2,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2,687270-08: Histoire MA2
+2025-09-25,Thursday,4,Class Day,,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2,
+2025-09-26,Friday,5,Class Day,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732,,680270-08: CCQ MA2
+2025-09-29,Monday,6,Class Day,,687270-08: Histoire MA2,AMA732-12: Atelier Math DGA 732,632270-08: Français MA2
+2025-09-30,Tuesday,7,Class Day,695270-08: Géo MA2,,632270-08: Français MA2,AMA732-12: Atelier Math DGA 732

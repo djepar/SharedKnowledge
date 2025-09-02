@@ -10,14 +10,6 @@ app.secret_key = 'your_secret_key'
 
 DB_FILE = 'database.db'
 
-def get_competences_by_discipline(discipline):
-    """Get competences for a specific discipline from the competences table"""
-    conn = sqlite3.connect(DB_FILE)
-    c = conn.cursor()
-    c.execute("SELECT nom FROM competences WHERE discipline = ? ORDER BY ordre", (discipline,))
-    competences = [row[0] for row in c.fetchall()]
-    conn.close()
-    return competences
 
 def check_and_migrate_database():
     """
@@ -87,14 +79,12 @@ def check_and_migrate_database():
         c.execute('''
             CREATE TABLE IF NOT EXISTS lessons (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                lesson_number INTEGER NOT NULL,
                 month TEXT NOT NULL,
                 week_number INTEGER NOT NULL,
                 day_number INTEGER NOT NULL,
                 title TEXT NOT NULL,
                 content TEXT,
                 duration INTEGER DEFAULT 75,
-                competences TEXT,
                 materials TEXT,
                 objectives TEXT,
                 tags TEXT,
@@ -108,8 +98,19 @@ def check_and_migrate_database():
         try:
             c.execute("ALTER TABLE lessons ADD COLUMN subject TEXT DEFAULT 'français'")
         except sqlite3.OperationalError:
-            # Column already exists
-            pass
+            pass  # Column already exists
+            
+        # Add lesson_date column if it doesn't exist
+        try:
+            c.execute("ALTER TABLE lessons ADD COLUMN lesson_date TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+            
+        # Add period column if it doesn't exist
+        try:
+            c.execute("ALTER TABLE lessons ADD COLUMN period TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         
         c.execute('''
             CREATE TABLE IF NOT EXISTS student_progress (
@@ -355,26 +356,26 @@ def check_and_migrate_database():
         c.execute("SELECT COUNT(*) FROM lessons")
         if c.fetchone()[0] == 0:
             sample_lessons = [
-                (1, "septembre", 1, 1, "🎯 Accueil et présentation du programme", 
+                ("septembre", 1, 1, "🎯 Accueil et présentation du programme", 
                  "Amorce (10 min) : Jeu brise-glace \"Qui suis-je littéraire ?\"\nDéveloppement (50 min) :\n• Présentation des 3 compétences PFEQ (15 min)\n• Survol des œuvres à lire cette année + extraits (20 min)\n• Explication système d'évaluation et portfolios (15 min)\nIntégration (15 min) : Questions-réponses et anticipations",
-                 75, "Oral", "Extraits d'œuvres, grille d'évaluation, cahiers", "Créer un climat de confiance et présenter les attentes", "oral"),
-                (2, "septembre", 1, 2, "📖 Évaluation diagnostique - Lecture",
+                 75, "Oral", "Extraits d'œuvres, grille d'évaluation, cahiers", "Créer un climat de confiance et présenter les attentes", "oral", "français", "2024-09-03", "1"),
+                ("septembre", 1, 2, "📖 Évaluation diagnostique - Lecture",
                  "Amorce (5 min) : Rappel des stratégies de lecture\nDéveloppement (60 min) :\n• Test de compréhension de lecture - 2 textes variés (45 min)\n• Questionnaire métacognitif sur les stratégies utilisées (15 min)\nIntégration (10 min) : Autoévaluation de la performance",
-                 75, "Lecture", "Cahier de textes diagnostiques, grille d'observation", "Évaluer les forces/défis en compréhension de lecture", "lecture,evaluation"),
-                (3, "septembre", 1, 3, "✍️ Évaluation diagnostique - Écriture",
+                 75, "Lecture", "Cahier de textes diagnostiques, grille d'observation", "Évaluer les forces/défis en compréhension de lecture", "lecture,evaluation", "français", "2024-09-04", "2"),
+                ("septembre", 1, 3, "✍️ Évaluation diagnostique - Écriture",
                  "Amorce (10 min) : Remue-méninges sur les caractéristiques du texte descriptif\nDéveloppement (55 min) :\n• Rédaction d'un texte descriptif de 150 mots : \"Mon lieu préféré\" (40 min)\n• Relecture et révision autonome (15 min)\nIntégration (10 min) : Remise et réflexion sur le processus d'écriture",
-                 75, "Écriture", "Feuilles mobiles, aide-mémoire descriptif", "Évaluer les compétences de base en écriture descriptive", "ecriture,evaluation"),
-                (4, "septembre", 1, 4, "📚 Introduction au carnet de lecture",
+                 75, "Écriture", "Feuilles mobiles, aide-mémoire descriptif", "Évaluer les compétences de base en écriture descriptive", "ecriture,evaluation", "français", "2024-09-05", "3"),
+                ("septembre", 1, 4, "📚 Introduction au carnet de lecture",
                  "Amorce (15 min) : Discussion sur les habitudes de lecture des élèves\nDéveloppement (50 min) :\n• Présentation du carnet de lecture et de ses composantes (15 min)\n• Création et personnalisation du carnet (20 min)\n• Première entrée : \"Mes goûts littéraires\" (15 min)\nIntégration (10 min) : Choix du premier roman + planification lecture",
-                 75, "Lecture", "Cahiers, liste romans disponibles, exemples carnets", "Établir l'outil de suivi des lectures personnelles", "lecture"),
-                (5, "septembre", 1, 5, "🦊 Bilan de la semaine + Introduction aux fables",
+                 75, "Lecture", "Cahiers, liste romans disponibles, exemples carnets", "Établir l'outil de suivi des lectures personnelles", "lecture", "français", "2024-09-06", "4"),
+                ("septembre", 1, 5, "🦊 Bilan de la semaine + Introduction aux fables",
                  "Amorce (20 min) : Retour sur la semaine, partage des impressions\nDéveloppement (45 min) :\n• Lecture expressive de \"Le Corbeau et le Renard\" (10 min)\n• Compréhension globale et première analyse (15 min)\n• Introduction au concept de fable et de morale (20 min)\nIntégration (10 min) : Anticipation de la suite du programme",
-                 75, "Lecture", "Recueil de fables, tableau des caractéristiques", "Clôturer positivement la première semaine", "lecture,oral"),
+                 75, "Lecture", "Recueil de fables, tableau des caractéristiques", "Clôturer positivement la première semaine", "lecture,oral", "français", "2024-09-07", "1"),
             ]
             
             c.executemany('''
-                INSERT INTO lessons (lesson_number, month, week_number, day_number, title, content, duration, competences, materials, objectives, tags)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO lessons (month, week_number, day_number, title, content, duration, materials, objectives, tags, subject, lesson_date, period)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', sample_lessons)
             conn.commit()
         
@@ -458,37 +459,119 @@ def calendar():
     if 'user' not in session:
         return redirect(url_for('login'))
     
-    # Get filter parameter
-    filter_subject = request.args.get('subject', '')
+    from datetime import datetime, timedelta
+    import calendar as cal
+    
+    # Get week parameter or default to current week
+    week_offset = int(request.args.get('week', 0))
     
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     
-    # Get all available subjects for the filter dropdown
-    c.execute("SELECT DISTINCT subject FROM lessons WHERE subject IS NOT NULL ORDER BY subject")
-    available_subjects = [row[0] for row in c.fetchall()]
+    # Create schedule table if it doesn't exist
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS schedule (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            day_of_week TEXT,
+            day_number INTEGER,
+            event_type TEXT,
+            p1_course TEXT,
+            p2_course TEXT,
+            p3_course TEXT,
+            p4_course TEXT,
+            UNIQUE(date)
+        )
+    ''')
     
-    # Build query based on filter
-    if filter_subject and filter_subject != 'all':
-        c.execute("SELECT * FROM lessons WHERE subject=? ORDER BY lesson_number", (filter_subject,))
-    else:
-        c.execute("SELECT * FROM lessons ORDER BY subject, lesson_number")
+    # Get current date and calculate week start
+    today = datetime.now().date()
+    # Find Monday of current week
+    days_since_monday = today.weekday()
+    current_monday = today - timedelta(days=days_since_monday)
+    # Apply week offset
+    target_monday = current_monday + timedelta(weeks=week_offset)
     
-    lessons = c.fetchall()
+    # Generate week dates
+    week_dates = []
+    for i in range(7):  # Monday to Sunday
+        week_dates.append(target_monday + timedelta(days=i))
+    
+    # Get schedule data for the week
+    week_schedule = {}
+    for date in week_dates:
+        date_str = date.strftime('%Y-%m-%d')
+        c.execute("SELECT * FROM schedule WHERE date = ?", (date_str,))
+        day_data = c.fetchone()
+        
+        week_schedule[date_str] = {
+            'date': date,
+            'day_name': date.strftime('%A'),
+            'day_short': date.strftime('%a'),
+            'day_number': date.day,
+            'month_name': date.strftime('%B'),
+            'data': day_data
+        }
+    
     conn.close()
     
-    # Group lessons by month
-    lessons_by_month = {}
-    for lesson in lessons:
-        month = lesson[2]
-        if month not in lessons_by_month:
-            lessons_by_month[month] = []
-        lessons_by_month[month].append(lesson)
-    
     return render_template('calendar.html', 
-                         lessons_by_month=lessons_by_month,
-                         available_subjects=available_subjects,
-                         current_filter=filter_subject)
+                         week_schedule=week_schedule,
+                         week_dates=week_dates,
+                         current_week_offset=week_offset,
+                         current_date=today)
+
+@app.route('/import-calendar')
+def import_calendar():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    import csv
+    import os
+    
+    csv_path = 'Notes/calendrier_cleaned.csv'
+    if not os.path.exists(csv_path):
+        flash("Fichier CSV non trouvé", 'error')
+        return redirect(url_for('calendar'))
+    
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    
+    # Clear existing schedule data
+    c.execute("DELETE FROM schedule")
+    
+    # Import CSV data
+    imported_count = 0
+    try:
+        with open(csv_path, 'r', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                c.execute('''
+                    INSERT OR REPLACE INTO schedule 
+                    (date, day_of_week, day_number, event_type, p1_course, p2_course, p3_course, p4_course)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    row['Date'],
+                    row['Day_of_Week'],
+                    row['Day_Number'] if row['Day_Number'] else None,
+                    row['Event_Type'],
+                    row['P1_Course'] if row['P1_Course'] else None,
+                    row['P2_Course'] if row['P2_Course'] else None,
+                    row['P3_Course'] if row['P3_Course'] else None,
+                    row['P4_Course'] if row['P4_Course'] else None
+                ))
+                imported_count += 1
+        
+        conn.commit()
+        flash(f"Calendrier importé avec succès! {imported_count} entrées ajoutées.", 'success')
+        
+    except Exception as e:
+        conn.rollback()
+        flash(f"Erreur lors de l'importation: {e}", 'error')
+    finally:
+        conn.close()
+    
+    return redirect(url_for('calendar'))
 
 @app.route('/lesson/<int:lesson_id>')
 def lesson_detail(lesson_id):
@@ -662,13 +745,13 @@ def discipline_dashboard(discipline):
     
     # Get recent activity for the discipline
     if discipline == 'mathematiques':
-        c.execute("""SELECT l.title, l.lesson_number, sp.completion_date
+        c.execute("""SELECT l.title, l.id as lesson_number, sp.completion_date
                     FROM student_progress sp
                     JOIN lessons l ON l.id = sp.lesson_id
                     WHERE sp.user_id = ? AND sp.completed = 1 AND l.subject = 'mathématiques'
                     ORDER BY sp.completion_date DESC LIMIT 5""", (user_id,))
     else:
-        c.execute("""SELECT l.title, l.lesson_number, sp.completion_date
+        c.execute("""SELECT l.title, l.id as lesson_number, sp.completion_date
                     FROM student_progress sp
                     JOIN lessons l ON l.id = sp.lesson_id
                     WHERE sp.user_id = ? AND sp.completed = 1
@@ -767,7 +850,6 @@ def lessons_list():
     
     # Get filter parameters
     month_filter = request.args.get('month', '')
-    competence_filter = request.args.get('competence', '')
     search_query = request.args.get('search', '')
     subject_filter = request.args.get('subject', session.get('discipline', 'français'))
     
@@ -782,25 +864,19 @@ def lessons_list():
         query += " AND month = ?"
         params.append(month_filter)
     
-    if competence_filter:
-        query += " AND competences LIKE ?"
-        params.append(f"%{competence_filter}%")
     
     if search_query:
         query += " AND (title LIKE ? OR content LIKE ?)"
         params.extend([f"%{search_query}%", f"%{search_query}%"])
     
-    query += " ORDER BY subject, lesson_number"
+    query += " ORDER BY subject, title"
     
     c.execute(query, params)
     lessons = c.fetchall()
     
-    # Get unique months and competences for filters - filtered by subject
-    c.execute("SELECT DISTINCT month FROM lessons WHERE subject = ? ORDER BY lesson_number", (subject_filter,))
+    # Get unique months for filters - filtered by subject
+    c.execute("SELECT DISTINCT month FROM lessons WHERE subject = ? ORDER BY id", (subject_filter,))
     months = [row[0] for row in c.fetchall()]
-    
-    # Get competences from the competences table for the selected subject
-    competences = get_competences_by_discipline(subject_filter)
     
     # Get available subjects for filter dropdown
     c.execute("SELECT DISTINCT subject FROM lessons WHERE subject IS NOT NULL ORDER BY subject")
@@ -810,12 +886,10 @@ def lessons_list():
     
     return render_template('lessons_list.html', 
                          lessons=lessons, 
-                         months=months, 
-                         competences=competences,
+                         months=months,
                          available_subjects=available_subjects,
                          current_filters={
                              'month': month_filter,
-                             'competence': competence_filter,
                              'search': search_query,
                              'subject': subject_filter
                          })
@@ -829,39 +903,40 @@ def create_lesson():
     if request.method == 'POST':
         subject = request.form.get('subject', 'français')
         
-        # Get next lesson number for this specific subject
         conn = sqlite3.connect(DB_FILE)
         c = conn.cursor()
-        c.execute("SELECT MAX(lesson_number) FROM lessons WHERE subject=?", (subject,))
-        result = c.fetchone()
-        next_lesson_number = (result[0] or 0) + 1
         
         lesson_data = {
-            'lesson_number': next_lesson_number,
             'month': request.form['month'],
             'week_number': request.form.get('week_number', type=int),
             'day_number': request.form.get('day_number', type=int),
             'title': request.form['title'],
             'content': request.form['content'],
             'duration': request.form.get('duration', 75, type=int),
-            'competences': request.form.get('competences', ''),
             'materials': request.form.get('materials', ''),
             'objectives': request.form.get('objectives', ''),
             'tags': request.form.get('tags', ''),
-            'subject': subject
+            'subject': subject,
+            'lesson_date': request.form.get('lesson_date', ''),
+            'period': request.form.get('period', '')
         }
         
         try:
             c.execute('''
                 INSERT INTO lessons 
-                (lesson_number, month, week_number, day_number, title, content, 
-                 duration, competences, materials, objectives, tags, subject)
+                (month, week_number, day_number, title, content, 
+                 duration, materials, objectives, tags, subject, lesson_date, period)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', tuple(lesson_data.values()))
             
             conn.commit()
             flash(f"Leçon '{lesson_data['title']}' créée avec succès!", 'success')
-            return redirect(url_for('lessons_list'))
+            
+            # If came from calendar, redirect back to calendar
+            if request.form.get('lesson_date') and request.args.get('date'):
+                return redirect(url_for('calendar'))
+            else:
+                return redirect(url_for('lessons_list'))
             
         except sqlite3.IntegrityError:
             flash("Erreur: Une leçon avec ce numéro existe déjà", 'error')
@@ -884,7 +959,35 @@ def create_lesson():
     
     conn.close()
     
-    return render_template('create_lesson.html', available_subjects=sorted(available_subjects))
+    # Handle URL parameters from calendar clicks
+    calendar_data = {}
+    if request.args.get('date'):
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(request.args.get('date'), '%Y-%m-%d').date()
+            
+            # Map French month names
+            month_names = {
+                1: 'janvier', 2: 'février', 3: 'mars', 4: 'avril', 5: 'mai', 6: 'juin',
+                7: 'juillet', 8: 'août', 9: 'septembre', 10: 'octobre', 11: 'novembre', 12: 'décembre'
+            }
+            
+            calendar_data = {
+                'date': request.args.get('date'),
+                'month': month_names.get(date_obj.month, ''),
+                'week_number': (date_obj.day - 1) // 7 + 1,
+                'day_number': date_obj.weekday() + 1,
+                'period': request.args.get('period', ''),
+                'course': request.args.get('course', ''),
+                'suggested_title': f"Leçon de {request.args.get('course', '')} - Période {request.args.get('period', '')}"
+            }
+        except Exception:
+            # If parsing fails, ignore calendar data
+            pass
+    
+    return render_template('create_lesson.html', 
+                         available_subjects=sorted(available_subjects),
+                         calendar_data=calendar_data)
 
 @app.route('/lesson/<int:lesson_id>/edit', methods=['GET', 'POST'])
 def edit_lesson(lesson_id):
@@ -896,27 +999,20 @@ def edit_lesson(lesson_id):
     c = conn.cursor()
     
     if request.method == 'POST':
-        # Get the current lesson to preserve lesson_number
-        c.execute("SELECT lesson_number FROM lessons WHERE id=?", (lesson_id,))
-        current_lesson = c.fetchone()
-        current_lesson_number = current_lesson[0] if current_lesson else 1
-        
         try:
             c.execute('''
                 UPDATE lessons SET 
-                lesson_number=?, month=?, week_number=?, day_number=?, title=?, 
-                content=?, duration=?, competences=?, materials=?, objectives=?, 
+                month=?, week_number=?, day_number=?, title=?, 
+                content=?, duration=?, materials=?, objectives=?, 
                 subject=?, evaluation=?, homework=?, adaptations=?, notes=?, updated_at=CURRENT_TIMESTAMP
                 WHERE id=?
             ''', (
-                current_lesson_number,
                 request.form['month'],
                 request.form.get('week', type=int),
                 request.form.get('day', type=int),
                 request.form['title'],
                 request.form['content'],
                 request.form.get('duration', 75, type=int),
-                request.form.get('competence', ''),
                 request.form.get('materials', ''),
                 request.form.get('objectives', ''),
                 request.form.get('subject', ''),
@@ -948,17 +1044,45 @@ def edit_lesson(lesson_id):
         flash("Leçon non trouvée", 'error')
         return redirect(url_for('lessons_list'))
     
-    # Get competences for the lesson's discipline
-    lesson_discipline = lesson[14]  # subject column
-    competences = get_competences_by_discipline(lesson_discipline) if lesson_discipline else []
-    
-    return render_template('edit_lesson.html', lesson=lesson, available_subjects=available_subjects, competences=competences)
+    return render_template('edit_lesson.html', lesson=lesson, available_subjects=available_subjects)
 
-@app.route('/api/competences/<discipline>')
-def get_competences_api(discipline):
-    """API endpoint to get competences for a specific discipline"""
-    competences = get_competences_by_discipline(discipline)
-    return {'competences': competences}
+
+@app.route('/api/lesson-for-slot')
+def lesson_for_slot():
+    """API endpoint to find lesson for a specific calendar slot"""
+    if 'user' not in session:
+        return {'error': 'Not authenticated'}, 401
+    
+    date_str = request.args.get('date')
+    period = request.args.get('period')
+    course = request.args.get('course')
+    
+    if not all([date_str, period, course]):
+        return {'error': 'Missing parameters'}, 400
+    
+    try:
+        # Search for existing lesson by date
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+        
+        # Look for lesson matching exact date and subject/course
+        c.execute("""
+            SELECT id FROM lessons 
+            WHERE lesson_date = ? 
+            AND (subject LIKE ? OR title LIKE ?)
+            LIMIT 1
+        """, (date_str, f'%{course.lower()}%', f'%{course}%'))
+        
+        result = c.fetchone()
+        conn.close()
+        
+        if result:
+            return {'lesson_id': result[0]}
+        else:
+            return {'lesson_id': None}
+            
+    except Exception as e:
+        return {'error': str(e)}, 500
 
 @app.route('/lesson/<int:lesson_id>/duplicate', methods=['POST'])
 def duplicate_lesson(lesson_id):
@@ -977,32 +1101,28 @@ def duplicate_lesson(lesson_id):
         flash("Leçon non trouvée", 'error')
         return redirect(url_for('lessons_list'))
     
-    # Get next lesson number for the original lesson's subject
-    subject = original[12] if len(original) > 12 else 'français'  # Get subject from original lesson
-    c.execute("SELECT MAX(lesson_number) FROM lessons WHERE subject = ?", (subject,))
-    result = c.fetchone()
-    next_lesson_number = (result[0] or 0) + 1
+    subject = original[11] if len(original) > 11 else 'français'  # Get subject from original lesson
     
     try:
-        # Create duplicate with new lesson number
+        # Create duplicate
         c.execute('''
             INSERT INTO lessons 
-            (lesson_number, month, week_number, day_number, title, content, 
-             duration, competences, materials, objectives, tags, subject)
+            (month, week_number, day_number, title, content, 
+             duration, materials, objectives, tags, subject, lesson_date, period)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            next_lesson_number,
-            original[2],  # month
-            original[3],  # week_number
-            original[4],  # day_number
-            f"[COPIE] {original[5]}",  # title
-            original[6],  # content
-            original[7],  # duration
-            original[8],  # competences
-            original[9],  # materials
-            original[10], # objectives
-            original[11], # tags
-            subject  # subject
+            original[1],  # month
+            original[2],  # week_number
+            original[3],  # day_number
+            f"[COPIE] {original[4]}",  # title
+            original[5],  # content
+            original[6],  # duration
+            original[8],  # materials
+            original[9], # objectives
+            original[10], # tags
+            subject,  # subject
+            original[12] if len(original) > 12 else '',  # lesson_date
+            original[13] if len(original) > 13 else ''   # period
         ))
         
         conn.commit()
@@ -1080,18 +1200,16 @@ def import_lessons():
                     try:
                         c.execute('''
                             INSERT INTO lessons 
-                            (lesson_number, month, week_number, day_number, title, content, 
-                             duration, competences, materials, objectives, tags, subject)
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            (month, week_number, day_number, title, content, 
+                             duration, materials, objectives, tags, subject)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         ''', (
-                            int(row.get('lesson_number', 0)),
                             row.get('month', ''),
                             int(row.get('week_number', 1)),
                             int(row.get('day_number', 1)),
                             row.get('title', ''),
                             row.get('content', ''),
                             int(row.get('duration', 75)),
-                            row.get('competences', ''),
                             row.get('materials', ''),
                             row.get('objectives', ''),
                             row.get('tags', ''),
@@ -1124,7 +1242,7 @@ def export_lessons():
     
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
-    c.execute("SELECT * FROM lessons ORDER BY lesson_number")
+    c.execute("SELECT * FROM lessons ORDER BY id")
     lessons = c.fetchall()
     conn.close()
     
@@ -1133,8 +1251,8 @@ def export_lessons():
     
     # Write header
     writer.writerow([
-        'id', 'lesson_number', 'month', 'week_number', 'day_number', 
-        'title', 'content', 'duration', 'competences', 'materials', 
+        'id', 'month', 'week_number', 'day_number', 
+        'title', 'content', 'duration', 'materials', 
         'objectives', 'tags', 'created_at', 'updated_at'
     ])
     
@@ -1181,13 +1299,6 @@ def bulk_actions():
                          [new_month] + lesson_ids)
                 flash(f"{len(lesson_ids)} leçons mises à jour (mois: {new_month})", 'success')
             
-        elif action == 'update_competence':
-            new_competence = request.form.get('new_competence')
-            if new_competence:
-                placeholders = ','.join(['?' for _ in lesson_ids])
-                c.execute(f"UPDATE lessons SET competences=? WHERE id IN ({placeholders})", 
-                         [new_competence] + lesson_ids)
-                flash(f"{len(lesson_ids)} leçons mises à jour (compétence: {new_competence})", 'success')
         
         conn.commit()
         
@@ -1221,10 +1332,10 @@ def math_schedule_overview():
         
         # Get competency distribution
         cursor.execute('''
-            SELECT competences, COUNT(*) as count
+            SELECT subject, COUNT(*) as count
             FROM lessons
-            WHERE competences IS NOT NULL AND subject = 'mathématiques'
-            GROUP BY competences
+            WHERE subject = 'mathématiques'
+            GROUP BY subject
             ORDER BY count DESC
         ''')
         competencies = cursor.fetchall()
@@ -1261,10 +1372,10 @@ def competencies_overview():
         
         # Get competency distribution by cycle
         cursor.execute('''
-            SELECT week_number, competences, COUNT(*) as count
+            SELECT week_number, COUNT(*) as count
             FROM lessons
-            WHERE competences IS NOT NULL AND subject = 'mathématiques'
-            GROUP BY week_number, competences
+            WHERE subject = 'mathématiques'
+            GROUP BY week_number
             ORDER BY week_number
         ''')
         
@@ -1273,12 +1384,9 @@ def competencies_overview():
         # Get overall competency statistics
         cursor.execute('''
             SELECT 
-                SUM(CASE WHEN competences LIKE '%C1%' THEN 1 ELSE 0 END) as c1_count,
-                SUM(CASE WHEN competences LIKE '%C2%' THEN 1 ELSE 0 END) as c2_count,
-                SUM(CASE WHEN competences LIKE '%C3%' THEN 1 ELSE 0 END) as c3_count,
                 COUNT(*) as total
             FROM lessons
-            WHERE competences IS NOT NULL AND subject = 'mathématiques'
+            WHERE subject = 'mathématiques'
         ''')
         
         overall_stats = cursor.fetchone()
@@ -1358,7 +1466,7 @@ def progress_dashboard():
         
         # Get recent activity
         cursor.execute('''
-            SELECT l.title, l.lesson_number, sp.completion_date
+            SELECT l.title, l.id as lesson_number, sp.completion_date
             FROM student_progress sp
             JOIN lessons l ON l.id = sp.lesson_id
             WHERE sp.user_id = ? AND sp.completed = 1 AND l.subject = 'mathématiques'
@@ -1431,7 +1539,7 @@ def create_theory():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     discipline = session.get('discipline', 'français')
-    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY lesson_number', (discipline,))
+    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY id', (discipline,))
     lessons = c.fetchall()
     conn.close()
     
@@ -1493,7 +1601,7 @@ def create_exercise():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     discipline = session.get('discipline', 'français')
-    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY lesson_number', (discipline,))
+    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY id', (discipline,))
     lessons = c.fetchall()
     c.execute('SELECT id, title FROM theory WHERE discipline = ? ORDER BY title', (discipline,))
     theory_items = c.fetchall()
@@ -1557,7 +1665,7 @@ def create_portfolio_item():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     discipline = session.get('discipline', 'français')
-    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY lesson_number', (discipline,))
+    c.execute('SELECT id, title FROM lessons WHERE subject = ? ORDER BY id', (discipline,))
     lessons = c.fetchall()
     conn.close()
     

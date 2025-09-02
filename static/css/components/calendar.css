@@ -1,5 +1,258 @@
 /* static/css/components/calendar.css - Calendar Specific Styles */
 
+/* Weekly Calendar Components */
+.week-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+.week-info {
+    flex: 1;
+}
+
+.week-title {
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-sm);
+    color: var(--primary-color);
+    font-weight: var(--font-weight-bold);
+}
+
+.current-week {
+    font-weight: var(--font-weight-semibold);
+    color: var(--primary-color);
+    font-size: var(--font-size-lg);
+    margin: 0;
+}
+
+.week-navigation {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+}
+
+.nav-btn {
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-300);
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--gray-600);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-normal);
+}
+
+.nav-btn:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.nav-btn--current {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary-color);
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.day-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-normal);
+    opacity: 0;
+    transform: translateY(20px);
+    box-shadow: var(--shadow-sm);
+}
+
+.day-card--today {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+    background: var(--primary-light);
+}
+
+.day-header {
+    text-align: center;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.day-name {
+    font-weight: var(--font-weight-bold);
+    color: var(--gray-700);
+    font-size: var(--font-size-md);
+}
+
+.day-date {
+    font-size: var(--font-size-sm);
+    color: var(--gray-500);
+    margin-top: var(--space-xs);
+}
+
+.day-content {
+    flex: 1;
+}
+
+.event-badge {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-sm);
+}
+
+.event-badge--holiday {
+    background: var(--success-light);
+    color: var(--success-dark);
+}
+
+.event-badge--pedagogique {
+    background: var(--warning-light);
+    color: var(--warning-color);
+}
+
+.event-badge--class {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+}
+
+.event-badge--weekend {
+    background: var(--gray-200);
+    color: var(--gray-600);
+}
+
+.course-slot {
+    margin-bottom: var(--space-sm);
+    padding: var(--space-sm);
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--gray-300);
+    transition: all var(--transition-normal);
+}
+
+.course-slot:hover {
+    transform: translateX(2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.clickable-course {
+    cursor: pointer;
+    position: relative;
+}
+
+.clickable-course:hover {
+    background: var(--primary-light);
+    transform: translateX(2px);
+    box-shadow: var(--shadow-md);
+}
+
+.clickable-course:hover .course-name {
+    color: var(--primary-dark);
+    font-weight: var(--font-weight-semibold);
+}
+
+.clickable-course::after {
+    content: "📝";
+    position: absolute;
+    right: var(--space-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity var(--transition-normal);
+    font-size: var(--font-size-xs);
+}
+
+.clickable-course:hover::after {
+    opacity: 1;
+}
+
+.course-slot--p1 { border-left-color: #e74c3c; }
+.course-slot--p2 { border-left-color: #3498db; }
+.course-slot--p3 { border-left-color: #f39c12; }
+.course-slot--p4 { border-left-color: #27ae60; }
+
+.course-period {
+    font-size: var(--font-size-xs);
+    color: var(--gray-500);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.course-name {
+    font-size: var(--font-size-sm);
+    color: var(--gray-700);
+    line-height: 1.3;
+    font-weight: var(--font-weight-medium);
+}
+
+.no-classes {
+    color: var(--gray-500);
+    font-style: italic;
+    text-align: center;
+    padding: var(--space-lg) 0;
+    font-size: var(--font-size-sm);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .week-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .week-container {
+        padding: var(--space-md);
+    }
+    
+    .week-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .week-header {
+        flex-direction: column;
+        gap: var(--space-md);
+        text-align: center;
+    }
+    
+    .week-navigation {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .week-title {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+/* Legacy Calendar Components (for backwards compatibility) */
 .calendar-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -35,26 +288,6 @@
     flex-wrap: wrap;
     gap: var(--space-sm);
     border-bottom: 2px solid var(--gray-200);
-}
-
-.nav-btn {
-    padding: var(--space-sm) var(--space-lg);
-    border: none;
-    border-radius: 25px;
-    background: var(--white);
-    color: var(--primary-color);
-    font-weight: var(--font-weight-bold);
-    cursor: pointer;
-    transition: all var(--transition-normal);
-    box-shadow: var(--shadow-sm);
-}
-
-.nav-btn:hover,
-.nav-btn.active {
-    background: var(--primary-color);
-    color: var(--white);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
 }
 
 .calendar-content {
@@ -235,10 +468,10 @@
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: var(--gradient-primary); /* Default fallback */
+    background: var(--gradient-primary);
 }
 
-/* Discipline-specific calendar styling using global variables */
+/* Discipline-specific calendar styling */
 .lesson-card.discipline-mathematiques {
     border-left-color: var(--math-primary);
 }

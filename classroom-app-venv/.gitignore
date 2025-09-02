@@ -1,15 +1,2 @@
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.env
-.venv/
-venv/
-instance/
-.pytest_cache/
-.coverage
-htmlcov/
-dist/
-build/
-*.egg-info/
-.DS_Store
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*
